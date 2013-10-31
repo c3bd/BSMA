@@ -1,0 +1,12 @@
+=========================================================================
+NOTICE file for use with, and corresponding to Section 4 of,            
+the Apache License, Version 2.0,                                  
+in this case for the BSMA project.                     
+=========================================================================
+
+   This product includes software developed by
+   Institute of Massive Computing, East China Normal University.
+   Copyright (c) 2012 Institute of Massive Computing, East China Normal University.
+   This product is based on YCSB developed by
+   Yahoo! Inc. (www.yahoo.com)
+   Copyright (c) 2010 Yahoo! Inc.

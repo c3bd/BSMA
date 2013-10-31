@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+   <project name="bsma" default="compile" basedir=".">
+   
+    <property name="src.dir"     value="src"/>
+    <property name="lib.dir"     value="lib"/>
+    <property name="doc.dir"     value="doc"/>
+
+    <property name="build.dir"   value="build"/>
+    <property name="classes.dir" value="${build.dir}/classes"/>
+    <property name="jar.dir"     value="${build.dir}/jar"/>
+
+    <path id="build.classpath">
+        <fileset dir="${lib.dir}">
+          <include name="**/*.jar" />
+        </fileset>
+    </path>
+
+    
+   	<target name="dbcompile-idb" depends="compile">
+		<property name="db.dir" value="db/idb"/>
+		<antcall target="dbcompile"/>
+	</target>   	
+	
+ 	<target name="compile">
+        <mkdir dir="${classes.dir}"/>
+        <javac srcdir="${src.dir}" destdir="${classes.dir}" classpathref="build.classpath" deprecation="on">
+          <compilerarg value="-Xlint:unchecked"/>
+        </javac>
+        <antcall target="makejar"/>
+    </target>
+
+	<target name="dbcompile">
+	    <path id="dbclasspath">
+	        <fileset dir="${db.dir}/lib" includes="**/*.jar"/>
+	        <fileset file="build/bsma.jar"/>
+	    </path>
+		
+    	<mkdir dir="${classes.dir}"/>
+        <javac srcdir="${db.dir}/src" destdir="${classes.dir}" classpathref="dbclasspath" deprecation="on">
+          <compilerarg value="-Xlint:unchecked"/>
+        </javac>
+        <antcall target="makejar"/>
+    </target>
+
+   	<target name ="makejar" description="Create a jar for the BSMA project">
+		<jar jarfile="build/bsma.jar" includes="**/*.class" basedir="${classes.dir}"/>
+	</target>
+   	
+    <target name="clean">
+       <delete includeemptydirs="true">
+          <fileset dir="build" includes="**/*"/>
+       </delete>
+    </target>
+
+   <target name="doc">
+      <javadoc destdir="${doc.dir}/javadoc" packagenames="edu.ecnu.imc.bsma,edu.ecnu.imc.bsma.workloads,edu.ecnu.imc.bsma.db,edu.ecnu.imc.bsma.generator,edu.ecnu.imc.bsma.measurements"> 
+         <fileset dir="." defaultexcludes="yes">
+           <include name="src/**"/>
+           <include name="db/**/src/**"/>
+         </fileset>
+      </javadoc>
+   </target>
+
+</project>
+
