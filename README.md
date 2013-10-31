@@ -12,4 +12,6 @@ Benchmark for Social Media Analysis (BSMA)
   Social Media Data Generator
   ----------
   
-  Due to various reasons such as privacy, the volume of data and difficulties of crawling those data, sheer volume of social media data in real world is often infeasible to researchers. Hence, we have developed a data generator that generates data conforming to properties existed in a real social media data, which we have collected from Sina Weibo. A local generator and a distributed data generator is currently provided under the fold BSMA_GEN. TimeLineGenerator is a single node generator. In order to generate massive dataset more efficiently, we also develop a distributed generator, that is DistributedGenerator under BSMA_GEN, utilizing the power of commodity machines to conduct some tasks in parallel.  
+  Due to various reasons such as privacy, bandwith, API barrier imposed by social network service providers,et al, accessing sheer volume of social media data in real world is often infeasible to researchers. Hence, we develope a data generator that generates data conforming to properties existed in a real social media data, which we have collected from Sina Weibo. A local generator and a distributed data generator is currently provided under the fold BSMA_GEN.
+  
+  TimeLineGenerator is a single node generator. In order to generate massive dataset more efficiently, we also develop a distributed generator, that is DistributedGenerator under BSMA_GEN, utilizing the power of commodity machines to conduct some tasks in parallel.  
