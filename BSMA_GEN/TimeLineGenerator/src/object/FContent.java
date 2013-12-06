@@ -2,7 +2,6 @@ package object;
 
 import java.text.ParseException;
 
-import genertor.Util;
 
 
 public class FContent implements Comparable {

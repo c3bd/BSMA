@@ -1,8 +1,9 @@
 package object;
 
+import generator.Util;
+
 import java.text.ParseException;
 
-import genertor.Util;
 
 
 public class Tweet{

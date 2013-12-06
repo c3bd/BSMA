@@ -1,3 +1,7 @@
+/*
+ * CopyingModelGenerator which generate  base on
+ */
+
 package NetworkGenerator;
 
 import java.io.BufferedReader;
@@ -24,7 +28,7 @@ public class CopyingModelGenerator{
 		this.nodeNum = nodeNum;
 		this.beta = beta;
 		try{
-        	BufferedReader infile = new BufferedReader(new FileReader("/home/yuchengcheng/workspace/TimeLineGenerator/data/outDegCPD"));
+        	BufferedReader infile = new BufferedReader(new FileReader("././data/outDegCPD"));
         	String line = null; 
         	while((line = infile.readLine())!=null ) 
             {
@@ -102,8 +106,6 @@ public class CopyingModelGenerator{
 		
 	}
 	
-	
-	
 	public void addEdge(int id1,int id2){
 			if(network.containsKey(id1)){
 				network.get(id1).add(id2);
@@ -139,10 +141,14 @@ public class CopyingModelGenerator{
 	}
 	
 	 public static void main(String[] args) {
-		 double rIN = 1.4667;
-		 double p = (rIN-1)/rIN;
-		 int num = 100;
-		 CopyingModelGenerator cmg = new CopyingModelGenerator(num,p);
-		 cmg.generator("/home/yuchengcheng/workspace/TimeLineGenerator/data/network"+num);
+		 double rIN = Double.valueOf(args[0]);
+		 int num = Integer.valueOf(args[1]);
+		// String inputPath = "E://workspace/TimeLineGenerator/data/";
+		 String outputPath = args[2];
+		 
+
+		 double beta = (rIN-1)/rIN;
+		 CopyingModelGenerator cmg = new CopyingModelGenerator(num,beta);
+		 cmg.generator(outputPath+"network"+num);
 	 }
 }

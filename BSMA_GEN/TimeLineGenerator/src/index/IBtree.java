@@ -8,9 +8,10 @@ import object.Tweet;
 
 
 public interface IBtree {
-	public void put(Long key, TweetInfo tweet) throws Exception;
-	public void remove(Long key, TweetInfo tweet) throws Exception;
-	public Tweet getMid(Long key, Tweet m);
+	
+	public void put(Tweet t) ;
+	public void remove(Tweet t);
+	public Tweet getTweet(Integer uid, int skipNum);
 	public void close() throws IOException;
 	public void flush() throws IOException;
 }

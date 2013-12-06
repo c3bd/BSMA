@@ -1,27 +1,30 @@
 package index;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.List;
 
 import com.sleepycat.bind.tuple.TupleBinding;
-import com.sleepycat.je.Cursor;
 import com.sleepycat.je.Database;
 import com.sleepycat.je.DatabaseConfig;
-import com.sleepycat.je.DatabaseEntry;
 import com.sleepycat.je.DatabaseException;
 import com.sleepycat.je.Environment;
 import com.sleepycat.je.EnvironmentConfig;
-import com.sleepycat.je.LockMode;
-import com.sleepycat.je.OperationStatus;
 import com.sleepycat.je.SecondaryConfig;
 import com.sleepycat.je.SecondaryDatabase;
 public class DBEnv{
 	private Environment myEnv;
 	private Database tweetDB;
+//	private SecondaryDatabase tweetSecDB;
 	private TupleBinding tweetBinding ;
 	private TupleBinding longBinding ;
+	public TupleBinding getIntegerBinding() {
+		return IntegerBinding;
+	}
+
+	public void setIntegerBinding(TupleBinding integerBinding) {
+		IntegerBinding = integerBinding;
+	}
+
+
+	private TupleBinding IntegerBinding ;
 	private EnvironmentConfig myEnvConfig = new EnvironmentConfig();
 	public DBEnv() {
 	  
@@ -36,8 +39,9 @@ public class DBEnv{
 	   
 	   myEnv = new Environment(envHome,myEnvConfig);
 	   openTweetDB(readOnly,duplicatesAllowed);
-	   tweetBinding= new TweetInfoBinding();
+	   tweetBinding= new TweetBinding();
 	   longBinding = new LongBinding();
+	   IntegerBinding = new IntegerBinding();
 	}
 	
 	public TupleBinding getLongBinding() {
@@ -53,16 +57,40 @@ public class DBEnv{
 		myDbConfig.setReadOnly(readOnly);
 		myDbConfig.setAllowCreate(!readOnly);
 		myDbConfig.setSortedDuplicates(duplicatesAllowed);
-		myDbConfig.setDuplicateComparator(TweetInfoComparator.class);
+		//myDbConfig.setDuplicateComparator(TweetComparator.class);
 		myDbConfig.setTransactional(false);
 		
+		SecondaryConfig mySecondaryconfig = new SecondaryConfig();
+		mySecondaryconfig.setReadOnly(readOnly);
+		mySecondaryconfig.setAllowCreate(!readOnly);
+		mySecondaryconfig.setSortedDuplicates(duplicatesAllowed);
+		mySecondaryconfig.setTransactional(false);
 				
 		try {
 			 tweetDB = myEnv.openDatabase(null, "tweetDB", myDbConfig);
+//			 TimeKeyCreator keyCreator = new TimeKeyCreator();
+//			 mySecondaryconfig.setKeyCreator(keyCreator);
+//			 tweetSecDB = myEnv.openSecondaryDatabase(null, "tweetSecDB", tweetDB, mySecondaryconfig);
 		} catch (DatabaseException e) {
 		    e.printStackTrace();
 		}
 	}
+
+//	public SecondaryDatabase getTweetSecDB() {
+//		return tweetSecDB;
+//	}
+//
+//	public void setTweetSecDB(SecondaryDatabase tweetSecDB) {
+//		this.tweetSecDB = tweetSecDB;
+//	}
+//
+//	public TupleBinding getIntegerBinding() {
+//		return IntegerBinding;
+//	}
+//
+//	public void setIntegerBinding(TupleBinding integerBinding) {
+//		IntegerBinding = integerBinding;
+//	}
 
 	public void flush() {
 		tweetDB.sync();
@@ -109,9 +137,8 @@ public class DBEnv{
 	public void close() {
 	   if(myEnv != null){
 		   try{
-			   if(tweetDB!= null){
-				   tweetDB.close();
-			   }
+			  // tweetSecDB.close();
+			   tweetDB.close();
 			   myEnv.cleanLog();
 			   myEnv.close();
 		   }catch(DatabaseException dbe){
