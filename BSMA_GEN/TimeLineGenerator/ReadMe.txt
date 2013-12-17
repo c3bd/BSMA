@@ -19,7 +19,7 @@ Parameters:
 File Parameters:
 	hour: the hour justment factors
 	day: the day justment factors
-	network_{userNum}: the followship network
+	network{userNum}: the followship network
 	retweetIntervalCPD_hour: the cumulative probability distribution of retweet interval 
 	userProportyCPD: the cumulative join probability distribution of user post rate and retweet rate
 
