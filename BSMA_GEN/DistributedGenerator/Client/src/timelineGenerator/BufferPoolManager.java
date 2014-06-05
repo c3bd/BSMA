@@ -1,10 +1,8 @@
 package timelineGenerator;
 
 import java.text.ParseException;
-import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.concurrent.ConcurrentHashMap;
 
 import object.FContent;
 import object.Tweet;

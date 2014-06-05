@@ -10,15 +10,17 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.Map.Entry;
 
-
-import object.Tweet;
 import object.ComparatorByTimeReverseOrder;
+import object.FContent;
+import object.SubFollowInfo;
+import object.Tweet;
+import object.UserInfo;
 
 
 public class Util {
@@ -26,20 +28,17 @@ public class Util {
 		Tweet result =null;
 		TreeMap<Integer,List<Tweet>> tms = new TreeMap<Integer,List<Tweet>>();
 		Map<Integer,Integer> tms_iden =new  HashMap<Integer,Integer>();
-		int tms_sum=0;
-		int count=0;
-		
-		TreeMap<Integer,List<Tweet>> itms = new TreeMap<Integer,List<Tweet>>();
-		Map<Integer,Integer> itms_iden =new  HashMap<Integer,Integer>();
-		int itms_sum=0;
+		int tms_sum = 0;
+		int count = 0;
 		int icount=0;
 		
-		Integer internal = Parameter.CPD_internal.ceilingEntry(new Random().nextDouble()).getValue();
-		Set<Integer> friends = new HashSet<Integer>(Parameter.followList.get(m.getUid()));
+		Integer internal = Parameter.CPD_internal.ceilingEntry(Math.random()).getValue();
+		SubFollowInfo uInfo = Parameter.subFollowInfo.get(m.getUid());
+		Set<Integer> friends = new HashSet<Integer>(uInfo.getFollowlist());
 		friends.retainAll(Parameter.pool.getCandidatePool().keySet());
 		TreeSet<Tweet> followings = new TreeSet(new ComparatorByTimeReverseOrder());
 		
-		int size = Parameter.userFeedSize.get(m.getUid());
+		int size = uInfo.getFeedSize();
 		
 		for(Integer uid:friends){
 			Entry entry =Parameter.pool.getCandidatePool().get(uid).lowerEntry(m.getTime());
@@ -65,37 +64,32 @@ public class Util {
 					if(icount> 0 && hours > internal){
 						break;
 					}
+					if(hours == internal){
+						if(icount == 0){
+							tms.clear();
+							tms_iden.clear();
+							tms_sum = 0;
+						}
+						icount++;
+					}
+					
 					Integer rtCount = 1;
 					if(Parameter.tweetRtCount.containsKey(im.getMid())){
 						rtCount = Parameter.tweetRtCount.get(im.getMid());
 					}
-					if(itms.isEmpty()){
-						if(tms_iden.containsKey(rtCount)){
-							Integer key = tms_iden.get(rtCount);
-							tms.get(key).add(im);
-						}else{
-							tms_sum+=rtCount;
-							tms_iden.put(rtCount, tms_sum);
-							List<Tweet> lts = new ArrayList<Tweet>();
-							lts.add(im);
-							tms.put(tms_sum, lts);
-						}
+					
+					if(tms_iden.containsKey(rtCount)){
+						Integer key = tms_iden.get(rtCount);
+						tms.get(key).add(im);
+					}else{
+						tms_sum += rtCount;
+						tms_iden.put(rtCount, tms_sum);
+						List<Tweet> lts = new ArrayList<Tweet>();
+						lts.add(im);
+						tms.put(tms_sum, lts);
 					}
 															
-					if(hours == internal){
-						icount++;
-						if(itms_iden.containsKey(rtCount)){
-							Integer key = itms_iden.get(rtCount);
-							itms.get(key).add(im);
-						}else{
-							itms_sum+=rtCount;
-							itms_iden.put(rtCount, itms_sum);
-							List<Tweet> lts = new ArrayList<Tweet>();
-							lts.add(im);
-							itms.put(itms_sum, lts);
-						}
-
-					}	
+						
 				}
 			}else{
 				break;
@@ -110,16 +104,10 @@ public class Util {
 		}
 		
 		
-		if(!itms.isEmpty()){
-			int index = new Random().nextInt(itms_sum);
-			List<Tweet> lts = itms.ceilingEntry(index).getValue();
-			result = lts.get(new Random().nextInt(lts.size()));
-			
-		}else if(!tms.isEmpty()){
+		if(!tms.isEmpty()){
 			int index = new Random().nextInt(tms_sum);
 			List<Tweet> lts = tms.ceilingEntry(index).getValue();
 			result = lts.get(new Random().nextInt(lts.size()));
-			
 		}
 		
 		if(result!=null){
@@ -129,23 +117,29 @@ public class Util {
 			}else{
 				Parameter.tweetRtCount.put(result.getMid(),2);
 			}
-			Parameter.rtfile.write(m.getMid()+","+result.getMid());
-			Parameter.rtfile.newLine();
-			Parameter.rtfile.flush();
 		}
 
 		return result;
 
 	}
 	
+	public static void initPool(Integer uid) throws ParseException{
+		Long time = Util.nextTime(Parameter.startTime,uid);
+		if(time!=null){
+			Parameter.pool.getFollowingPool().add(new FContent(time,uid));
+		}
+	}
+	
+	
 	public static SimpleDateFormat fmt =new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	
 	public static Long nextTime(long startTime,Integer uid){
-		String[] items =  Parameter.CDF_postRate.ceilingEntry(Parameter.userProporty.get(uid)).getValue().split("\t");
+		UserInfo uInfo = Parameter.userInfo.get(uid);
+		String[] items =  Parameter.CDF_postRate.ceilingEntry(uInfo.getProportyIden()).getValue().split("\t");
 		double pRate = Double.valueOf(items[0]);
 		long time = startTime;
 		while(time < Parameter.endTime){
-			double r = Parameter.random_userPost.get(uid).nextDouble();
+			double r = uInfo.getRandomPost().nextDouble();
 			time += (-Math.log(r)/(Parameter.maxFactor*pRate));
 			if(time <= Parameter.endTime){
 				if(Math.random() < (getFactor(time)/Parameter.maxFactor)){
@@ -167,9 +161,10 @@ public class Util {
 	}
 	
 	public static boolean isRetweet(Tweet m){
-		String[] items =  Parameter.CDF_postRate.ceilingEntry(Parameter.userProporty.get(m.getUid())).getValue().split("\t");
+		UserInfo uInfo = Parameter.userInfo.get(m.getUid());
+		String[] items =  Parameter.CDF_postRate.ceilingEntry(uInfo.getProportyIden()).getValue().split("\t");
 		double rRate = Double.valueOf(items[1]);
-		if(Parameter.random_userRetweet.get(m.getUid()).nextDouble() <= rRate){
+		if(uInfo.getRandomRetweet().nextDouble() <= rRate){
 			return true;
 		}else{
 			return false;

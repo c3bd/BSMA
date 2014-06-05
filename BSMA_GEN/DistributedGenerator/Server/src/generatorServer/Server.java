@@ -5,17 +5,20 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.CountDownLatch;
 
-import timelineGenerator.ParameterGen;
+import timelineGenerator.GenerateTimeline;
+import timelineGenerator.Parameter;
 import timelineGenerator.SendTasks;
+
 
 public class Server extends Thread {
 
 	protected ServerSocket listen;
+	public final static int TESTPORT=5005;
 
 	public Server() {
 		try {
 			System.out.println("socket server start...");
-			listen = new ServerSocket(ParameterServer.TESTPORT);
+			listen = new ServerSocket(TESTPORT);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -26,24 +29,24 @@ public class Server extends Thread {
 		try {
 			long start = System.currentTimeMillis();
 			CountDownLatch threadSignal = new CountDownLatch(
-					ParameterServer.clientNum + 1);
+					Parameter.clientNum + 2);
 			while(true) {
 				Socket client = listen.accept();
-				 Connects cc = new Connects(client, threadSignal);
-				if (ParameterServer.connectNum == ParameterServer.clientNum) {
-					System.out.println("connectNum: "
-							+ ParameterServer.connectNum);
-					System.out.println("clientNum: "
-							+ ParameterServer.clientNum);
+				new Connects(client, threadSignal);
+				if (Parameter.connectNum == Parameter.clientNum) {
 					break;
 				}
 			}
+			new Thread(new GenerateTimeline(threadSignal)).start();
 			new Thread(new SendTasks(threadSignal)).start();
 			threadSignal.await();
 			
 			System.out.println("Server end!");
 			System.out.println("running time: "
 					+ (System.currentTimeMillis() - start) / 1000f + "s");
+			System.out.println("the total number of tweet is "+ Parameter.tweetCount
+					+" and the number of retweet is "+ Parameter.retweetCount);
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (Exception e) {
@@ -58,10 +61,11 @@ public class Server extends Thread {
 		int userNum = 1000;
 		String startTime = "2012-01-01 00:00:00";
 		String endTime = "2013-01-01 00:00:00";
-		String inputPath = "/home/yuchengcheng/distributionGen";
+		String serverPath = "/home/yuchengcheng";
+		String clientPath = "/home/yuchengcheng";
 		
-		new ParameterServer(nodeNum,userNum);
-		new ParameterGen(nodeNum,userNum, startTime, endTime, inputPath);
+		
+		new Parameter(nodeNum,userNum, startTime, endTime, serverPath, clientPath);
 		
 
 		new Server();

@@ -1,14 +1,22 @@
 package generatorClient;
 
+
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.IOException;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import object.ClientInitInfo;
+import object.SubFollowInfo;
+import object.TaskResult;
 import object.Tweet;
+import object.UserInfo;
+import timelineGenerator.Parameter;
+import timelineGenerator.Util;
 
 public class IO {
 	private Lock writeLock = new ReentrantLock();
@@ -31,26 +39,7 @@ public class IO {
 		}
 	}
 
-	public void writeUserProportyIden(double proporty)
-			throws Exception {
-		writeLock.lock();
-		try {
-			os.writeBytes("UserProportyIden" + "\n");
-			os.writeBytes(String.valueOf(proporty) + "\n");
-			os.flush();
-		}finally{
-			writeLock.unlock();
-		}
-	}
 
-	public double readUserProportyIden() throws Exception {
-		readLock.lock();
-		try{
-			return Double.valueOf(is.readLine());
-		}finally{
-			readLock.unlock();
-		}
-	}
 
 	public void writeClientInitInfo(ClientInitInfo info)
 			throws Exception {
@@ -79,31 +68,32 @@ public class IO {
 		}finally{
 			readLock.unlock();
 		}
-		
-
 	}
 
-	
-	public void writeReTweet(Tweet m) throws Exception {
+	public void writeTweet(Tweet m) throws Exception {
 		writeLock.lock();
 		try {
-			os.writeBytes("ReTweet" + "\n");
+			os.writeBytes("Tweet" + "\n");
 			os.writeBytes(m.toString() + "\n");
 			os.flush();
 		} finally {
 			writeLock.unlock();
 		}
-		// System.out.println("send ReTweet:"+m.toString());
 	}
 
-	public Tweet readReTweet() throws Exception {
+	public Tweet readTweet() throws Exception {
 		readLock.lock();
 		try{
 			String[] infor = is.readLine().split(",");
 			String mid = infor[0];
 			long time = Long.valueOf(infor[1]);
 			Integer uid = Integer.valueOf(infor[2]);
-			Tweet m = new Tweet(mid, time, uid);
+			Integer isRetweet = Integer.valueOf(infor[3]);
+			Tweet m = new Tweet(mid, time, uid,isRetweet);
+			if(infor.length>4){
+				String rtMid = infor[4];
+				m.setRtMid(rtMid);
+			}
 			return m;
 		}finally{
 			readLock.unlock();
@@ -111,39 +101,22 @@ public class IO {
 		
 	}
 	
-	public void writeNonLocalTask(Tweet m) throws Exception {
+	public void writeTaskResult(TaskResult tr) throws Exception {
 		writeLock.lock();
 		try {
-			os.writeBytes("NonLocalTask" + "\n");
-			os.writeBytes(m.toString() + "\n");
+			os.writeBytes("TaskResult" + "\n");
+			os.writeBytes(tr.toString() + "\n");
 			os.flush();
 		} finally {
 			writeLock.unlock();
 		}
-		// System.out.println("send ReTweet:"+m.toString());
 	}
 
-	public Tweet readNonLocalTask() throws Exception {
-		readLock.lock();
-		try{
-			String[] infor = is.readLine().split(",");
-			String mid = infor[0];
-			long time = Long.valueOf(infor[1]);
-			Integer uid = Integer.valueOf(infor[2]);
-			Tweet m = new Tweet(mid, time, uid);
-			return m;
-		}finally{
-			readLock.unlock();
-		}
-		
-	}
 	
-	
-	public void writeSendRetweetEnd() throws Exception {
+	public void writeSendTweetsEnd() throws Exception {
 		writeLock.lock();
-		System.err.println("writeSendRetweetEnd");
 		try {
-			os.writeBytes("SendReTweetEnd" + "\n");
+			os.writeBytes("SendTweetsEnd" + "\n");
 			os.flush();
 		} finally {
 			writeLock.unlock();
@@ -161,36 +134,44 @@ public class IO {
 	}
 	
 	
-	public  void writeUserFeedSize( Map<Integer,Integer> userFeedSize) throws Exception{
-		writeLock.lock();
-		try{
-			os.writeBytes("UserFeedSize"+"\n");
-			String output="";
-			for(Integer uid:userFeedSize.keySet()){
-				output+=(uid+","+userFeedSize.get(uid)+",");
-			}
-			os.writeBytes(output+"\n");
-			os.flush();
-		}finally{
-			writeLock.unlock();
-		}
-	}
-	
-	public Map<Integer,Integer> readUserFeedSize() throws Exception{
+	public void readSubFollowInfo() throws Exception{
 		readLock.lock();
 		try{
-			String item[] = is.readLine().split(",");
-			Map<Integer,Integer> userFeedSize = new HashMap<Integer,Integer>();
-			int index =0;
-			System.out.println(item.length);
-			for(int i=0;i<item.length/2;i++){
-				userFeedSize.put(Integer.valueOf(item[index++]), Integer.valueOf(item[index++]));
+			String line = is.readLine();			
+			String item[] = line.split("/#");
+			
+			for(int i=0;i<item.length;i++){
+				String its[] = item[i].split(",");
+				Integer uid = Integer.valueOf(its[0]);
+				Integer feedSize = Integer.valueOf(its[1]);
+				List<Integer> followlist = new ArrayList<Integer>();
+				for(int j = 2;j<its.length;j++){
+					followlist.add(Integer.valueOf(its[j]));
+				}
+				Parameter.subFollowInfo.put(uid, new SubFollowInfo(feedSize,followlist));
+				
 			}
-			return userFeedSize;
+		}finally{ 
+			readLock.unlock();
+		}
+		
+	}
+	
+	
+	public void readUserInfo() throws IOException, ParseException{
+		readLock.lock();
+		try{
+			String[] infor = is.readLine().split("/#");
+			for(int i=0;i<infor.length;i++){
+				String[] its = infor[i].split(",");
+				Integer uid = Integer.valueOf(its[0]);
+				Double iden = Double.valueOf(its[1]);
+				Parameter.userInfo.put(uid, new UserInfo(iden));
+				Util.initPool(uid);
+			}
 		}finally{
 			readLock.unlock();
 		}
 	}
-	
 	
 }

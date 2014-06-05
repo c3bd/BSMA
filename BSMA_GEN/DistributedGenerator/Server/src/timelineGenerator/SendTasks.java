@@ -1,16 +1,11 @@
 package timelineGenerator;
 
-import generatorServer.ParameterServer;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.TreeMap;
 import java.util.concurrent.CountDownLatch;
 
-import object.Task;
+import object.Tweet;
 
 public class SendTasks implements Runnable{
 	private CountDownLatch threadsSignal; 
@@ -19,51 +14,43 @@ public class SendTasks implements Runnable{
 	}
 	@Override
 	public void run() {
+		Thread.currentThread().setName("SendTasks");
 		// TODO Auto-generated method stub
 		System.out.println("send tasks start...");
-		while(true){
-			//System.out.println("send tasks start...");
-			try {
-				if(!ParameterGen.task.isEmpty()){
-					Task retweet =ParameterGen.task.pollFirst();
+		try {
+			while(true){
+				Tweet retweet =Parameter.task.getFirstTask();
+				if(retweet != null){
 					Integer clientID = chooseClient(retweet);
-					ParameterServer.clientConmunication.get(clientID).writeReTweet(retweet.getM());
-				}
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			if(ParameterGen.task.isEmpty() &&
-					ParameterGen.SendRetweetEndClientNum == ParameterGen.clientNum){
-				for(int cl =0;cl<ParameterServer.clientNum;cl++){
-					try {
-						ParameterServer.clientConmunication.get(cl).writeSendTaskEnd();
-						
-					} catch (Exception e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+					Parameter.clientConmunication.get(clientID).writeTask(retweet);
+				}else{
+					for(int cl =0;cl < Parameter.clientNum;cl++){
+						Parameter.clientConmunication.get(cl).writeSendTaskEnd();
 					}
+					break;
 				}
-				
-				break;
-			}	
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+
 		threadsSignal.countDown();
 		System.out.println("send task end...");
 	}
 	
-	public Integer chooseClient(Task m){
-		Map<Integer,Integer> sizeInClient = ParameterGen.followerList.get(m.getM().getUid());
+	public Integer chooseClient(Tweet m){
 		TreeMap<Integer,Integer> ms = new TreeMap<Integer,Integer>();
 		int sum =0;
-		
-		for(Integer client:sizeInClient.keySet()){
-			if(m.getClientID()!=client ){
-				Integer size =sizeInClient.get(client);
+		for(Integer cl:Parameter.followInfoInClient.keySet()){
+			boolean isContainUid = Parameter.followInfoInClient.get(cl).containsKey(m.getUid());
+			if(isContainUid && m.getClientID()!=cl){
+				Integer size =Parameter.followInfoInClient.get(cl).get(m.getUid()).getFeedSize();
 				sum +=size;
-				ms.put(sum, client);
+				ms.put(sum, cl);
 			}
 		}
+		
 		return ms.ceilingEntry(new Random().nextInt(sum)).getValue();
 	}
 	

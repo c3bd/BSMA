@@ -11,24 +11,23 @@ public class ReceiveMessage implements Runnable{
 	}
 	@Override
 	public void run() {
+		Thread.currentThread().setName("receiveMessage");
 		System.out.println("receive message start...");
 		// TODO Auto-generated method stub
-		
 			while(true){
-				//System.out.println("receive message start...");
+				//System.out.println("receive message running...");
 				String Handler="";
 				try {
 					Handler =Parameter.io.readHandler();
-					//System.out.println("Handler="+Handler);
-					if(Handler!=null){
-//System.out.println(Handler);
-
-						if(Handler.equals("ReTweet")){
-							Tweet m = Parameter.io.readReTweet();
-							Parameter.tasks.add(m);
+					
+					if(Handler!=null){				
+						if(Handler.equals("Task")){
+							Tweet m = Parameter.io.readTweet();
+							Parameter.task.addTask(m);
 						}
 						if(Handler.equals("SendTaskEnd")){
 							Parameter.ReceiveTaskEnd =true;
+							Parameter.task.trySingalTaskEmpty();
 							break;
 						}
 						

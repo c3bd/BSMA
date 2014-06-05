@@ -1,15 +1,19 @@
 package generatorServer;
 
+
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
-import java.util.HashMap;
+import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import object.ClientInitInfo;
-import object.Task;
+import object.Pair;
+import object.SubFollowInfo;
 import object.Tweet;
+import timelineGenerator.Parameter;
 
 public class IO {
 	private Lock writeLock = new ReentrantLock();
@@ -32,78 +36,7 @@ public class IO {
 		}
 	}
 
-	public void writeTask(Task t) throws Exception {
-		writeLock.lock();
-		try {
-			os.writeBytes("Task" + "\n");
-			os.writeBytes(t.toString() + "\n");
-			os.flush();
-		}finally{
-			writeLock.unlock();
-		}
-		
-	}
 
-	public Task readTask() throws Exception {
-		readLock.lock();
-		try{
-			String str = is.readLine();
-			String[] infor = str.split(",");
-			String mid = infor[0];
-			long time = Long.valueOf(infor[1]);
-			Integer uid = Integer.valueOf(infor[2]);
-			Tweet m = new Tweet(mid,time,uid);
-			Integer internal = null;
-			if(infor.length>3){
-				internal = Integer.valueOf(infor[3]);
-			}
-			return new Task(m,internal);
-		}finally{
-			readLock.unlock();
-		}
-		
-	}
-
-	public void writeRetweetMid(String mid) throws Exception {
-		writeLock.lock();
-		try {
-			os.writeBytes("RetweetMid" + "\n");
-			os.writeBytes(mid + "\n");
-			os.flush();
-		}finally{
-			writeLock.unlock();
-		}
-	}
-
-	public String readRetweetMid() throws Exception {
-		readLock.lock();
-		try{
-			return is.readLine();
-		}finally{
-			readLock.unlock();
-		}
-	}
-
-	public void writeUserProportyIden(double proporty)
-			throws Exception {
-		writeLock.lock();
-		try {
-			os.writeBytes("UserProportyIden" + "\n");
-			os.writeBytes(String.valueOf(proporty) + "\n");
-			os.flush();
-		}finally{
-			writeLock.unlock();
-		}
-	}
-
-	public double readUserProportyIden() throws Exception {
-		readLock.lock();
-		try{
-			return Double.valueOf(is.readLine());
-		}finally{
-			readLock.unlock();
-		}
-	}
 
 	public void writeClientInitInfo(ClientInitInfo info)
 			throws Exception {
@@ -132,16 +65,14 @@ public class IO {
 		}finally{
 			readLock.unlock();
 		}
-		
-
 	}
 
-	
 
-	public void writeReTweet(Tweet m) throws Exception {
+
+	public void writeRetweet(Tweet m) throws Exception {
 		writeLock.lock();
 		try {
-			os.writeBytes("ReTweet" + "\n");
+			os.writeBytes("Retweet" + "\n");
 			os.writeBytes(m.toString() + "\n");
 			os.flush();
 		} finally {
@@ -150,41 +81,30 @@ public class IO {
 		// System.out.println("send ReTweet:"+m.toString());
 	}
 
-	public Tweet readReTweet() throws Exception {
-		readLock.lock();
-		try{
-			String[] infor = is.readLine().split(",");
-			String mid = infor[0];
-			long time = Long.valueOf(infor[1]);
-			Integer uid = Integer.valueOf(infor[2]);
-			Tweet m = new Tweet(mid, time, uid);
-			return m;
-		}finally{
-			readLock.unlock();
-		}
-		
-	}
-	
-	public void writeNonLocalTask(Tweet m) throws Exception {
+	public void writeTweet(Tweet m) throws Exception {
 		writeLock.lock();
 		try {
-			os.writeBytes("NonLocalTask" + "\n");
+			os.writeBytes("Tweet" + "\n");
 			os.writeBytes(m.toString() + "\n");
 			os.flush();
 		} finally {
 			writeLock.unlock();
 		}
-		// System.out.println("send ReTweet:"+m.toString());
 	}
 
-	public Tweet readNonLocalTask() throws Exception {
+	public Tweet readTweet() throws Exception {
 		readLock.lock();
 		try{
 			String[] infor = is.readLine().split(",");
 			String mid = infor[0];
 			long time = Long.valueOf(infor[1]);
 			Integer uid = Integer.valueOf(infor[2]);
-			Tweet m = new Tweet(mid, time, uid);
+			Integer isRetweet = Integer.valueOf(infor[3]);
+			Tweet m = new Tweet(mid, time, uid,isRetweet);
+			if(infor.length > 4){
+				String rtMid = infor[4];
+				m.setRtMid(rtMid);
+			}
 			return m;
 		}finally{
 			readLock.unlock();
@@ -192,12 +112,22 @@ public class IO {
 		
 	}
 	
-
-	public void writeSendRetweetEnd() throws Exception {
+	public void writeTaskResult(Pair tr) throws Exception {
 		writeLock.lock();
-		System.err.println("writeSendRetweetEnd");
 		try {
-			os.writeBytes("SendReTweetEnd" + "\n");
+			os.writeBytes("TaskResult" + "\n");
+			os.writeBytes(tr.toString() + "\n");
+			os.flush();
+		} finally {
+			writeLock.unlock();
+		}
+	}
+
+	
+	public void writeSendTweetsEnd() throws Exception {
+		writeLock.lock();
+		try {
+			os.writeBytes("SendTweetsEnd" + "\n");
 			os.flush();
 		} finally {
 			writeLock.unlock();
@@ -213,77 +143,76 @@ public class IO {
 			writeLock.unlock();
 		}
 	}
-	
-	
-	public  void writeUserFeedSize( Map<Integer,Integer> userFeedSize) throws Exception{
-		writeLock.lock();
-		try{
-			os.writeBytes("UserFeedSize"+"\n");
-			String output="";
-			for(Integer uid:userFeedSize.keySet()){
-				output+=(uid+","+userFeedSize.get(uid)+",");
-			}
-			os.writeBytes(output+"\n");
-			os.flush();
-		}finally{
-			writeLock.unlock();
-		}
-	}
-	
-	public Map<Integer,Integer> readUserFeedSize() throws Exception{
+
+	public Pair readTaskResult() throws Exception {
+		// TODO Auto-generated method stub
 		readLock.lock();
 		try{
-			String item[] = is.readLine().split(",");
-			Map<Integer,Integer> userFeedSize = new HashMap<Integer,Integer>();
-			int index =0;
-			for(int i=0;i<item.length/2;i++){
-				userFeedSize.put(Integer.valueOf(item[index++]), Integer.valueOf(item[index++]));
-			}
-			return userFeedSize;
-		}finally{
-			readLock.unlock();
-		}
-	}
-	
-	public void writeSingalTask(Task t) throws Exception{
-		writeLock.lock();
-		try {
-			os.writeBytes("SingalTask"+"\n");
-			os.writeBytes(t.toString()+"\n");
-			os.flush();
-		}finally{
-			writeLock.unlock();
-		}
-	}
-	
-	public Task readSingalTask() throws Exception{
-		readLock.lock();
-		try{
-			String str =is.readLine();
-			String[] infor = str.split(",");
-			String mid = infor[0];
-			long time = Long.valueOf(infor[1]);
-			Integer uid = Integer.valueOf(infor[2]);
-			Tweet m = new Tweet(mid,time,uid);
-			Integer internal = null;
-			if(infor.length>3){
-				internal = Integer.valueOf(infor[4]);
-			}
-			return new Task(m,internal);
+			String[] infor = is.readLine().split(",");
+			return new Pair(infor[0],infor[1]);
 		}finally{
 			readLock.unlock();
 		}
 	}
 
-	public void writeSendTaskEnd() throws Exception {
+	public void writeSubFollowInfo(Integer clientID) throws Exception {
+		// TODO Auto-generated method stub
+		
+		writeLock.lock();
+		try {
+			os.writeBytes("SubFollowInfo"+"\n");
+			Map<Integer,SubFollowInfo> subFollowInfo = Parameter.followInfoInClient.get(clientID);
+			for(Integer uid:subFollowInfo.keySet()){
+				SubFollowInfo sfi = subFollowInfo.get(uid);
+				os.writeBytes(uid+",");
+				os.writeBytes(sfi.toString());
+				os.writeBytes("/#");
+			}
+			os.writeBytes("\n");
+			os.flush();
+		} finally {
+			writeLock.unlock();
+		}
+	}
+
+	public void writeTask(Tweet m) throws Exception {
+		// TODO Auto-generated method stub
+		writeLock.lock();
+		try {
+			os.writeBytes("Task"+"\n");
+			os.writeBytes(m.toString()+"\n");
+			os.flush();
+		} finally {
+			writeLock.unlock();
+		}
+	}
+
+	public void writeSendTaskEnd() throws IOException {
 		// TODO Auto-generated method stub
 		writeLock.lock();
 		try {
 			os.writeBytes("SendTaskEnd"+"\n");
-		}finally{
+			os.flush();
+		} finally {
 			writeLock.unlock();
 		}
 	}
 
-	
+	public void writeUserInfo(Integer clientID) throws IOException {
+		// TODO Auto-generated method stub
+		writeLock.lock();
+		try {
+			os.writeBytes("UserInfo"+"\n");
+			List<Integer> uids =Parameter.cluster.get(clientID);
+			for(Integer uid:uids){
+				os.writeBytes(uid+","+Parameter.getUserProportyIden(uid)+"/#");
+			}
+			os.writeBytes("\n");
+			os.flush();
+		} finally {
+			writeLock.unlock();
+		}
+	}
+
+
 }

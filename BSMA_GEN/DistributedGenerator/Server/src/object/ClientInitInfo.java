@@ -23,11 +23,9 @@ public class ClientInitInfo{
 	}
 
 
-
 	public void setUserNum(Integer userNum) {
 		this.userNum = userNum;
 	}
-
 
 
 	public void setClientID(Integer clientID) {

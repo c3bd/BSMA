@@ -2,14 +2,14 @@ package object;
 
 import java.util.Comparator;
 
-public class ComparatorByTimeOrder implements Comparator<Task>{
+public class ComparatorByTimeOrder implements Comparator<Tweet>{
 
 	@Override
-	public int compare(Task m1, Task m2) {
+	public int compare(Tweet m1, Tweet m2) {
 		// TODO Auto-generated method stub
-		long comp = m1.getM().getTime()-m2.getM().getTime();
+		long comp = m1.getTime()-m2.getTime();
 		if(comp == 0){
-			return (int) (m1.getM().getMid().compareTo(m2.getM().getMid()));
+			return (int) (m1.getMid().compareTo(m2.getMid()));
 		} else {
 			return comp < 0? -1 : 1;
 		}
