@@ -1,48 +1,45 @@
 package edu.ecnu.imc.bsma.measurements.exporter;
 
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
+import java.sql.SQLException;
 
+import edu.ecnu.imc.bsma.dao.Dao;
+import edu.ecnu.imc.bsma.dao.QueryRunningReport;
 import edu.ecnu.imc.bsma.dao.RunningReport;
 
 public class RuntimeExporter {
 	public int SubJobId;
-	int seqID = 0;
-	Statement state;
-
-	List<RunningReport> reports = new ArrayList<RunningReport>();
+	Dao dao;
+	RunningReport report = new RunningReport();
 	int idx = 0;
 
 	public void newReport() {
-		seqID++;
 	}
 
-	public void endReport() {
-		if (idx < reports.size() - 1) {
-			reports.subList(idx + 1, reports.size()).clear();
+	public void endReport() throws SQLException {
+		if (idx < report.qStatus.size() - 1) {
+			report.qStatus.subList(idx + 1, report.qStatus.size()).clear();
 		}
 		// TODO insert into mysql
-
+		dao.insertRunningResults(report);
 		idx = 0;
 	}
 
-	public void reportOverall(long time, long totalOps, double throughput) {
-
+	public void reportOverall(long time, int totalOps, double throughput) {
+		report.time = time;
+		report.totalOps = totalOps;
+		report.throughput = throughput;
 	}
 
 	public void reportOneM(String Name, double latency) {
-		RunningReport cur;
-		if (idx < reports.size()) {
-			cur = new RunningReport();
-			reports.add(cur);
+		QueryRunningReport cur;
+		if (idx < report.qStatus.size()) {
+			cur = new QueryRunningReport();
+			report.qStatus.add(cur);
 		} else {
-			cur = reports.get(idx);
+			cur = report.qStatus.get(idx);
 		}
-		cur.SubJobId = SubJobId;
-		cur.Queryid = Integer.parseInt(Name);
-		cur.Seqid = seqID;
-		cur.AverageLatency = latency;
+		cur.queryId = Integer.parseInt(Name);
+		cur.avgLatency = latency;
 
 		idx++;
 	}

@@ -9,10 +9,8 @@ import weibo4j.org.json.JSONObject;
 public class BasicJobInfo {
 	public int subJobID;
 	public int threadCount;
-	public int wrapper;
 	public int opCount;
 	public Map<Integer, Double> queryFracs;
-	public Map<String, String> props;
 
 	public BasicJobInfo() {
 
@@ -21,7 +19,6 @@ public class BasicJobInfo {
 	public BasicJobInfo(JSONObject obj) throws JSONException {
 		subJobID = obj.getInt("id");
 		threadCount = obj.getInt("tNum");
-		wrapper = obj.getInt("db");
 		opCount = obj.getInt("ops");
 
 		JSONObject map = obj.getJSONObject("qfrac");
@@ -31,12 +28,7 @@ public class BasicJobInfo {
 			queryFracs.put(qID, map.getDouble(Integer.toString(qID)));
 		}
 
-		map = obj.getJSONObject("props");
-		arr = map.names();
-		for (int i = 0; i < arr.length(); i++) {
-			String key = arr.getString(i);
-			props.put(key, map.getString(key));
-		}
+	
 	}
 
 	public JSONObject asJSON() throws JSONException {
@@ -44,10 +36,8 @@ public class BasicJobInfo {
 
 		obj.put("id", subJobID);
 		obj.put("tNum", threadCount);
-		obj.put("db", wrapper);
 		obj.put("ops", opCount);
 		obj.put("qfrac", queryFracs);
-		obj.put("props", props);
 
 		return obj;
 	}
