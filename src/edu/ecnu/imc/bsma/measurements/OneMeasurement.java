@@ -21,31 +21,31 @@ package edu.ecnu.imc.bsma.measurements;
 import java.io.IOException;
 
 import edu.ecnu.imc.bsma.measurements.exporter.MeasurementsExporter;
+import edu.ecnu.imc.bsma.measurements.exporter.RuntimeExporter;
 
 /**
  * A single measured metric (such as Query1 LATENCY)
  */
-public abstract class OneMeasurement
-{
+public abstract class OneMeasurement {
 
 	String _name;
 
-	public String getName()
-	{
+	public String getName() {
 		return _name;
 	}
 
 	/**
 	 * @param _name
 	 */
-	public OneMeasurement(String _name)
-	{
+	public OneMeasurement(String _name) {
 		this._name = _name;
 	}
 
 	public abstract void measure(int latency);
 
 	public abstract String getSummary();
+
+	public abstract void getSummary(RuntimeExporter exporter);
 
 	/**
 	 * Export the current measurements to a suitable format.
@@ -55,5 +55,6 @@ public abstract class OneMeasurement
 	 * @throws IOException
 	 *             Thrown if the export failed.
 	 */
-	public abstract void exportMeasurements(MeasurementsExporter exporter) throws IOException;
+	public abstract void exportMeasurements(MeasurementsExporter exporter)
+			throws IOException;
 }
