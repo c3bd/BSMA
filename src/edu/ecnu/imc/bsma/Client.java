@@ -18,16 +18,16 @@
 
 package edu.ecnu.imc.bsma;
 
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Enumeration;
+import java.sql.SQLException;
 import java.util.Properties;
 import java.util.Random;
 import java.util.Vector;
 
 import edu.ecnu.imc.bsma.dao.BasicJobInfo;
+import edu.ecnu.imc.bsma.dao.JobInfo;
 import edu.ecnu.imc.bsma.measurements.Measurements;
 import edu.ecnu.imc.bsma.measurements.exporter.MeasurementsExporter;
 import edu.ecnu.imc.bsma.measurements.exporter.RuntimeExporter;
@@ -100,7 +100,11 @@ class StatusThread extends Thread {
 			_exporter.newReport();
 			_exporter.reportOverall(interval / 1000, totalops, curthroughput);
 			_measurements.getSummary(_exporter);
-			_exporter.endReport();
+			try {
+				_exporter.endReport();
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
 
 			try {
 				sleep(sleeptime);
@@ -254,58 +258,13 @@ class ClientThread extends Thread {
 /**
  * Main class for executing BSMA.
  */
-public class Client {
+public class Client extends Thread {
+	BasicJobInfo basicJobInfo;
+	JobInfo jobInfo;
 
-	public static final String OPERATION_COUNT_PROPERTY = "operationcount";
-
-	public static final String WORKLOAD_PROPERTY = "workload";
-
-	public static void usageMessage() {
-		System.out.println("Usage: java edu.ecnu.imc.bsma.Client [options]");
-		System.out.println("Options:");
-		System.out
-				.println("  -threads n: execute using n threads (default: 1) - can also be specified as the \n"
-						+ "              \"threadcount\" property using -p");
-		System.out
-				.println("  -target n: attempt to do n operations per second (default: unlimited) - can also\n"
-						+ "             be specified as the \"target\" property using -p");
-		System.out
-				.println("  -db dbname: specify the name of the DB to use (default: edu.ecnu.imc.bsma.db.DBClient) - \n"
-						+ "              can also be specified as the \"db\" property using -p");
-		System.out
-				.println("  -P propertyfile: load properties from the given file.");
-		System.out
-				.println("  -p name=value:  specify a property to be passed to the DB and workloads;");
-		System.out
-				.println("                  multiple properties can be specified, and override any values in the propertyfile");
-		System.out
-				.println("  -s:  show status during run (default: no status)");
-		System.out.println("Required properties:");
-		System.out
-				.println("  "
-						+ WORKLOAD_PROPERTY
-						+ ": the name of the workload class to use (e.g. edu.ecnu.imc.bsma.workloads.CoreWorkload)");
-		System.out.println("  " + OPERATION_COUNT_PROPERTY
-				+ ": the number of queries to execute");
-		System.out
-				.println("  queryNpropertion(N=1,2,3...19): the proportion of QueryN in all queries. In workloadqueryN, queryNproportion is 1 and no other queryMproportions(M!=N) need listed since no mixed workload(queries) is required.");
-
-		System.out.println("");
-		System.out
-				.println("To run the analysis phase from multiple servers, start a separate client on each.");
-	}
-
-	public static boolean checkRequiredProperties(Properties props) {
-		if (props.getProperty(WORKLOAD_PROPERTY) == null) {
-			System.out.println("Missing property: " + WORKLOAD_PROPERTY);
-			return false;
-		}
-		if (props.getProperty(OPERATION_COUNT_PROPERTY) == null) {
-			System.out.println("Missing property: " + OPERATION_COUNT_PROPERTY);
-			return false;
-		}
-
-		return true;
+	public Client(JobInfo jobInfo, BasicJobInfo basicJobInfo) {
+		this.basicJobInfo = basicJobInfo;
+		this.jobInfo = jobInfo;
 	}
 
 	/**
@@ -316,7 +275,7 @@ public class Client {
 	 *             Either failed to write to output stream or failed to close
 	 *             it.
 	 */
-	private static void exportMeasurements(Properties props, int opcount,
+	private void exportMeasurements(Properties props, int opcount,
 			long runtime, Measurements measurements) throws IOException {
 		MeasurementsExporter exporter = null;
 		try {
@@ -360,148 +319,18 @@ public class Client {
 		}
 	}
 
-	public static void main(String[] args) {
-		String dbname;
-		Properties props = new Properties();
-		Properties fileprops = new Properties();
-		int threadcount = 1;
-		int target = 0;
-		boolean status = false;
-
-		// parse arguments
-		int argindex = 0;
-
-		if (args.length == 0) {
-			usageMessage();
-			System.exit(0);
-		}
-
-		while (args[argindex].startsWith("-")) {
-			if (args[argindex].compareTo("-threads") == 0) {
-				argindex++;
-				if (argindex >= args.length) {
-					usageMessage();
-					System.exit(0);
-				}
-				int tcount = Integer.parseInt(args[argindex]);
-				props.setProperty("threadcount", tcount + "");
-				argindex++;
-			} else if (args[argindex].compareTo("-target") == 0) {
-				argindex++;
-				if (argindex >= args.length) {
-					usageMessage();
-					System.exit(0);
-				}
-				int ttarget = Integer.parseInt(args[argindex]);
-				props.setProperty("target", ttarget + "");
-				argindex++;
-			} else if (args[argindex].compareTo("-s") == 0) {
-				status = true;
-				argindex++;
-			} else if (args[argindex].compareTo("-db") == 0) {
-				argindex++;
-				if (argindex >= args.length) {
-					usageMessage();
-					System.exit(0);
-				}
-				props.setProperty("db", args[argindex]);
-				argindex++;
-			} else if (args[argindex].compareTo("-P") == 0) {
-				argindex++;
-				if (argindex >= args.length) {
-					usageMessage();
-					System.exit(0);
-				}
-				String propfile = args[argindex];
-				argindex++;
-
-				Properties myfileprops = new Properties();
-				try {
-					myfileprops.load(new FileInputStream(propfile));
-				} catch (IOException e) {
-					System.out.println(e.getMessage());
-					System.exit(0);
-				}
-
-				// Issue #5 - remove call to stringPropertyNames to make
-				// compilable under Java 1.5
-				for (Enumeration e = myfileprops.propertyNames(); e
-						.hasMoreElements();) {
-					String prop = (String) e.nextElement();
-
-					fileprops.setProperty(prop, myfileprops.getProperty(prop));
-				}
-
-			} else if (args[argindex].compareTo("-p") == 0) {
-				argindex++;
-				if (argindex >= args.length) {
-					usageMessage();
-					System.exit(0);
-				}
-				int eq = args[argindex].indexOf('=');
-				if (eq < 0) {
-					usageMessage();
-					System.exit(0);
-				}
-
-				String name = args[argindex].substring(0, eq);
-				String value = args[argindex].substring(eq + 1);
-				props.put(name, value);
-				argindex++;
-			} else {
-				System.out.println("Unknown option " + args[argindex]);
-				usageMessage();
-				System.exit(0);
-			}
-
-			if (argindex >= args.length) {
-				break;
-			}
-		}
-
-		if (argindex != args.length) {
-			usageMessage();
-			System.exit(0);
-		}
-
-		// set up logging
-		// BasicConfigurator.configure();
-
-		// overwrite file properties with properties from the command line
-
-		// Issue #5 - remove call to stringPropertyNames to make compilable
-		// under Java 1.5
-		for (Enumeration e = props.propertyNames(); e.hasMoreElements();) {
-			String prop = (String) e.nextElement();
-
-			fileprops.setProperty(prop, props.getProperty(prop));
-		}
-
-		props = fileprops;
-
-		if (!checkRequiredProperties(props)) {
-			System.exit(0);
-		}
-
-		// TODO init
-		BasicJobInfo jobInfo = null;
-		// get number of threads, target and db
-		threadcount = Integer.parseInt(props.getProperty("threadcount", "1"));
-		dbname = props.getProperty("db", "edu.ecnu.imc.bsma.db.DBClient");
-		target = Integer.parseInt(props.getProperty("target", "0"));
-
+	@Override
+	public void run() {
 		// compute the target throughput
 		double targetperthreadperms = -1;
-		if (target > 0) {
-			double targetperthread = ((double) target) / ((double) threadcount);
+		if (basicJobInfo.opCount > 0) {
+			double targetperthread = ((double) basicJobInfo.opCount)
+					/ ((double) basicJobInfo.threadCount);
 			targetperthreadperms = targetperthread / 1000.0;
 		}
 
 		System.out.println("BSMA Client 0.1");
 		System.out.print("Command line:");
-		for (int i = 0; i < args.length; i++) {
-			System.out.print(" " + args[i]);
-		}
 		System.out.println();
 		System.err.println("Loading workload...");
 
@@ -520,20 +349,13 @@ public class Client {
 						.println(" (might take a few minutes for large data sets)");
 			}
 		};
-
 		warningthread.start();
-
-		// set up measurements
-		Measurements.setProperties(props);
 
 		// load the workload
 		ClassLoader classLoader = Client.class.getClassLoader();
-
 		Workload workload = null;
-
 		try {
-			Class workloadclass = classLoader.loadClass(props
-					.getProperty(WORKLOAD_PROPERTY));
+			Class workloadclass = classLoader.loadClass(jobInfo.wrapper);
 
 			workload = (Workload) workloadclass.newInstance();
 		} catch (Exception e) {
@@ -541,7 +363,7 @@ public class Client {
 			e.printStackTrace(System.out);
 			System.exit(0);
 		}
-
+		Properties props = constructProp();
 		try {
 			workload.init(props);
 		} catch (WorkloadException e) {
@@ -562,16 +384,16 @@ public class Client {
 
 		// if the workload has more threads than operations, the number of
 		// threads will be changed to the number of operations.
-		if (opcount < threadcount) {
+		if (opcount < basicJobInfo.threadCount) {
 			System.err
 					.println("warning: the number of threads is bigger than that of operations!"
 							.toUpperCase());
-			threadcount = opcount;
+			basicJobInfo.threadCount = opcount;
 		}
 
 		Vector<Thread> threads = new Vector<Thread>();
 		Measurements measurements = new Measurements(props);
-		for (int threadid = 0; threadid < threadcount; threadid++) {
+		for (int threadid = 0; threadid < basicJobInfo.threadCount; threadid++) {
 			DB db = null;
 			try {
 				db = DBFactory.newDB(dbname, props, measurements);
@@ -632,5 +454,9 @@ public class Client {
 		}
 
 		System.exit(0);
+	}
+
+	Properties constructProp() {
+		return null;
 	}
 }
