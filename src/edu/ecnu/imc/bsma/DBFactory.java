@@ -19,32 +19,31 @@ package edu.ecnu.imc.bsma;
 
 import java.util.Properties;
 
+import edu.ecnu.imc.bsma.measurements.Measurements;
+
 /**
  * Creates a DB layer by dynamically classloading the specified DB class.
  */
-public class DBFactory
-{
-	public static DB newDB(String dbname, Properties properties) throws UnknownDBException
-	{
+public class DBFactory {
+	public static DB newDB(String dbname, Properties properties,
+			Measurements measurements) throws UnknownDBException {
 		ClassLoader classLoader = DBFactory.class.getClassLoader();
 
 		DB ret = null;
 
-		try
-		{
+		try {
 			Class dbclass = classLoader.loadClass(dbname);
 			// System.out.println("dbclass.getName() = " + dbclass.getName());
 
 			ret = (DB) dbclass.newInstance();
-		} catch (Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
 		}
 
 		ret.setProperties(properties);
 
-		return new DBWrapper(ret);
+		return new DBWrapper(ret, measurements);
 	}
 
 }

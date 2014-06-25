@@ -4,5 +4,5 @@ public class RunningReport {
 	public int SubJobId;
 	public int Queryid;
 	public int Seqid;
-	public int AverageLatency;
+	public double AverageLatency;
 }

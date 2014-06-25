@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Properties;
 
 import edu.ecnu.imc.bsma.measurements.exporter.MeasurementsExporter;
+import edu.ecnu.imc.bsma.measurements.exporter.RuntimeExporter;
 
 /**
  * Collects latency measurements, and reports them when requested.
@@ -30,29 +31,18 @@ import edu.ecnu.imc.bsma.measurements.exporter.MeasurementsExporter;
  * @author cooperb
  * @author wjx
  * 
+ * @version 2014-06-25
+ * @author xiafan
+ * 
  */
-public class Measurements
-{
+public class Measurements {
 
-	static Measurements singleton = null;
+	// static Measurements singleton = null;
 
 	static Properties measurementproperties = null;
 
-	public static void setProperties(Properties props)
-	{
+	public static void setProperties(Properties props) {
 		measurementproperties = props;
-	}
-
-	/**
-	 * Return the singleton Measurements object.
-	 */
-	public synchronized static Measurements getMeasurements()
-	{
-		if (singleton == null)
-		{
-			singleton = new Measurements(measurementproperties);
-		}
-		return singleton;
 	}
 
 	HashMap<String, OneMeasurement> data;
@@ -62,16 +52,14 @@ public class Measurements
 	/**
 	 * Create a new object with the specified properties.
 	 */
-	public Measurements(Properties props)
-	{
+	public Measurements(Properties props) {
 		data = new HashMap<String, OneMeasurement>();
 
 		_props = props;
 
 	}
 
-	OneMeasurement constructOneMeasurement(String name)
-	{
+	OneMeasurement constructOneMeasurement(String name) {
 		return new OneMeasurementHistogram(name, _props);
 	}
 
@@ -79,24 +67,19 @@ public class Measurements
 	 * Report a single value of a single metric. E.g. for BSMAQuery1 latency,
 	 * operation="Query1" and latency is the measured value.
 	 */
-	public synchronized void measure(String operation, int latency)
-	{
-		if (!data.containsKey(operation))
-		{
-			synchronized (this)
-			{
-				if (!data.containsKey(operation))
-				{
+	public synchronized void measure(String operation, int latency) {
+		if (!data.containsKey(operation)) {
+			synchronized (this) {
+				if (!data.containsKey(operation)) {
 					data.put(operation, constructOneMeasurement(operation));
 				}
 			}
 		}
-		try
-		{
+		try {
 			data.get(operation).measure(latency);
-		} catch (java.lang.ArrayIndexOutOfBoundsException e)
-		{
-			System.out.println("ERROR: java.lang.ArrayIndexOutOfBoundsException - ignoring and continuing");
+		} catch (java.lang.ArrayIndexOutOfBoundsException e) {
+			System.out
+					.println("ERROR: java.lang.ArrayIndexOutOfBoundsException - ignoring and continuing");
 			e.printStackTrace();
 			e.printStackTrace(System.out);
 		}
@@ -110,22 +93,28 @@ public class Measurements
 	 * @throws IOException
 	 *             Thrown if the export failed.
 	 */
-	public void exportMeasurements(MeasurementsExporter exporter) throws IOException
-	{
-		for (OneMeasurement measurement : data.values())
-		{
+	public void exportMeasurements(MeasurementsExporter exporter)
+			throws IOException {
+		for (OneMeasurement measurement : data.values()) {
 			measurement.exportMeasurements(exporter);
+		}
+	}
+
+	/**
+	 * Return the summary of the measurements.
+	 */
+	public void getSummary(RuntimeExporter reporter) {
+		for (OneMeasurement m : data.values()) {
+			m.getSummary(reporter);
 		}
 	}
 
 	/**
 	 * Return a one line summary of the measurements.
 	 */
-	public String getSummary()
-	{
+	public String getSummary() {
 		String ret = "";
-		for (OneMeasurement m : data.values())
-		{
+		for (OneMeasurement m : data.values()) {
 			ret += m.getSummary() + " ";
 		}
 
