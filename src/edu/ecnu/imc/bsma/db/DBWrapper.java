@@ -15,7 +15,7 @@
  * LICENSE file.                                                                                                                                                                   
  */
 
-package edu.ecnu.imc.bsma;
+package edu.ecnu.imc.bsma.db;
 
 import java.util.Properties;
 

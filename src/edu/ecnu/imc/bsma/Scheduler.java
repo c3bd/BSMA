@@ -7,6 +7,8 @@ import org.apache.thrift.TException;
 
 import rpc.BSMAService;
 import rpc.Job;
+import rpc.SubJob;
+import edu.ecnu.imc.bsma.dao.JobInfo;
 
 /**
  * TODO:
@@ -25,19 +27,7 @@ public class Scheduler implements BSMAService.Iface {
 
 	}
 
-	@Override
-	public Job start(String job) throws TException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void cancel(int jobID) throws TException {
-		// TODO Auto-generated method stub
-
-	}
-
-	private void launchJob(int jobID) {
+	private void launchJob(Job job) {
 		Thread thread = new Thread() {
 			@Override
 			public void run() {
@@ -45,6 +35,32 @@ public class Scheduler implements BSMAService.Iface {
 			}
 		};
 		thread.start();
+		Client client = new Client(new JobInfo(job));
 		jobs.put(jobID, thread);
+	}
+
+	@Override
+	public Job submit(Job job) throws TException {
+		job.setJobID(jobIDGen.incrementAndGet());
+		for (SubJob subJob : job.getSubJobs()) {
+			subJob.setSubJobID(subJobIDGen.incrementAndGet());
+		}
+		//TODO write to mysql
+		
+		
+		//start the job
+		return job;
+	}
+
+	@Override
+	public void cancelJob(int jobID) throws TException {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void cancelSubJob(int jobID, int subID) throws TException {
+		// TODO Auto-generated method stub
+
 	}
 }

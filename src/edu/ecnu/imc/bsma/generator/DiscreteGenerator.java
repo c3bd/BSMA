@@ -18,69 +18,72 @@
 
 package edu.ecnu.imc.bsma.generator;
 
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Random;
 
 import edu.ecnu.imc.bsma.WorkloadException;
 
 /**
  * Generates a distribution by choosing from a discrete set of values.
+ * @modify xiafan
  */
-public class DiscreteGenerator extends Generator
-{
-	class Pair
-	{
+public class DiscreteGenerator<ValueType> extends Generator<ValueType> {
+	class Pair {
 		public double _weight;
-		public String _value;
+		public ValueType _value;
 
-		Pair(double weight, String value)
-		{
+		Pair(double weight, ValueType value) {
 			_weight = weight;
 			_value = value;
 		}
 	}
 
-	Vector<Pair> _values;
+	List<Pair> _values;
 	Random _random;
-	String _lastvalue;
+	ValueType _lastvalue;
 
-	public DiscreteGenerator()
-	{
-		_values = new Vector<Pair>();
+	public DiscreteGenerator() {
+		_values = new ArrayList<Pair>();
 		_random = new Random();
 		_lastvalue = null;
 	}
 
+	boolean inited = false;
+
+	class PairComp implements Comparator<Pair> {
+		@Override
+		public int compare(Pair arg0, Pair arg1) {
+			return Double.compare(arg0._weight, arg1._weight);
+		}
+	}
+
+	PairComp comp = new PairComp();
+
 	/**
 	 * Generate the next string in the distribution.
 	 */
-	public String nextString()
-	{
-		double sum = 0;
+	public ValueType nextString() {
+		if (inited == false) {
+			Collections.sort(_values, comp);
 
-		for (Pair p : _values)
-		{
-			sum += p._weight;
+			double sum = 0.0f;
+			for (Pair pair : _values) {
+				double tmp = pair._weight;
+				pair._weight = sum;
+				sum += tmp;
+			}
+			assert sum > 1.0 - 0.000000000001;
 		}
 
 		double val = _random.nextDouble();
-
-		for (Pair p : _values)
-		{
-			if (val < p._weight / sum)
-			{
-				return p._value;
-			}
-
-			val -= p._weight / sum;
-		}
-
-		// should never get here.
-		System.out.println("oops. should not get here.");
-
-		System.exit(0);
-
-		return null;
+		int idx = Collections.binarySearch(_values, new Pair(val, null), comp);
+		idx = Math.abs(idx + 1);
+		assert idx < _values.size();
+		
+		return _values.get(idx)._value;
 	}
 
 	/**
@@ -91,9 +94,9 @@ public class DiscreteGenerator extends Generator
 	 * @throws WorkloadException
 	 *             if this generator does not support integer values
 	 */
-	public int nextInt() throws WorkloadException
-	{
-		throw new WorkloadException("DiscreteGenerator does not support nextInt()");
+	public int nextInt() throws WorkloadException {
+		throw new WorkloadException(
+				"DiscreteGenerator does not support nextInt()");
 	}
 
 	/**
@@ -102,18 +105,14 @@ public class DiscreteGenerator extends Generator
 	 * the distribution or have any side effects. If nextString() has not yet
 	 * been called, lastString() should return something reasonable.
 	 */
-	public String lastString()
-	{
-		if (_lastvalue == null)
-		{
+	public ValueType lastString() {
+		if (_lastvalue == null) {
 			_lastvalue = nextString();
 		}
 		return _lastvalue;
 	}
 
-	public void addValue(double weight, String value)
-	{
+	public void addValue(double weight, ValueType value) {
 		_values.add(new Pair(weight, value));
 	}
-
 }

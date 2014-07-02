@@ -1,6 +1,7 @@
 /**                                                                                                                                                                                
  * Copyright (c) 2012 Institute of Massive Computing, East China Normal University.
- * NOTICE: This file is based on the corresponding one in YCSB [Copyright (c) 2010 Yahoo! Inc.]                                                                                                                                                                                   
+ * NOTICE: This file is based on the corresponding one in YCSB [Copyright (c) 2010 Yahoo! Inc.]                                                                                                                             
+ *                                                                                                                                                                                 
  * Licensed under the Apache License, Version 2.0 (the "License"); you                                                                                                             
  * may not use this file except in compliance with the License. You                                                                                                                
  * may obtain a copy of the License at                                                                                                                                             
@@ -15,35 +16,36 @@
  * LICENSE file.                                                                                                                                                                   
  */
 
-package edu.ecnu.imc.bsma;
-
-import java.util.Properties;
-
-import edu.ecnu.imc.bsma.measurements.Measurements;
+package edu.ecnu.imc.bsma.db;
 
 /**
- * Creates a DB layer by dynamically classloading the specified DB class.
+ * Something bad happened while interacting with the database.
  */
-public class DBFactory {
-	public static DB newDB(String dbname, Properties properties,
-			Measurements measurements) throws UnknownDBException {
-		ClassLoader classLoader = DBFactory.class.getClassLoader();
+public class DBException extends Exception
+{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 6646883591588721475L;
 
-		DB ret = null;
+	public DBException(String message)
+	{
+		super(message);
+	}
 
-		try {
-			Class dbclass = classLoader.loadClass(dbname);
-			// System.out.println("dbclass.getName() = " + dbclass.getName());
+	public DBException()
+	{
+		super();
+	}
 
-			ret = (DB) dbclass.newInstance();
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}
+	public DBException(String message, Throwable cause)
+	{
+		super(message, cause);
+	}
 
-		ret.setProperties(properties);
-
-		return new DBWrapper(ret, measurements);
+	public DBException(Throwable cause)
+	{
+		super(cause);
 	}
 
 }

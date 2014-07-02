@@ -20,6 +20,8 @@ package edu.ecnu.imc.bsma;
 
 import java.util.Properties;
 
+import edu.ecnu.imc.bsma.db.DB;
+
 /**
  * One experiment scenario. One object of this type will be instantiated and
  * shared among all client threads. This class should be constructed using a

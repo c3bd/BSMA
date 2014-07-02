@@ -24,12 +24,26 @@
  */
 namespace java rpc
 
-struct Job {
-  1: i32 jobID = 0,
-  2: list<i32> subIDs,
+struct Query {
+	1: byte qID,
+	2: double frac
 }
 
+struct SubJob {
+	1: i32 subJobID,
+	2: i32 opCount,
+	3: i16 threadNum
+}
+struct Job {
+  1: i32 jobID = 0,
+  2: byte dbImpl, //implementation of database interface
+  3: list<Query> queries, //fractions of each query
+  4: list<SubJob> subJobs 
+}
+
+
 service BSMAService {
-   Job start(1:string job),
-   void cancel(1:i32 jobID)
+   Job submit(1:Job job),
+   void cancelJob(1:i32 jobID),
+   void cancelSubJob(1:i32 jobID, 2:i32 subID)
 }

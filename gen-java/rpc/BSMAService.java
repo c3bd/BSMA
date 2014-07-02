@@ -36,17 +36,21 @@ public class BSMAService {
 
   public interface Iface {
 
-    public Job start(String job) throws org.apache.thrift.TException;
+    public Job submit(Job job) throws org.apache.thrift.TException;
 
-    public void cancel(int jobID) throws org.apache.thrift.TException;
+    public void cancelJob(int jobID) throws org.apache.thrift.TException;
+
+    public void cancelSubJob(int jobID, int subID) throws org.apache.thrift.TException;
 
   }
 
   public interface AsyncIface {
 
-    public void start(String job, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException;
+    public void submit(Job job, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException;
 
-    public void cancel(int jobID, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException;
+    public void cancelJob(int jobID, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException;
+
+    public void cancelSubJob(int jobID, int subID, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException;
 
   }
 
@@ -70,46 +74,67 @@ public class BSMAService {
       super(iprot, oprot);
     }
 
-    public Job start(String job) throws org.apache.thrift.TException
+    public Job submit(Job job) throws org.apache.thrift.TException
     {
-      send_start(job);
-      return recv_start();
+      send_submit(job);
+      return recv_submit();
     }
 
-    public void send_start(String job) throws org.apache.thrift.TException
+    public void send_submit(Job job) throws org.apache.thrift.TException
     {
-      start_args args = new start_args();
+      submit_args args = new submit_args();
       args.setJob(job);
-      sendBase("start", args);
+      sendBase("submit", args);
     }
 
-    public Job recv_start() throws org.apache.thrift.TException
+    public Job recv_submit() throws org.apache.thrift.TException
     {
-      start_result result = new start_result();
-      receiveBase(result, "start");
+      submit_result result = new submit_result();
+      receiveBase(result, "submit");
       if (result.isSetSuccess()) {
         return result.success;
       }
-      throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "start failed: unknown result");
+      throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "submit failed: unknown result");
     }
 
-    public void cancel(int jobID) throws org.apache.thrift.TException
+    public void cancelJob(int jobID) throws org.apache.thrift.TException
     {
-      send_cancel(jobID);
-      recv_cancel();
+      send_cancelJob(jobID);
+      recv_cancelJob();
     }
 
-    public void send_cancel(int jobID) throws org.apache.thrift.TException
+    public void send_cancelJob(int jobID) throws org.apache.thrift.TException
     {
-      cancel_args args = new cancel_args();
+      cancelJob_args args = new cancelJob_args();
       args.setJobID(jobID);
-      sendBase("cancel", args);
+      sendBase("cancelJob", args);
     }
 
-    public void recv_cancel() throws org.apache.thrift.TException
+    public void recv_cancelJob() throws org.apache.thrift.TException
     {
-      cancel_result result = new cancel_result();
-      receiveBase(result, "cancel");
+      cancelJob_result result = new cancelJob_result();
+      receiveBase(result, "cancelJob");
+      return;
+    }
+
+    public void cancelSubJob(int jobID, int subID) throws org.apache.thrift.TException
+    {
+      send_cancelSubJob(jobID, subID);
+      recv_cancelSubJob();
+    }
+
+    public void send_cancelSubJob(int jobID, int subID) throws org.apache.thrift.TException
+    {
+      cancelSubJob_args args = new cancelSubJob_args();
+      args.setJobID(jobID);
+      args.setSubID(subID);
+      sendBase("cancelSubJob", args);
+    }
+
+    public void recv_cancelSubJob() throws org.apache.thrift.TException
+    {
+      cancelSubJob_result result = new cancelSubJob_result();
+      receiveBase(result, "cancelSubJob");
       return;
     }
 
@@ -131,23 +156,23 @@ public class BSMAService {
       super(protocolFactory, clientManager, transport);
     }
 
-    public void start(String job, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException {
+    public void submit(Job job, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException {
       checkReady();
-      start_call method_call = new start_call(job, resultHandler, this, ___protocolFactory, ___transport);
+      submit_call method_call = new submit_call(job, resultHandler, this, ___protocolFactory, ___transport);
       this.___currentMethod = method_call;
       ___manager.call(method_call);
     }
 
-    public static class start_call extends org.apache.thrift.async.TAsyncMethodCall {
-      private String job;
-      public start_call(String job, org.apache.thrift.async.AsyncMethodCallback resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
+    public static class submit_call extends org.apache.thrift.async.TAsyncMethodCall {
+      private Job job;
+      public submit_call(Job job, org.apache.thrift.async.AsyncMethodCallback resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
         super(client, protocolFactory, transport, resultHandler, false);
         this.job = job;
       }
 
       public void write_args(org.apache.thrift.protocol.TProtocol prot) throws org.apache.thrift.TException {
-        prot.writeMessageBegin(new org.apache.thrift.protocol.TMessage("start", org.apache.thrift.protocol.TMessageType.CALL, 0));
-        start_args args = new start_args();
+        prot.writeMessageBegin(new org.apache.thrift.protocol.TMessage("submit", org.apache.thrift.protocol.TMessageType.CALL, 0));
+        submit_args args = new submit_args();
         args.setJob(job);
         args.write(prot);
         prot.writeMessageEnd();
@@ -159,27 +184,27 @@ public class BSMAService {
         }
         org.apache.thrift.transport.TMemoryInputTransport memoryTransport = new org.apache.thrift.transport.TMemoryInputTransport(getFrameBuffer().array());
         org.apache.thrift.protocol.TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
-        return (new Client(prot)).recv_start();
+        return (new Client(prot)).recv_submit();
       }
     }
 
-    public void cancel(int jobID, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException {
+    public void cancelJob(int jobID, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException {
       checkReady();
-      cancel_call method_call = new cancel_call(jobID, resultHandler, this, ___protocolFactory, ___transport);
+      cancelJob_call method_call = new cancelJob_call(jobID, resultHandler, this, ___protocolFactory, ___transport);
       this.___currentMethod = method_call;
       ___manager.call(method_call);
     }
 
-    public static class cancel_call extends org.apache.thrift.async.TAsyncMethodCall {
+    public static class cancelJob_call extends org.apache.thrift.async.TAsyncMethodCall {
       private int jobID;
-      public cancel_call(int jobID, org.apache.thrift.async.AsyncMethodCallback resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
+      public cancelJob_call(int jobID, org.apache.thrift.async.AsyncMethodCallback resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
         super(client, protocolFactory, transport, resultHandler, false);
         this.jobID = jobID;
       }
 
       public void write_args(org.apache.thrift.protocol.TProtocol prot) throws org.apache.thrift.TException {
-        prot.writeMessageBegin(new org.apache.thrift.protocol.TMessage("cancel", org.apache.thrift.protocol.TMessageType.CALL, 0));
-        cancel_args args = new cancel_args();
+        prot.writeMessageBegin(new org.apache.thrift.protocol.TMessage("cancelJob", org.apache.thrift.protocol.TMessageType.CALL, 0));
+        cancelJob_args args = new cancelJob_args();
         args.setJobID(jobID);
         args.write(prot);
         prot.writeMessageEnd();
@@ -191,7 +216,42 @@ public class BSMAService {
         }
         org.apache.thrift.transport.TMemoryInputTransport memoryTransport = new org.apache.thrift.transport.TMemoryInputTransport(getFrameBuffer().array());
         org.apache.thrift.protocol.TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
-        (new Client(prot)).recv_cancel();
+        (new Client(prot)).recv_cancelJob();
+      }
+    }
+
+    public void cancelSubJob(int jobID, int subID, org.apache.thrift.async.AsyncMethodCallback resultHandler) throws org.apache.thrift.TException {
+      checkReady();
+      cancelSubJob_call method_call = new cancelSubJob_call(jobID, subID, resultHandler, this, ___protocolFactory, ___transport);
+      this.___currentMethod = method_call;
+      ___manager.call(method_call);
+    }
+
+    public static class cancelSubJob_call extends org.apache.thrift.async.TAsyncMethodCall {
+      private int jobID;
+      private int subID;
+      public cancelSubJob_call(int jobID, int subID, org.apache.thrift.async.AsyncMethodCallback resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
+        super(client, protocolFactory, transport, resultHandler, false);
+        this.jobID = jobID;
+        this.subID = subID;
+      }
+
+      public void write_args(org.apache.thrift.protocol.TProtocol prot) throws org.apache.thrift.TException {
+        prot.writeMessageBegin(new org.apache.thrift.protocol.TMessage("cancelSubJob", org.apache.thrift.protocol.TMessageType.CALL, 0));
+        cancelSubJob_args args = new cancelSubJob_args();
+        args.setJobID(jobID);
+        args.setSubID(subID);
+        args.write(prot);
+        prot.writeMessageEnd();
+      }
+
+      public void getResult() throws org.apache.thrift.TException {
+        if (getState() != org.apache.thrift.async.TAsyncMethodCall.State.RESPONSE_READ) {
+          throw new IllegalStateException("Method call not finished!");
+        }
+        org.apache.thrift.transport.TMemoryInputTransport memoryTransport = new org.apache.thrift.transport.TMemoryInputTransport(getFrameBuffer().array());
+        org.apache.thrift.protocol.TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
+        (new Client(prot)).recv_cancelSubJob();
       }
     }
 
@@ -208,47 +268,68 @@ public class BSMAService {
     }
 
     private static <I extends Iface> Map<String,  org.apache.thrift.ProcessFunction<I, ? extends  org.apache.thrift.TBase>> getProcessMap(Map<String,  org.apache.thrift.ProcessFunction<I, ? extends  org.apache.thrift.TBase>> processMap) {
-      processMap.put("start", new start());
-      processMap.put("cancel", new cancel());
+      processMap.put("submit", new submit());
+      processMap.put("cancelJob", new cancelJob());
+      processMap.put("cancelSubJob", new cancelSubJob());
       return processMap;
     }
 
-    public static class start<I extends Iface> extends org.apache.thrift.ProcessFunction<I, start_args> {
-      public start() {
-        super("start");
+    public static class submit<I extends Iface> extends org.apache.thrift.ProcessFunction<I, submit_args> {
+      public submit() {
+        super("submit");
       }
 
-      public start_args getEmptyArgsInstance() {
-        return new start_args();
+      public submit_args getEmptyArgsInstance() {
+        return new submit_args();
       }
 
       protected boolean isOneway() {
         return false;
       }
 
-      public start_result getResult(I iface, start_args args) throws org.apache.thrift.TException {
-        start_result result = new start_result();
-        result.success = iface.start(args.job);
+      public submit_result getResult(I iface, submit_args args) throws org.apache.thrift.TException {
+        submit_result result = new submit_result();
+        result.success = iface.submit(args.job);
         return result;
       }
     }
 
-    public static class cancel<I extends Iface> extends org.apache.thrift.ProcessFunction<I, cancel_args> {
-      public cancel() {
-        super("cancel");
+    public static class cancelJob<I extends Iface> extends org.apache.thrift.ProcessFunction<I, cancelJob_args> {
+      public cancelJob() {
+        super("cancelJob");
       }
 
-      public cancel_args getEmptyArgsInstance() {
-        return new cancel_args();
+      public cancelJob_args getEmptyArgsInstance() {
+        return new cancelJob_args();
       }
 
       protected boolean isOneway() {
         return false;
       }
 
-      public cancel_result getResult(I iface, cancel_args args) throws org.apache.thrift.TException {
-        cancel_result result = new cancel_result();
-        iface.cancel(args.jobID);
+      public cancelJob_result getResult(I iface, cancelJob_args args) throws org.apache.thrift.TException {
+        cancelJob_result result = new cancelJob_result();
+        iface.cancelJob(args.jobID);
+        return result;
+      }
+    }
+
+    public static class cancelSubJob<I extends Iface> extends org.apache.thrift.ProcessFunction<I, cancelSubJob_args> {
+      public cancelSubJob() {
+        super("cancelSubJob");
+      }
+
+      public cancelSubJob_args getEmptyArgsInstance() {
+        return new cancelSubJob_args();
+      }
+
+      protected boolean isOneway() {
+        return false;
+      }
+
+      public cancelSubJob_result getResult(I iface, cancelSubJob_args args) throws org.apache.thrift.TException {
+        cancelSubJob_result result = new cancelSubJob_result();
+        iface.cancelSubJob(args.jobID, args.subID);
         return result;
       }
     }
@@ -266,25 +347,26 @@ public class BSMAService {
     }
 
     private static <I extends AsyncIface> Map<String,  org.apache.thrift.AsyncProcessFunction<I, ? extends  org.apache.thrift.TBase,?>> getProcessMap(Map<String,  org.apache.thrift.AsyncProcessFunction<I, ? extends  org.apache.thrift.TBase, ?>> processMap) {
-      processMap.put("start", new start());
-      processMap.put("cancel", new cancel());
+      processMap.put("submit", new submit());
+      processMap.put("cancelJob", new cancelJob());
+      processMap.put("cancelSubJob", new cancelSubJob());
       return processMap;
     }
 
-    public static class start<I extends AsyncIface> extends org.apache.thrift.AsyncProcessFunction<I, start_args, Job> {
-      public start() {
-        super("start");
+    public static class submit<I extends AsyncIface> extends org.apache.thrift.AsyncProcessFunction<I, submit_args, Job> {
+      public submit() {
+        super("submit");
       }
 
-      public start_args getEmptyArgsInstance() {
-        return new start_args();
+      public submit_args getEmptyArgsInstance() {
+        return new submit_args();
       }
 
       public AsyncMethodCallback<Job> getResultHandler(final AsyncFrameBuffer fb, final int seqid) {
         final org.apache.thrift.AsyncProcessFunction fcall = this;
         return new AsyncMethodCallback<Job>() { 
           public void onComplete(Job o) {
-            start_result result = new start_result();
+            submit_result result = new submit_result();
             result.success = o;
             try {
               fcall.sendResponse(fb,result, org.apache.thrift.protocol.TMessageType.REPLY,seqid);
@@ -297,7 +379,7 @@ public class BSMAService {
           public void onError(Exception e) {
             byte msgType = org.apache.thrift.protocol.TMessageType.REPLY;
             org.apache.thrift.TBase msg;
-            start_result result = new start_result();
+            submit_result result = new submit_result();
             {
               msgType = org.apache.thrift.protocol.TMessageType.EXCEPTION;
               msg = (org.apache.thrift.TBase)new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.INTERNAL_ERROR, e.getMessage());
@@ -317,25 +399,25 @@ public class BSMAService {
         return false;
       }
 
-      public void start(I iface, start_args args, org.apache.thrift.async.AsyncMethodCallback<Job> resultHandler) throws TException {
-        iface.start(args.job,resultHandler);
+      public void start(I iface, submit_args args, org.apache.thrift.async.AsyncMethodCallback<Job> resultHandler) throws TException {
+        iface.submit(args.job,resultHandler);
       }
     }
 
-    public static class cancel<I extends AsyncIface> extends org.apache.thrift.AsyncProcessFunction<I, cancel_args, Void> {
-      public cancel() {
-        super("cancel");
+    public static class cancelJob<I extends AsyncIface> extends org.apache.thrift.AsyncProcessFunction<I, cancelJob_args, Void> {
+      public cancelJob() {
+        super("cancelJob");
       }
 
-      public cancel_args getEmptyArgsInstance() {
-        return new cancel_args();
+      public cancelJob_args getEmptyArgsInstance() {
+        return new cancelJob_args();
       }
 
       public AsyncMethodCallback<Void> getResultHandler(final AsyncFrameBuffer fb, final int seqid) {
         final org.apache.thrift.AsyncProcessFunction fcall = this;
         return new AsyncMethodCallback<Void>() { 
           public void onComplete(Void o) {
-            cancel_result result = new cancel_result();
+            cancelJob_result result = new cancelJob_result();
             try {
               fcall.sendResponse(fb,result, org.apache.thrift.protocol.TMessageType.REPLY,seqid);
               return;
@@ -347,7 +429,7 @@ public class BSMAService {
           public void onError(Exception e) {
             byte msgType = org.apache.thrift.protocol.TMessageType.REPLY;
             org.apache.thrift.TBase msg;
-            cancel_result result = new cancel_result();
+            cancelJob_result result = new cancelJob_result();
             {
               msgType = org.apache.thrift.protocol.TMessageType.EXCEPTION;
               msg = (org.apache.thrift.TBase)new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.INTERNAL_ERROR, e.getMessage());
@@ -367,25 +449,75 @@ public class BSMAService {
         return false;
       }
 
-      public void start(I iface, cancel_args args, org.apache.thrift.async.AsyncMethodCallback<Void> resultHandler) throws TException {
-        iface.cancel(args.jobID,resultHandler);
+      public void start(I iface, cancelJob_args args, org.apache.thrift.async.AsyncMethodCallback<Void> resultHandler) throws TException {
+        iface.cancelJob(args.jobID,resultHandler);
+      }
+    }
+
+    public static class cancelSubJob<I extends AsyncIface> extends org.apache.thrift.AsyncProcessFunction<I, cancelSubJob_args, Void> {
+      public cancelSubJob() {
+        super("cancelSubJob");
+      }
+
+      public cancelSubJob_args getEmptyArgsInstance() {
+        return new cancelSubJob_args();
+      }
+
+      public AsyncMethodCallback<Void> getResultHandler(final AsyncFrameBuffer fb, final int seqid) {
+        final org.apache.thrift.AsyncProcessFunction fcall = this;
+        return new AsyncMethodCallback<Void>() { 
+          public void onComplete(Void o) {
+            cancelSubJob_result result = new cancelSubJob_result();
+            try {
+              fcall.sendResponse(fb,result, org.apache.thrift.protocol.TMessageType.REPLY,seqid);
+              return;
+            } catch (Exception e) {
+              LOGGER.error("Exception writing to internal frame buffer", e);
+            }
+            fb.close();
+          }
+          public void onError(Exception e) {
+            byte msgType = org.apache.thrift.protocol.TMessageType.REPLY;
+            org.apache.thrift.TBase msg;
+            cancelSubJob_result result = new cancelSubJob_result();
+            {
+              msgType = org.apache.thrift.protocol.TMessageType.EXCEPTION;
+              msg = (org.apache.thrift.TBase)new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.INTERNAL_ERROR, e.getMessage());
+            }
+            try {
+              fcall.sendResponse(fb,msg,msgType,seqid);
+              return;
+            } catch (Exception ex) {
+              LOGGER.error("Exception writing to internal frame buffer", ex);
+            }
+            fb.close();
+          }
+        };
+      }
+
+      protected boolean isOneway() {
+        return false;
+      }
+
+      public void start(I iface, cancelSubJob_args args, org.apache.thrift.async.AsyncMethodCallback<Void> resultHandler) throws TException {
+        iface.cancelSubJob(args.jobID, args.subID,resultHandler);
       }
     }
 
   }
 
-  public static class start_args implements org.apache.thrift.TBase<start_args, start_args._Fields>, java.io.Serializable, Cloneable, Comparable<start_args>   {
-    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("start_args");
+  public static class submit_args implements org.apache.thrift.TBase<submit_args, submit_args._Fields>, java.io.Serializable, Cloneable, Comparable<submit_args>   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("submit_args");
 
-    private static final org.apache.thrift.protocol.TField JOB_FIELD_DESC = new org.apache.thrift.protocol.TField("job", org.apache.thrift.protocol.TType.STRING, (short)1);
+    private static final org.apache.thrift.protocol.TField JOB_FIELD_DESC = new org.apache.thrift.protocol.TField("job", org.apache.thrift.protocol.TType.STRUCT, (short)1);
 
     private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
     static {
-      schemes.put(StandardScheme.class, new start_argsStandardSchemeFactory());
-      schemes.put(TupleScheme.class, new start_argsTupleSchemeFactory());
+      schemes.put(StandardScheme.class, new submit_argsStandardSchemeFactory());
+      schemes.put(TupleScheme.class, new submit_argsTupleSchemeFactory());
     }
 
-    public String job; // required
+    public Job job; // required
 
     /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
@@ -450,16 +582,16 @@ public class BSMAService {
     static {
       Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
       tmpMap.put(_Fields.JOB, new org.apache.thrift.meta_data.FieldMetaData("job", org.apache.thrift.TFieldRequirementType.DEFAULT, 
-          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+          new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, Job.class)));
       metaDataMap = Collections.unmodifiableMap(tmpMap);
-      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(start_args.class, metaDataMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(submit_args.class, metaDataMap);
     }
 
-    public start_args() {
+    public submit_args() {
     }
 
-    public start_args(
-      String job)
+    public submit_args(
+      Job job)
     {
       this();
       this.job = job;
@@ -468,14 +600,14 @@ public class BSMAService {
     /**
      * Performs a deep copy on <i>other</i>.
      */
-    public start_args(start_args other) {
+    public submit_args(submit_args other) {
       if (other.isSetJob()) {
-        this.job = other.job;
+        this.job = new Job(other.job);
       }
     }
 
-    public start_args deepCopy() {
-      return new start_args(this);
+    public submit_args deepCopy() {
+      return new submit_args(this);
     }
 
     @Override
@@ -483,11 +615,11 @@ public class BSMAService {
       this.job = null;
     }
 
-    public String getJob() {
+    public Job getJob() {
       return this.job;
     }
 
-    public start_args setJob(String job) {
+    public submit_args setJob(Job job) {
       this.job = job;
       return this;
     }
@@ -513,7 +645,7 @@ public class BSMAService {
         if (value == null) {
           unsetJob();
         } else {
-          setJob((String)value);
+          setJob((Job)value);
         }
         break;
 
@@ -546,12 +678,12 @@ public class BSMAService {
     public boolean equals(Object that) {
       if (that == null)
         return false;
-      if (that instanceof start_args)
-        return this.equals((start_args)that);
+      if (that instanceof submit_args)
+        return this.equals((submit_args)that);
       return false;
     }
 
-    public boolean equals(start_args that) {
+    public boolean equals(submit_args that) {
       if (that == null)
         return false;
 
@@ -573,7 +705,7 @@ public class BSMAService {
     }
 
     @Override
-    public int compareTo(start_args other) {
+    public int compareTo(submit_args other) {
       if (!getClass().equals(other.getClass())) {
         return getClass().getName().compareTo(other.getClass().getName());
       }
@@ -607,7 +739,7 @@ public class BSMAService {
 
     @Override
     public String toString() {
-      StringBuilder sb = new StringBuilder("start_args(");
+      StringBuilder sb = new StringBuilder("submit_args(");
       boolean first = true;
 
       sb.append("job:");
@@ -624,6 +756,9 @@ public class BSMAService {
     public void validate() throws org.apache.thrift.TException {
       // check for required fields
       // check for sub-struct validity
+      if (job != null) {
+        job.validate();
+      }
     }
 
     private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
@@ -642,15 +777,15 @@ public class BSMAService {
       }
     }
 
-    private static class start_argsStandardSchemeFactory implements SchemeFactory {
-      public start_argsStandardScheme getScheme() {
-        return new start_argsStandardScheme();
+    private static class submit_argsStandardSchemeFactory implements SchemeFactory {
+      public submit_argsStandardScheme getScheme() {
+        return new submit_argsStandardScheme();
       }
     }
 
-    private static class start_argsStandardScheme extends StandardScheme<start_args> {
+    private static class submit_argsStandardScheme extends StandardScheme<submit_args> {
 
-      public void read(org.apache.thrift.protocol.TProtocol iprot, start_args struct) throws org.apache.thrift.TException {
+      public void read(org.apache.thrift.protocol.TProtocol iprot, submit_args struct) throws org.apache.thrift.TException {
         org.apache.thrift.protocol.TField schemeField;
         iprot.readStructBegin();
         while (true)
@@ -661,8 +796,9 @@ public class BSMAService {
           }
           switch (schemeField.id) {
             case 1: // JOB
-              if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
-                struct.job = iprot.readString();
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRUCT) {
+                struct.job = new Job();
+                struct.job.read(iprot);
                 struct.setJobIsSet(true);
               } else { 
                 org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
@@ -679,13 +815,13 @@ public class BSMAService {
         struct.validate();
       }
 
-      public void write(org.apache.thrift.protocol.TProtocol oprot, start_args struct) throws org.apache.thrift.TException {
+      public void write(org.apache.thrift.protocol.TProtocol oprot, submit_args struct) throws org.apache.thrift.TException {
         struct.validate();
 
         oprot.writeStructBegin(STRUCT_DESC);
         if (struct.job != null) {
           oprot.writeFieldBegin(JOB_FIELD_DESC);
-          oprot.writeString(struct.job);
+          struct.job.write(oprot);
           oprot.writeFieldEnd();
         }
         oprot.writeFieldStop();
@@ -694,16 +830,16 @@ public class BSMAService {
 
     }
 
-    private static class start_argsTupleSchemeFactory implements SchemeFactory {
-      public start_argsTupleScheme getScheme() {
-        return new start_argsTupleScheme();
+    private static class submit_argsTupleSchemeFactory implements SchemeFactory {
+      public submit_argsTupleScheme getScheme() {
+        return new submit_argsTupleScheme();
       }
     }
 
-    private static class start_argsTupleScheme extends TupleScheme<start_args> {
+    private static class submit_argsTupleScheme extends TupleScheme<submit_args> {
 
       @Override
-      public void write(org.apache.thrift.protocol.TProtocol prot, start_args struct) throws org.apache.thrift.TException {
+      public void write(org.apache.thrift.protocol.TProtocol prot, submit_args struct) throws org.apache.thrift.TException {
         TTupleProtocol oprot = (TTupleProtocol) prot;
         BitSet optionals = new BitSet();
         if (struct.isSetJob()) {
@@ -711,16 +847,17 @@ public class BSMAService {
         }
         oprot.writeBitSet(optionals, 1);
         if (struct.isSetJob()) {
-          oprot.writeString(struct.job);
+          struct.job.write(oprot);
         }
       }
 
       @Override
-      public void read(org.apache.thrift.protocol.TProtocol prot, start_args struct) throws org.apache.thrift.TException {
+      public void read(org.apache.thrift.protocol.TProtocol prot, submit_args struct) throws org.apache.thrift.TException {
         TTupleProtocol iprot = (TTupleProtocol) prot;
         BitSet incoming = iprot.readBitSet(1);
         if (incoming.get(0)) {
-          struct.job = iprot.readString();
+          struct.job = new Job();
+          struct.job.read(iprot);
           struct.setJobIsSet(true);
         }
       }
@@ -728,15 +865,15 @@ public class BSMAService {
 
   }
 
-  public static class start_result implements org.apache.thrift.TBase<start_result, start_result._Fields>, java.io.Serializable, Cloneable, Comparable<start_result>   {
-    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("start_result");
+  public static class submit_result implements org.apache.thrift.TBase<submit_result, submit_result._Fields>, java.io.Serializable, Cloneable, Comparable<submit_result>   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("submit_result");
 
     private static final org.apache.thrift.protocol.TField SUCCESS_FIELD_DESC = new org.apache.thrift.protocol.TField("success", org.apache.thrift.protocol.TType.STRUCT, (short)0);
 
     private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
     static {
-      schemes.put(StandardScheme.class, new start_resultStandardSchemeFactory());
-      schemes.put(TupleScheme.class, new start_resultTupleSchemeFactory());
+      schemes.put(StandardScheme.class, new submit_resultStandardSchemeFactory());
+      schemes.put(TupleScheme.class, new submit_resultTupleSchemeFactory());
     }
 
     public Job success; // required
@@ -806,13 +943,13 @@ public class BSMAService {
       tmpMap.put(_Fields.SUCCESS, new org.apache.thrift.meta_data.FieldMetaData("success", org.apache.thrift.TFieldRequirementType.DEFAULT, 
           new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, Job.class)));
       metaDataMap = Collections.unmodifiableMap(tmpMap);
-      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(start_result.class, metaDataMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(submit_result.class, metaDataMap);
     }
 
-    public start_result() {
+    public submit_result() {
     }
 
-    public start_result(
+    public submit_result(
       Job success)
     {
       this();
@@ -822,14 +959,14 @@ public class BSMAService {
     /**
      * Performs a deep copy on <i>other</i>.
      */
-    public start_result(start_result other) {
+    public submit_result(submit_result other) {
       if (other.isSetSuccess()) {
         this.success = new Job(other.success);
       }
     }
 
-    public start_result deepCopy() {
-      return new start_result(this);
+    public submit_result deepCopy() {
+      return new submit_result(this);
     }
 
     @Override
@@ -841,7 +978,7 @@ public class BSMAService {
       return this.success;
     }
 
-    public start_result setSuccess(Job success) {
+    public submit_result setSuccess(Job success) {
       this.success = success;
       return this;
     }
@@ -900,12 +1037,12 @@ public class BSMAService {
     public boolean equals(Object that) {
       if (that == null)
         return false;
-      if (that instanceof start_result)
-        return this.equals((start_result)that);
+      if (that instanceof submit_result)
+        return this.equals((submit_result)that);
       return false;
     }
 
-    public boolean equals(start_result that) {
+    public boolean equals(submit_result that) {
       if (that == null)
         return false;
 
@@ -927,7 +1064,7 @@ public class BSMAService {
     }
 
     @Override
-    public int compareTo(start_result other) {
+    public int compareTo(submit_result other) {
       if (!getClass().equals(other.getClass())) {
         return getClass().getName().compareTo(other.getClass().getName());
       }
@@ -961,7 +1098,7 @@ public class BSMAService {
 
     @Override
     public String toString() {
-      StringBuilder sb = new StringBuilder("start_result(");
+      StringBuilder sb = new StringBuilder("submit_result(");
       boolean first = true;
 
       sb.append("success:");
@@ -999,15 +1136,15 @@ public class BSMAService {
       }
     }
 
-    private static class start_resultStandardSchemeFactory implements SchemeFactory {
-      public start_resultStandardScheme getScheme() {
-        return new start_resultStandardScheme();
+    private static class submit_resultStandardSchemeFactory implements SchemeFactory {
+      public submit_resultStandardScheme getScheme() {
+        return new submit_resultStandardScheme();
       }
     }
 
-    private static class start_resultStandardScheme extends StandardScheme<start_result> {
+    private static class submit_resultStandardScheme extends StandardScheme<submit_result> {
 
-      public void read(org.apache.thrift.protocol.TProtocol iprot, start_result struct) throws org.apache.thrift.TException {
+      public void read(org.apache.thrift.protocol.TProtocol iprot, submit_result struct) throws org.apache.thrift.TException {
         org.apache.thrift.protocol.TField schemeField;
         iprot.readStructBegin();
         while (true)
@@ -1037,7 +1174,7 @@ public class BSMAService {
         struct.validate();
       }
 
-      public void write(org.apache.thrift.protocol.TProtocol oprot, start_result struct) throws org.apache.thrift.TException {
+      public void write(org.apache.thrift.protocol.TProtocol oprot, submit_result struct) throws org.apache.thrift.TException {
         struct.validate();
 
         oprot.writeStructBegin(STRUCT_DESC);
@@ -1052,16 +1189,16 @@ public class BSMAService {
 
     }
 
-    private static class start_resultTupleSchemeFactory implements SchemeFactory {
-      public start_resultTupleScheme getScheme() {
-        return new start_resultTupleScheme();
+    private static class submit_resultTupleSchemeFactory implements SchemeFactory {
+      public submit_resultTupleScheme getScheme() {
+        return new submit_resultTupleScheme();
       }
     }
 
-    private static class start_resultTupleScheme extends TupleScheme<start_result> {
+    private static class submit_resultTupleScheme extends TupleScheme<submit_result> {
 
       @Override
-      public void write(org.apache.thrift.protocol.TProtocol prot, start_result struct) throws org.apache.thrift.TException {
+      public void write(org.apache.thrift.protocol.TProtocol prot, submit_result struct) throws org.apache.thrift.TException {
         TTupleProtocol oprot = (TTupleProtocol) prot;
         BitSet optionals = new BitSet();
         if (struct.isSetSuccess()) {
@@ -1074,7 +1211,7 @@ public class BSMAService {
       }
 
       @Override
-      public void read(org.apache.thrift.protocol.TProtocol prot, start_result struct) throws org.apache.thrift.TException {
+      public void read(org.apache.thrift.protocol.TProtocol prot, submit_result struct) throws org.apache.thrift.TException {
         TTupleProtocol iprot = (TTupleProtocol) prot;
         BitSet incoming = iprot.readBitSet(1);
         if (incoming.get(0)) {
@@ -1087,15 +1224,15 @@ public class BSMAService {
 
   }
 
-  public static class cancel_args implements org.apache.thrift.TBase<cancel_args, cancel_args._Fields>, java.io.Serializable, Cloneable, Comparable<cancel_args>   {
-    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("cancel_args");
+  public static class cancelJob_args implements org.apache.thrift.TBase<cancelJob_args, cancelJob_args._Fields>, java.io.Serializable, Cloneable, Comparable<cancelJob_args>   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("cancelJob_args");
 
     private static final org.apache.thrift.protocol.TField JOB_ID_FIELD_DESC = new org.apache.thrift.protocol.TField("jobID", org.apache.thrift.protocol.TType.I32, (short)1);
 
     private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
     static {
-      schemes.put(StandardScheme.class, new cancel_argsStandardSchemeFactory());
-      schemes.put(TupleScheme.class, new cancel_argsTupleSchemeFactory());
+      schemes.put(StandardScheme.class, new cancelJob_argsStandardSchemeFactory());
+      schemes.put(TupleScheme.class, new cancelJob_argsTupleSchemeFactory());
     }
 
     public int jobID; // required
@@ -1167,13 +1304,13 @@ public class BSMAService {
       tmpMap.put(_Fields.JOB_ID, new org.apache.thrift.meta_data.FieldMetaData("jobID", org.apache.thrift.TFieldRequirementType.DEFAULT, 
           new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
       metaDataMap = Collections.unmodifiableMap(tmpMap);
-      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(cancel_args.class, metaDataMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(cancelJob_args.class, metaDataMap);
     }
 
-    public cancel_args() {
+    public cancelJob_args() {
     }
 
-    public cancel_args(
+    public cancelJob_args(
       int jobID)
     {
       this();
@@ -1184,13 +1321,13 @@ public class BSMAService {
     /**
      * Performs a deep copy on <i>other</i>.
      */
-    public cancel_args(cancel_args other) {
+    public cancelJob_args(cancelJob_args other) {
       __isset_bitfield = other.__isset_bitfield;
       this.jobID = other.jobID;
     }
 
-    public cancel_args deepCopy() {
-      return new cancel_args(this);
+    public cancelJob_args deepCopy() {
+      return new cancelJob_args(this);
     }
 
     @Override
@@ -1203,7 +1340,7 @@ public class BSMAService {
       return this.jobID;
     }
 
-    public cancel_args setJobID(int jobID) {
+    public cancelJob_args setJobID(int jobID) {
       this.jobID = jobID;
       setJobIDIsSet(true);
       return this;
@@ -1261,12 +1398,12 @@ public class BSMAService {
     public boolean equals(Object that) {
       if (that == null)
         return false;
-      if (that instanceof cancel_args)
-        return this.equals((cancel_args)that);
+      if (that instanceof cancelJob_args)
+        return this.equals((cancelJob_args)that);
       return false;
     }
 
-    public boolean equals(cancel_args that) {
+    public boolean equals(cancelJob_args that) {
       if (that == null)
         return false;
 
@@ -1288,7 +1425,7 @@ public class BSMAService {
     }
 
     @Override
-    public int compareTo(cancel_args other) {
+    public int compareTo(cancelJob_args other) {
       if (!getClass().equals(other.getClass())) {
         return getClass().getName().compareTo(other.getClass().getName());
       }
@@ -1322,7 +1459,7 @@ public class BSMAService {
 
     @Override
     public String toString() {
-      StringBuilder sb = new StringBuilder("cancel_args(");
+      StringBuilder sb = new StringBuilder("cancelJob_args(");
       boolean first = true;
 
       sb.append("jobID:");
@@ -1355,15 +1492,15 @@ public class BSMAService {
       }
     }
 
-    private static class cancel_argsStandardSchemeFactory implements SchemeFactory {
-      public cancel_argsStandardScheme getScheme() {
-        return new cancel_argsStandardScheme();
+    private static class cancelJob_argsStandardSchemeFactory implements SchemeFactory {
+      public cancelJob_argsStandardScheme getScheme() {
+        return new cancelJob_argsStandardScheme();
       }
     }
 
-    private static class cancel_argsStandardScheme extends StandardScheme<cancel_args> {
+    private static class cancelJob_argsStandardScheme extends StandardScheme<cancelJob_args> {
 
-      public void read(org.apache.thrift.protocol.TProtocol iprot, cancel_args struct) throws org.apache.thrift.TException {
+      public void read(org.apache.thrift.protocol.TProtocol iprot, cancelJob_args struct) throws org.apache.thrift.TException {
         org.apache.thrift.protocol.TField schemeField;
         iprot.readStructBegin();
         while (true)
@@ -1392,7 +1529,7 @@ public class BSMAService {
         struct.validate();
       }
 
-      public void write(org.apache.thrift.protocol.TProtocol oprot, cancel_args struct) throws org.apache.thrift.TException {
+      public void write(org.apache.thrift.protocol.TProtocol oprot, cancelJob_args struct) throws org.apache.thrift.TException {
         struct.validate();
 
         oprot.writeStructBegin(STRUCT_DESC);
@@ -1405,16 +1542,16 @@ public class BSMAService {
 
     }
 
-    private static class cancel_argsTupleSchemeFactory implements SchemeFactory {
-      public cancel_argsTupleScheme getScheme() {
-        return new cancel_argsTupleScheme();
+    private static class cancelJob_argsTupleSchemeFactory implements SchemeFactory {
+      public cancelJob_argsTupleScheme getScheme() {
+        return new cancelJob_argsTupleScheme();
       }
     }
 
-    private static class cancel_argsTupleScheme extends TupleScheme<cancel_args> {
+    private static class cancelJob_argsTupleScheme extends TupleScheme<cancelJob_args> {
 
       @Override
-      public void write(org.apache.thrift.protocol.TProtocol prot, cancel_args struct) throws org.apache.thrift.TException {
+      public void write(org.apache.thrift.protocol.TProtocol prot, cancelJob_args struct) throws org.apache.thrift.TException {
         TTupleProtocol oprot = (TTupleProtocol) prot;
         BitSet optionals = new BitSet();
         if (struct.isSetJobID()) {
@@ -1427,7 +1564,7 @@ public class BSMAService {
       }
 
       @Override
-      public void read(org.apache.thrift.protocol.TProtocol prot, cancel_args struct) throws org.apache.thrift.TException {
+      public void read(org.apache.thrift.protocol.TProtocol prot, cancelJob_args struct) throws org.apache.thrift.TException {
         TTupleProtocol iprot = (TTupleProtocol) prot;
         BitSet incoming = iprot.readBitSet(1);
         if (incoming.get(0)) {
@@ -1439,14 +1576,14 @@ public class BSMAService {
 
   }
 
-  public static class cancel_result implements org.apache.thrift.TBase<cancel_result, cancel_result._Fields>, java.io.Serializable, Cloneable, Comparable<cancel_result>   {
-    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("cancel_result");
+  public static class cancelJob_result implements org.apache.thrift.TBase<cancelJob_result, cancelJob_result._Fields>, java.io.Serializable, Cloneable, Comparable<cancelJob_result>   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("cancelJob_result");
 
 
     private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
     static {
-      schemes.put(StandardScheme.class, new cancel_resultStandardSchemeFactory());
-      schemes.put(TupleScheme.class, new cancel_resultTupleSchemeFactory());
+      schemes.put(StandardScheme.class, new cancelJob_resultStandardSchemeFactory());
+      schemes.put(TupleScheme.class, new cancelJob_resultTupleSchemeFactory());
     }
 
 
@@ -1509,20 +1646,20 @@ public class BSMAService {
     static {
       Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
       metaDataMap = Collections.unmodifiableMap(tmpMap);
-      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(cancel_result.class, metaDataMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(cancelJob_result.class, metaDataMap);
     }
 
-    public cancel_result() {
+    public cancelJob_result() {
     }
 
     /**
      * Performs a deep copy on <i>other</i>.
      */
-    public cancel_result(cancel_result other) {
+    public cancelJob_result(cancelJob_result other) {
     }
 
-    public cancel_result deepCopy() {
-      return new cancel_result(this);
+    public cancelJob_result deepCopy() {
+      return new cancelJob_result(this);
     }
 
     @Override
@@ -1555,12 +1692,12 @@ public class BSMAService {
     public boolean equals(Object that) {
       if (that == null)
         return false;
-      if (that instanceof cancel_result)
-        return this.equals((cancel_result)that);
+      if (that instanceof cancelJob_result)
+        return this.equals((cancelJob_result)that);
       return false;
     }
 
-    public boolean equals(cancel_result that) {
+    public boolean equals(cancelJob_result that) {
       if (that == null)
         return false;
 
@@ -1573,7 +1710,7 @@ public class BSMAService {
     }
 
     @Override
-    public int compareTo(cancel_result other) {
+    public int compareTo(cancelJob_result other) {
       if (!getClass().equals(other.getClass())) {
         return getClass().getName().compareTo(other.getClass().getName());
       }
@@ -1597,7 +1734,7 @@ public class BSMAService {
 
     @Override
     public String toString() {
-      StringBuilder sb = new StringBuilder("cancel_result(");
+      StringBuilder sb = new StringBuilder("cancelJob_result(");
       boolean first = true;
 
       sb.append(")");
@@ -1625,15 +1762,15 @@ public class BSMAService {
       }
     }
 
-    private static class cancel_resultStandardSchemeFactory implements SchemeFactory {
-      public cancel_resultStandardScheme getScheme() {
-        return new cancel_resultStandardScheme();
+    private static class cancelJob_resultStandardSchemeFactory implements SchemeFactory {
+      public cancelJob_resultStandardScheme getScheme() {
+        return new cancelJob_resultStandardScheme();
       }
     }
 
-    private static class cancel_resultStandardScheme extends StandardScheme<cancel_result> {
+    private static class cancelJob_resultStandardScheme extends StandardScheme<cancelJob_result> {
 
-      public void read(org.apache.thrift.protocol.TProtocol iprot, cancel_result struct) throws org.apache.thrift.TException {
+      public void read(org.apache.thrift.protocol.TProtocol iprot, cancelJob_result struct) throws org.apache.thrift.TException {
         org.apache.thrift.protocol.TField schemeField;
         iprot.readStructBegin();
         while (true)
@@ -1654,7 +1791,7 @@ public class BSMAService {
         struct.validate();
       }
 
-      public void write(org.apache.thrift.protocol.TProtocol oprot, cancel_result struct) throws org.apache.thrift.TException {
+      public void write(org.apache.thrift.protocol.TProtocol oprot, cancelJob_result struct) throws org.apache.thrift.TException {
         struct.validate();
 
         oprot.writeStructBegin(STRUCT_DESC);
@@ -1664,21 +1801,713 @@ public class BSMAService {
 
     }
 
-    private static class cancel_resultTupleSchemeFactory implements SchemeFactory {
-      public cancel_resultTupleScheme getScheme() {
-        return new cancel_resultTupleScheme();
+    private static class cancelJob_resultTupleSchemeFactory implements SchemeFactory {
+      public cancelJob_resultTupleScheme getScheme() {
+        return new cancelJob_resultTupleScheme();
       }
     }
 
-    private static class cancel_resultTupleScheme extends TupleScheme<cancel_result> {
+    private static class cancelJob_resultTupleScheme extends TupleScheme<cancelJob_result> {
 
       @Override
-      public void write(org.apache.thrift.protocol.TProtocol prot, cancel_result struct) throws org.apache.thrift.TException {
+      public void write(org.apache.thrift.protocol.TProtocol prot, cancelJob_result struct) throws org.apache.thrift.TException {
         TTupleProtocol oprot = (TTupleProtocol) prot;
       }
 
       @Override
-      public void read(org.apache.thrift.protocol.TProtocol prot, cancel_result struct) throws org.apache.thrift.TException {
+      public void read(org.apache.thrift.protocol.TProtocol prot, cancelJob_result struct) throws org.apache.thrift.TException {
+        TTupleProtocol iprot = (TTupleProtocol) prot;
+      }
+    }
+
+  }
+
+  public static class cancelSubJob_args implements org.apache.thrift.TBase<cancelSubJob_args, cancelSubJob_args._Fields>, java.io.Serializable, Cloneable, Comparable<cancelSubJob_args>   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("cancelSubJob_args");
+
+    private static final org.apache.thrift.protocol.TField JOB_ID_FIELD_DESC = new org.apache.thrift.protocol.TField("jobID", org.apache.thrift.protocol.TType.I32, (short)1);
+    private static final org.apache.thrift.protocol.TField SUB_ID_FIELD_DESC = new org.apache.thrift.protocol.TField("subID", org.apache.thrift.protocol.TType.I32, (short)2);
+
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    static {
+      schemes.put(StandardScheme.class, new cancelSubJob_argsStandardSchemeFactory());
+      schemes.put(TupleScheme.class, new cancelSubJob_argsTupleSchemeFactory());
+    }
+
+    public int jobID; // required
+    public int subID; // required
+
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements org.apache.thrift.TFieldIdEnum {
+      JOB_ID((short)1, "jobID"),
+      SUB_ID((short)2, "subID");
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          case 1: // JOB_ID
+            return JOB_ID;
+          case 2: // SUB_ID
+            return SUB_ID;
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
+    }
+
+    // isset id assignments
+    private static final int __JOBID_ISSET_ID = 0;
+    private static final int __SUBID_ISSET_ID = 1;
+    private byte __isset_bitfield = 0;
+    public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
+    static {
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      tmpMap.put(_Fields.JOB_ID, new org.apache.thrift.meta_data.FieldMetaData("jobID", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
+      tmpMap.put(_Fields.SUB_ID, new org.apache.thrift.meta_data.FieldMetaData("subID", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(cancelSubJob_args.class, metaDataMap);
+    }
+
+    public cancelSubJob_args() {
+    }
+
+    public cancelSubJob_args(
+      int jobID,
+      int subID)
+    {
+      this();
+      this.jobID = jobID;
+      setJobIDIsSet(true);
+      this.subID = subID;
+      setSubIDIsSet(true);
+    }
+
+    /**
+     * Performs a deep copy on <i>other</i>.
+     */
+    public cancelSubJob_args(cancelSubJob_args other) {
+      __isset_bitfield = other.__isset_bitfield;
+      this.jobID = other.jobID;
+      this.subID = other.subID;
+    }
+
+    public cancelSubJob_args deepCopy() {
+      return new cancelSubJob_args(this);
+    }
+
+    @Override
+    public void clear() {
+      setJobIDIsSet(false);
+      this.jobID = 0;
+      setSubIDIsSet(false);
+      this.subID = 0;
+    }
+
+    public int getJobID() {
+      return this.jobID;
+    }
+
+    public cancelSubJob_args setJobID(int jobID) {
+      this.jobID = jobID;
+      setJobIDIsSet(true);
+      return this;
+    }
+
+    public void unsetJobID() {
+      __isset_bitfield = EncodingUtils.clearBit(__isset_bitfield, __JOBID_ISSET_ID);
+    }
+
+    /** Returns true if field jobID is set (has been assigned a value) and false otherwise */
+    public boolean isSetJobID() {
+      return EncodingUtils.testBit(__isset_bitfield, __JOBID_ISSET_ID);
+    }
+
+    public void setJobIDIsSet(boolean value) {
+      __isset_bitfield = EncodingUtils.setBit(__isset_bitfield, __JOBID_ISSET_ID, value);
+    }
+
+    public int getSubID() {
+      return this.subID;
+    }
+
+    public cancelSubJob_args setSubID(int subID) {
+      this.subID = subID;
+      setSubIDIsSet(true);
+      return this;
+    }
+
+    public void unsetSubID() {
+      __isset_bitfield = EncodingUtils.clearBit(__isset_bitfield, __SUBID_ISSET_ID);
+    }
+
+    /** Returns true if field subID is set (has been assigned a value) and false otherwise */
+    public boolean isSetSubID() {
+      return EncodingUtils.testBit(__isset_bitfield, __SUBID_ISSET_ID);
+    }
+
+    public void setSubIDIsSet(boolean value) {
+      __isset_bitfield = EncodingUtils.setBit(__isset_bitfield, __SUBID_ISSET_ID, value);
+    }
+
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
+      case JOB_ID:
+        if (value == null) {
+          unsetJobID();
+        } else {
+          setJobID((Integer)value);
+        }
+        break;
+
+      case SUB_ID:
+        if (value == null) {
+          unsetSubID();
+        } else {
+          setSubID((Integer)value);
+        }
+        break;
+
+      }
+    }
+
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
+      case JOB_ID:
+        return Integer.valueOf(getJobID());
+
+      case SUB_ID:
+        return Integer.valueOf(getSubID());
+
+      }
+      throw new IllegalStateException();
+    }
+
+    /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
+      case JOB_ID:
+        return isSetJobID();
+      case SUB_ID:
+        return isSetSubID();
+      }
+      throw new IllegalStateException();
+    }
+
+    @Override
+    public boolean equals(Object that) {
+      if (that == null)
+        return false;
+      if (that instanceof cancelSubJob_args)
+        return this.equals((cancelSubJob_args)that);
+      return false;
+    }
+
+    public boolean equals(cancelSubJob_args that) {
+      if (that == null)
+        return false;
+
+      boolean this_present_jobID = true;
+      boolean that_present_jobID = true;
+      if (this_present_jobID || that_present_jobID) {
+        if (!(this_present_jobID && that_present_jobID))
+          return false;
+        if (this.jobID != that.jobID)
+          return false;
+      }
+
+      boolean this_present_subID = true;
+      boolean that_present_subID = true;
+      if (this_present_subID || that_present_subID) {
+        if (!(this_present_subID && that_present_subID))
+          return false;
+        if (this.subID != that.subID)
+          return false;
+      }
+
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      return 0;
+    }
+
+    @Override
+    public int compareTo(cancelSubJob_args other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+
+      lastComparison = Boolean.valueOf(isSetJobID()).compareTo(other.isSetJobID());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetJobID()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.jobID, other.jobID);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      lastComparison = Boolean.valueOf(isSetSubID()).compareTo(other.isSetSubID());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetSubID()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.subID, other.subID);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
+      schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
+    }
+
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
+      schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder("cancelSubJob_args(");
+      boolean first = true;
+
+      sb.append("jobID:");
+      sb.append(this.jobID);
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("subID:");
+      sb.append(this.subID);
+      first = false;
+      sb.append(")");
+      return sb.toString();
+    }
+
+    public void validate() throws org.apache.thrift.TException {
+      // check for required fields
+      // check for sub-struct validity
+    }
+
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+      try {
+        write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+      try {
+        // it doesn't seem like you should have to do this, but java serialization is wacky, and doesn't call the default constructor.
+        __isset_bitfield = 0;
+        read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private static class cancelSubJob_argsStandardSchemeFactory implements SchemeFactory {
+      public cancelSubJob_argsStandardScheme getScheme() {
+        return new cancelSubJob_argsStandardScheme();
+      }
+    }
+
+    private static class cancelSubJob_argsStandardScheme extends StandardScheme<cancelSubJob_args> {
+
+      public void read(org.apache.thrift.protocol.TProtocol iprot, cancelSubJob_args struct) throws org.apache.thrift.TException {
+        org.apache.thrift.protocol.TField schemeField;
+        iprot.readStructBegin();
+        while (true)
+        {
+          schemeField = iprot.readFieldBegin();
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+            break;
+          }
+          switch (schemeField.id) {
+            case 1: // JOB_ID
+              if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
+                struct.jobID = iprot.readI32();
+                struct.setJobIDIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            case 2: // SUB_ID
+              if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
+                struct.subID = iprot.readI32();
+                struct.setSubIDIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
+            default:
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+          }
+          iprot.readFieldEnd();
+        }
+        iprot.readStructEnd();
+
+        // check for required fields of primitive type, which can't be checked in the validate method
+        struct.validate();
+      }
+
+      public void write(org.apache.thrift.protocol.TProtocol oprot, cancelSubJob_args struct) throws org.apache.thrift.TException {
+        struct.validate();
+
+        oprot.writeStructBegin(STRUCT_DESC);
+        oprot.writeFieldBegin(JOB_ID_FIELD_DESC);
+        oprot.writeI32(struct.jobID);
+        oprot.writeFieldEnd();
+        oprot.writeFieldBegin(SUB_ID_FIELD_DESC);
+        oprot.writeI32(struct.subID);
+        oprot.writeFieldEnd();
+        oprot.writeFieldStop();
+        oprot.writeStructEnd();
+      }
+
+    }
+
+    private static class cancelSubJob_argsTupleSchemeFactory implements SchemeFactory {
+      public cancelSubJob_argsTupleScheme getScheme() {
+        return new cancelSubJob_argsTupleScheme();
+      }
+    }
+
+    private static class cancelSubJob_argsTupleScheme extends TupleScheme<cancelSubJob_args> {
+
+      @Override
+      public void write(org.apache.thrift.protocol.TProtocol prot, cancelSubJob_args struct) throws org.apache.thrift.TException {
+        TTupleProtocol oprot = (TTupleProtocol) prot;
+        BitSet optionals = new BitSet();
+        if (struct.isSetJobID()) {
+          optionals.set(0);
+        }
+        if (struct.isSetSubID()) {
+          optionals.set(1);
+        }
+        oprot.writeBitSet(optionals, 2);
+        if (struct.isSetJobID()) {
+          oprot.writeI32(struct.jobID);
+        }
+        if (struct.isSetSubID()) {
+          oprot.writeI32(struct.subID);
+        }
+      }
+
+      @Override
+      public void read(org.apache.thrift.protocol.TProtocol prot, cancelSubJob_args struct) throws org.apache.thrift.TException {
+        TTupleProtocol iprot = (TTupleProtocol) prot;
+        BitSet incoming = iprot.readBitSet(2);
+        if (incoming.get(0)) {
+          struct.jobID = iprot.readI32();
+          struct.setJobIDIsSet(true);
+        }
+        if (incoming.get(1)) {
+          struct.subID = iprot.readI32();
+          struct.setSubIDIsSet(true);
+        }
+      }
+    }
+
+  }
+
+  public static class cancelSubJob_result implements org.apache.thrift.TBase<cancelSubJob_result, cancelSubJob_result._Fields>, java.io.Serializable, Cloneable, Comparable<cancelSubJob_result>   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("cancelSubJob_result");
+
+
+    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
+    static {
+      schemes.put(StandardScheme.class, new cancelSubJob_resultStandardSchemeFactory());
+      schemes.put(TupleScheme.class, new cancelSubJob_resultTupleSchemeFactory());
+    }
+
+
+    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
+    public enum _Fields implements org.apache.thrift.TFieldIdEnum {
+;
+
+      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
+
+      static {
+        for (_Fields field : EnumSet.allOf(_Fields.class)) {
+          byName.put(field.getFieldName(), field);
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, or null if its not found.
+       */
+      public static _Fields findByThriftId(int fieldId) {
+        switch(fieldId) {
+          default:
+            return null;
+        }
+      }
+
+      /**
+       * Find the _Fields constant that matches fieldId, throwing an exception
+       * if it is not found.
+       */
+      public static _Fields findByThriftIdOrThrow(int fieldId) {
+        _Fields fields = findByThriftId(fieldId);
+        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
+        return fields;
+      }
+
+      /**
+       * Find the _Fields constant that matches name, or null if its not found.
+       */
+      public static _Fields findByName(String name) {
+        return byName.get(name);
+      }
+
+      private final short _thriftId;
+      private final String _fieldName;
+
+      _Fields(short thriftId, String fieldName) {
+        _thriftId = thriftId;
+        _fieldName = fieldName;
+      }
+
+      public short getThriftFieldId() {
+        return _thriftId;
+      }
+
+      public String getFieldName() {
+        return _fieldName;
+      }
+    }
+    public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
+    static {
+      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+      metaDataMap = Collections.unmodifiableMap(tmpMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(cancelSubJob_result.class, metaDataMap);
+    }
+
+    public cancelSubJob_result() {
+    }
+
+    /**
+     * Performs a deep copy on <i>other</i>.
+     */
+    public cancelSubJob_result(cancelSubJob_result other) {
+    }
+
+    public cancelSubJob_result deepCopy() {
+      return new cancelSubJob_result(this);
+    }
+
+    @Override
+    public void clear() {
+    }
+
+    public void setFieldValue(_Fields field, Object value) {
+      switch (field) {
+      }
+    }
+
+    public Object getFieldValue(_Fields field) {
+      switch (field) {
+      }
+      throw new IllegalStateException();
+    }
+
+    /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
+    public boolean isSet(_Fields field) {
+      if (field == null) {
+        throw new IllegalArgumentException();
+      }
+
+      switch (field) {
+      }
+      throw new IllegalStateException();
+    }
+
+    @Override
+    public boolean equals(Object that) {
+      if (that == null)
+        return false;
+      if (that instanceof cancelSubJob_result)
+        return this.equals((cancelSubJob_result)that);
+      return false;
+    }
+
+    public boolean equals(cancelSubJob_result that) {
+      if (that == null)
+        return false;
+
+      return true;
+    }
+
+    @Override
+    public int hashCode() {
+      return 0;
+    }
+
+    @Override
+    public int compareTo(cancelSubJob_result other) {
+      if (!getClass().equals(other.getClass())) {
+        return getClass().getName().compareTo(other.getClass().getName());
+      }
+
+      int lastComparison = 0;
+
+      return 0;
+    }
+
+    public _Fields fieldForId(int fieldId) {
+      return _Fields.findByThriftId(fieldId);
+    }
+
+    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
+      schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
+    }
+
+    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
+      schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
+      }
+
+    @Override
+    public String toString() {
+      StringBuilder sb = new StringBuilder("cancelSubJob_result(");
+      boolean first = true;
+
+      sb.append(")");
+      return sb.toString();
+    }
+
+    public void validate() throws org.apache.thrift.TException {
+      // check for required fields
+      // check for sub-struct validity
+    }
+
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
+      try {
+        write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
+      try {
+        read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
+      } catch (org.apache.thrift.TException te) {
+        throw new java.io.IOException(te);
+      }
+    }
+
+    private static class cancelSubJob_resultStandardSchemeFactory implements SchemeFactory {
+      public cancelSubJob_resultStandardScheme getScheme() {
+        return new cancelSubJob_resultStandardScheme();
+      }
+    }
+
+    private static class cancelSubJob_resultStandardScheme extends StandardScheme<cancelSubJob_result> {
+
+      public void read(org.apache.thrift.protocol.TProtocol iprot, cancelSubJob_result struct) throws org.apache.thrift.TException {
+        org.apache.thrift.protocol.TField schemeField;
+        iprot.readStructBegin();
+        while (true)
+        {
+          schemeField = iprot.readFieldBegin();
+          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
+            break;
+          }
+          switch (schemeField.id) {
+            default:
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+          }
+          iprot.readFieldEnd();
+        }
+        iprot.readStructEnd();
+
+        // check for required fields of primitive type, which can't be checked in the validate method
+        struct.validate();
+      }
+
+      public void write(org.apache.thrift.protocol.TProtocol oprot, cancelSubJob_result struct) throws org.apache.thrift.TException {
+        struct.validate();
+
+        oprot.writeStructBegin(STRUCT_DESC);
+        oprot.writeFieldStop();
+        oprot.writeStructEnd();
+      }
+
+    }
+
+    private static class cancelSubJob_resultTupleSchemeFactory implements SchemeFactory {
+      public cancelSubJob_resultTupleScheme getScheme() {
+        return new cancelSubJob_resultTupleScheme();
+      }
+    }
+
+    private static class cancelSubJob_resultTupleScheme extends TupleScheme<cancelSubJob_result> {
+
+      @Override
+      public void write(org.apache.thrift.protocol.TProtocol prot, cancelSubJob_result struct) throws org.apache.thrift.TException {
+        TTupleProtocol oprot = (TTupleProtocol) prot;
+      }
+
+      @Override
+      public void read(org.apache.thrift.protocol.TProtocol prot, cancelSubJob_result struct) throws org.apache.thrift.TException {
         TTupleProtocol iprot = (TTupleProtocol) prot;
       }
     }

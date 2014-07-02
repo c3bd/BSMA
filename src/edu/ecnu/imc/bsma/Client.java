@@ -28,6 +28,9 @@ import java.util.Vector;
 
 import edu.ecnu.imc.bsma.dao.BasicJobInfo;
 import edu.ecnu.imc.bsma.dao.JobInfo;
+import edu.ecnu.imc.bsma.db.DB;
+import edu.ecnu.imc.bsma.db.DBException;
+import edu.ecnu.imc.bsma.db.DBFactory;
 import edu.ecnu.imc.bsma.measurements.Measurements;
 import edu.ecnu.imc.bsma.measurements.exporter.MeasurementsExporter;
 import edu.ecnu.imc.bsma.measurements.exporter.RuntimeExporter;
@@ -259,11 +262,10 @@ class ClientThread extends Thread {
  * Main class for executing BSMA.
  */
 public class Client extends Thread {
-	BasicJobInfo basicJobInfo;
+	// BasicJobInfo basicJobInfo;
 	JobInfo jobInfo;
 
-	public Client(JobInfo jobInfo, BasicJobInfo basicJobInfo) {
-		this.basicJobInfo = basicJobInfo;
+	public Client(JobInfo jobInfo) {
 		this.jobInfo = jobInfo;
 	}
 
@@ -355,7 +357,7 @@ public class Client extends Thread {
 		ClassLoader classLoader = Client.class.getClassLoader();
 		Workload workload = null;
 		try {
-			Class workloadclass = classLoader.loadClass(jobInfo.wrapper);
+			Class workloadclass = classLoader.loadClass(jobInfo.getWorkload());
 
 			workload = (Workload) workloadclass.newInstance();
 		} catch (Exception e) {
@@ -396,9 +398,9 @@ public class Client extends Thread {
 		for (int threadid = 0; threadid < basicJobInfo.threadCount; threadid++) {
 			DB db = null;
 			try {
-				db = DBFactory.newDB(dbname, props, measurements);
+				db = DBFactory.newDB(jobInfo.getDBImpl(), props, measurements);
 			} catch (UnknownDBException e) {
-				System.out.println("Unknown DB " + dbname);
+				System.out.println("Unknown DB " + jobInfo.getDBImpl());
 				System.exit(0);
 			}
 

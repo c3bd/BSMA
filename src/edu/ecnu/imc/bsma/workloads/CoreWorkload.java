@@ -23,10 +23,10 @@ import java.util.Properties;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
-import edu.ecnu.imc.bsma.DB;
 import edu.ecnu.imc.bsma.Utils;
 import edu.ecnu.imc.bsma.Workload;
 import edu.ecnu.imc.bsma.WorkloadException;
+import edu.ecnu.imc.bsma.db.DB;
 import edu.ecnu.imc.bsma.generator.DiscreteGenerator;
 
 /**
@@ -319,7 +319,7 @@ public class CoreWorkload extends Workload
 	 */
 	public static final String RETURN_COUNT_PROPERTY_DEFAULT = "99999999";
 
-	DiscreteGenerator operationchooser;
+	DiscreteGenerator<String> operationchooser;
 	int returncount;
 	String timespan;
 	Random random = new Random();
@@ -364,7 +364,7 @@ public class CoreWorkload extends Workload
 
 		returncount = Integer.parseInt(p.getProperty(RETURN_COUNT_PROPERTY, RETURN_COUNT_PROPERTY_DEFAULT));
 		timespan = p.getProperty(TIME_SPAN_PROPERTY, TIME_SPAN_PROPERTY_DEFAULT);
-		operationchooser = new DiscreteGenerator();
+		operationchooser = new DiscreteGenerator<String>();
 
 		// prints below properties if exist
 		StringBuilder sb = new StringBuilder();
