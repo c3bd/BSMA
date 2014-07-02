@@ -30,20 +30,30 @@ struct Query {
 }
 
 struct SubJob {
-	1: i32 subJobID,
+	1: i32 subJobID = -1,
 	2: i32 opCount,
 	3: i16 threadNum
 }
 struct Job {
-  1: i32 jobID = 0,
-  2: byte dbImpl, //implementation of database interface
-  3: list<Query> queries, //fractions of each query
-  4: list<SubJob> subJobs 
+  1: i32 jobID = -1,
+  2: string name,
+  3: byte dbImpl, //implementation of database interface
+  4: optional string custDbImpl,
+  5: list<Query> queries, //fractions of each query
+  6: list<SubJob> subJobs,
+  7: optional map<string, string> props
 }
 
+/**
+ * Structs can also be exceptions, if they are nasty.
+ */
+exception InvalidJob {
+  1: i32 what,
+  2: string why
+}
 
 service BSMAService {
-   Job submit(1:Job job),
+   Job submit(1:Job job) throws (1:InvalidJob ex),
    void cancelJob(1:i32 jobID),
    void cancelSubJob(1:i32 jobID, 2:i32 subID)
 }

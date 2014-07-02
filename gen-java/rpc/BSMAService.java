@@ -36,7 +36,7 @@ public class BSMAService {
 
   public interface Iface {
 
-    public Job submit(Job job) throws org.apache.thrift.TException;
+    public Job submit(Job job) throws InvalidJob, org.apache.thrift.TException;
 
     public void cancelJob(int jobID) throws org.apache.thrift.TException;
 
@@ -74,7 +74,7 @@ public class BSMAService {
       super(iprot, oprot);
     }
 
-    public Job submit(Job job) throws org.apache.thrift.TException
+    public Job submit(Job job) throws InvalidJob, org.apache.thrift.TException
     {
       send_submit(job);
       return recv_submit();
@@ -87,12 +87,15 @@ public class BSMAService {
       sendBase("submit", args);
     }
 
-    public Job recv_submit() throws org.apache.thrift.TException
+    public Job recv_submit() throws InvalidJob, org.apache.thrift.TException
     {
       submit_result result = new submit_result();
       receiveBase(result, "submit");
       if (result.isSetSuccess()) {
         return result.success;
+      }
+      if (result.ex != null) {
+        throw result.ex;
       }
       throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "submit failed: unknown result");
     }
@@ -178,7 +181,7 @@ public class BSMAService {
         prot.writeMessageEnd();
       }
 
-      public Job getResult() throws org.apache.thrift.TException {
+      public Job getResult() throws InvalidJob, org.apache.thrift.TException {
         if (getState() != org.apache.thrift.async.TAsyncMethodCall.State.RESPONSE_READ) {
           throw new IllegalStateException("Method call not finished!");
         }
@@ -289,7 +292,11 @@ public class BSMAService {
 
       public submit_result getResult(I iface, submit_args args) throws org.apache.thrift.TException {
         submit_result result = new submit_result();
-        result.success = iface.submit(args.job);
+        try {
+          result.success = iface.submit(args.job);
+        } catch (InvalidJob ex) {
+          result.ex = ex;
+        }
         return result;
       }
     }
@@ -380,6 +387,12 @@ public class BSMAService {
             byte msgType = org.apache.thrift.protocol.TMessageType.REPLY;
             org.apache.thrift.TBase msg;
             submit_result result = new submit_result();
+            if (e instanceof InvalidJob) {
+                        result.ex = (InvalidJob) e;
+                        result.setExIsSet(true);
+                        msg = result;
+            }
+             else 
             {
               msgType = org.apache.thrift.protocol.TMessageType.EXCEPTION;
               msg = (org.apache.thrift.TBase)new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.INTERNAL_ERROR, e.getMessage());
@@ -869,6 +882,7 @@ public class BSMAService {
     private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("submit_result");
 
     private static final org.apache.thrift.protocol.TField SUCCESS_FIELD_DESC = new org.apache.thrift.protocol.TField("success", org.apache.thrift.protocol.TType.STRUCT, (short)0);
+    private static final org.apache.thrift.protocol.TField EX_FIELD_DESC = new org.apache.thrift.protocol.TField("ex", org.apache.thrift.protocol.TType.STRUCT, (short)1);
 
     private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
     static {
@@ -877,10 +891,12 @@ public class BSMAService {
     }
 
     public Job success; // required
+    public InvalidJob ex; // required
 
     /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
-      SUCCESS((short)0, "success");
+      SUCCESS((short)0, "success"),
+      EX((short)1, "ex");
 
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -897,6 +913,8 @@ public class BSMAService {
         switch(fieldId) {
           case 0: // SUCCESS
             return SUCCESS;
+          case 1: // EX
+            return EX;
           default:
             return null;
         }
@@ -942,6 +960,8 @@ public class BSMAService {
       Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
       tmpMap.put(_Fields.SUCCESS, new org.apache.thrift.meta_data.FieldMetaData("success", org.apache.thrift.TFieldRequirementType.DEFAULT, 
           new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, Job.class)));
+      tmpMap.put(_Fields.EX, new org.apache.thrift.meta_data.FieldMetaData("ex", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRUCT)));
       metaDataMap = Collections.unmodifiableMap(tmpMap);
       org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(submit_result.class, metaDataMap);
     }
@@ -950,10 +970,12 @@ public class BSMAService {
     }
 
     public submit_result(
-      Job success)
+      Job success,
+      InvalidJob ex)
     {
       this();
       this.success = success;
+      this.ex = ex;
     }
 
     /**
@@ -962,6 +984,9 @@ public class BSMAService {
     public submit_result(submit_result other) {
       if (other.isSetSuccess()) {
         this.success = new Job(other.success);
+      }
+      if (other.isSetEx()) {
+        this.ex = new InvalidJob(other.ex);
       }
     }
 
@@ -972,6 +997,7 @@ public class BSMAService {
     @Override
     public void clear() {
       this.success = null;
+      this.ex = null;
     }
 
     public Job getSuccess() {
@@ -998,6 +1024,30 @@ public class BSMAService {
       }
     }
 
+    public InvalidJob getEx() {
+      return this.ex;
+    }
+
+    public submit_result setEx(InvalidJob ex) {
+      this.ex = ex;
+      return this;
+    }
+
+    public void unsetEx() {
+      this.ex = null;
+    }
+
+    /** Returns true if field ex is set (has been assigned a value) and false otherwise */
+    public boolean isSetEx() {
+      return this.ex != null;
+    }
+
+    public void setExIsSet(boolean value) {
+      if (!value) {
+        this.ex = null;
+      }
+    }
+
     public void setFieldValue(_Fields field, Object value) {
       switch (field) {
       case SUCCESS:
@@ -1008,6 +1058,14 @@ public class BSMAService {
         }
         break;
 
+      case EX:
+        if (value == null) {
+          unsetEx();
+        } else {
+          setEx((InvalidJob)value);
+        }
+        break;
+
       }
     }
 
@@ -1015,6 +1073,9 @@ public class BSMAService {
       switch (field) {
       case SUCCESS:
         return getSuccess();
+
+      case EX:
+        return getEx();
 
       }
       throw new IllegalStateException();
@@ -1029,6 +1090,8 @@ public class BSMAService {
       switch (field) {
       case SUCCESS:
         return isSetSuccess();
+      case EX:
+        return isSetEx();
       }
       throw new IllegalStateException();
     }
@@ -1052,6 +1115,15 @@ public class BSMAService {
         if (!(this_present_success && that_present_success))
           return false;
         if (!this.success.equals(that.success))
+          return false;
+      }
+
+      boolean this_present_ex = true && this.isSetEx();
+      boolean that_present_ex = true && that.isSetEx();
+      if (this_present_ex || that_present_ex) {
+        if (!(this_present_ex && that_present_ex))
+          return false;
+        if (!this.ex.equals(that.ex))
           return false;
       }
 
@@ -1081,6 +1153,16 @@ public class BSMAService {
           return lastComparison;
         }
       }
+      lastComparison = Boolean.valueOf(isSetEx()).compareTo(other.isSetEx());
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+      if (isSetEx()) {
+        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.ex, other.ex);
+        if (lastComparison != 0) {
+          return lastComparison;
+        }
+      }
       return 0;
     }
 
@@ -1106,6 +1188,14 @@ public class BSMAService {
         sb.append("null");
       } else {
         sb.append(this.success);
+      }
+      first = false;
+      if (!first) sb.append(", ");
+      sb.append("ex:");
+      if (this.ex == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.ex);
       }
       first = false;
       sb.append(")");
@@ -1163,6 +1253,15 @@ public class BSMAService {
                 org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
               }
               break;
+            case 1: // EX
+              if (schemeField.type == org.apache.thrift.protocol.TType.STRUCT) {
+                struct.ex = new InvalidJob();
+                struct.ex.read(iprot);
+                struct.setExIsSet(true);
+              } else { 
+                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+              }
+              break;
             default:
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
           }
@@ -1181,6 +1280,11 @@ public class BSMAService {
         if (struct.success != null) {
           oprot.writeFieldBegin(SUCCESS_FIELD_DESC);
           struct.success.write(oprot);
+          oprot.writeFieldEnd();
+        }
+        if (struct.ex != null) {
+          oprot.writeFieldBegin(EX_FIELD_DESC);
+          struct.ex.write(oprot);
           oprot.writeFieldEnd();
         }
         oprot.writeFieldStop();
@@ -1204,20 +1308,31 @@ public class BSMAService {
         if (struct.isSetSuccess()) {
           optionals.set(0);
         }
-        oprot.writeBitSet(optionals, 1);
+        if (struct.isSetEx()) {
+          optionals.set(1);
+        }
+        oprot.writeBitSet(optionals, 2);
         if (struct.isSetSuccess()) {
           struct.success.write(oprot);
+        }
+        if (struct.isSetEx()) {
+          struct.ex.write(oprot);
         }
       }
 
       @Override
       public void read(org.apache.thrift.protocol.TProtocol prot, submit_result struct) throws org.apache.thrift.TException {
         TTupleProtocol iprot = (TTupleProtocol) prot;
-        BitSet incoming = iprot.readBitSet(1);
+        BitSet incoming = iprot.readBitSet(2);
         if (incoming.get(0)) {
           struct.success = new Job();
           struct.success.read(iprot);
           struct.setSuccessIsSet(true);
+        }
+        if (incoming.get(1)) {
+          struct.ex = new InvalidJob();
+          struct.ex.read(iprot);
+          struct.setExIsSet(true);
         }
       }
     }

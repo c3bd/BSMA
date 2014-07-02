@@ -461,4 +461,22 @@ public class Client extends Thread {
 	Properties constructProp() {
 		return null;
 	}
+
+	/**
+	 * stop the job
+	 */
+	public boolean cancel() {
+		// TODO Auto-generated method stub
+		return true;
+	}
+
+	/**
+	 * cancel execution of subID
+	 * @param subID
+	 * @return
+	 */
+	public boolean cancel(int subID) {
+		// TODO Auto-generated method stub
+		return true;
+	}
 }

@@ -1,8 +1,6 @@
 package edu.ecnu.imc.bsma.dao;
 
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import rpc.Job;
 import rpc.Query;
@@ -17,27 +15,31 @@ import weibo4j.org.json.JSONObject;
  * @author xiafan
  * 
  */
-public class JobInfo extends Job{
-	//public int jobID;
-	//public byte dbImpl; // the implementation of database access class
-	//public List<Query> queries;
-	//public List<BasicJobInfo> subJobs;
-	//public Map<String, String> props;
-	//public String userDbImpl; // user provided db access implementation
+public class JobInfo extends Job {
+	// public int jobID;
+	// public byte dbImpl; // the implementation of database access class
+	// public List<Query> queries;
+	// public List<BasicJobInfo> subJobs;
+	// public Map<String, String> props;
+	// public String userDbImpl; // user provided db access implementation
+	public JobInfo(Job job) {
+		super(job);
+	}
 
 	public JobInfo(JSONObject obj) throws JSONException {
 		jobID = obj.getInt("id");
 		JSONArray arr = obj.getJSONArray("subjobs");
-		
+
 		for (int i = 0; i < arr.length(); i++) {
 			subJobs.add(new BasicJobInfo(arr.getJSONObject(i)));
 		}
 
-		JSONObject map = obj.getJSONObject("qfrac");
+		JSONObject map = obj.getJSONObject("queries");
 		arr = map.names();
 		for (int i = 0; i < arr.length(); i++) {
-			int qID = arr.getInt(i);
-			queryFracs.put(qID, map.getDouble(Integer.toString(qID)));
+			JSONObject qObj = arr.getJSONObject(i);
+			queries.add(new Query((byte) qObj.getInt("type"), qObj
+					.getDouble("frac")));
 		}
 
 		map = obj.getJSONObject("props");
@@ -62,25 +64,27 @@ public class JobInfo extends Job{
 		return workloads.get(idx);
 	}
 
-	private static HashMap<Integer, String> dbImpls = new HashMap<Integer, String>();
-	public static final int HIVE_DB = 0;
-	public static final int SHARK_DB = 1;
-	public static final int MONETDB_DB = 2;
+	private static HashMap<Byte, String> dbImpls = new HashMap<Byte, String>();
+	public static final byte HIVE_DB = 0;
+	public static final byte SHARK_DB = 1;
+	public static final byte MONETDB_DB = 2;
 	static {
 		dbImpls.put(HIVE_DB, "edu.ecnu.imc.bsma.dbimpl.HiveDBImpl");
 		dbImpls.put(SHARK_DB, "edu.ecnu.imc.bsma.dbimpl.SparkDBImpl");
 		dbImpls.put(MONETDB_DB, "edu.ecnu.imc.bsma.dbimpl.MonetDBImpl");
 	}
 
-	public static String getDBImpl(int idx) {
+	public static String getDBImpl(byte idx) {
 		return dbImpls.get(idx);
 	}
 
+	public static final String CUST_DBIMPL = "db.";
+
 	public String getDBImpl() {
-		if (userDbImpl == null)
-			return getDBImpl(dbImpl);
-		else {
-			return userDbImpl;
+		String ret = getDBImpl(dbImpl);
+		if (ret == null) {
+			ret = custDbImpl;
 		}
+		return ret;
 	}
 }

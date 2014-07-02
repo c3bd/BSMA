@@ -132,6 +132,8 @@ public class SubJob implements org.apache.thrift.TBase<SubJob, SubJob._Fields>, 
   }
 
   public SubJob() {
+    this.subJobID = -1;
+
   }
 
   public SubJob(
@@ -164,8 +166,8 @@ public class SubJob implements org.apache.thrift.TBase<SubJob, SubJob._Fields>, 
 
   @Override
   public void clear() {
-    setSubJobIDIsSet(false);
-    this.subJobID = 0;
+    this.subJobID = -1;
+
     setOpCountIsSet(false);
     this.opCount = 0;
     setThreadNumIsSet(false);

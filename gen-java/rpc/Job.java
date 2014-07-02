@@ -36,9 +36,12 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
   private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("Job");
 
   private static final org.apache.thrift.protocol.TField JOB_ID_FIELD_DESC = new org.apache.thrift.protocol.TField("jobID", org.apache.thrift.protocol.TType.I32, (short)1);
-  private static final org.apache.thrift.protocol.TField DB_IMPL_FIELD_DESC = new org.apache.thrift.protocol.TField("dbImpl", org.apache.thrift.protocol.TType.BYTE, (short)2);
-  private static final org.apache.thrift.protocol.TField QUERIES_FIELD_DESC = new org.apache.thrift.protocol.TField("queries", org.apache.thrift.protocol.TType.LIST, (short)3);
-  private static final org.apache.thrift.protocol.TField SUB_JOBS_FIELD_DESC = new org.apache.thrift.protocol.TField("subJobs", org.apache.thrift.protocol.TType.LIST, (short)4);
+  private static final org.apache.thrift.protocol.TField NAME_FIELD_DESC = new org.apache.thrift.protocol.TField("name", org.apache.thrift.protocol.TType.STRING, (short)2);
+  private static final org.apache.thrift.protocol.TField DB_IMPL_FIELD_DESC = new org.apache.thrift.protocol.TField("dbImpl", org.apache.thrift.protocol.TType.BYTE, (short)3);
+  private static final org.apache.thrift.protocol.TField CUST_DB_IMPL_FIELD_DESC = new org.apache.thrift.protocol.TField("custDbImpl", org.apache.thrift.protocol.TType.STRING, (short)4);
+  private static final org.apache.thrift.protocol.TField QUERIES_FIELD_DESC = new org.apache.thrift.protocol.TField("queries", org.apache.thrift.protocol.TType.LIST, (short)5);
+  private static final org.apache.thrift.protocol.TField SUB_JOBS_FIELD_DESC = new org.apache.thrift.protocol.TField("subJobs", org.apache.thrift.protocol.TType.LIST, (short)6);
+  private static final org.apache.thrift.protocol.TField PROPS_FIELD_DESC = new org.apache.thrift.protocol.TField("props", org.apache.thrift.protocol.TType.MAP, (short)7);
 
   private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
   static {
@@ -47,16 +50,22 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
   }
 
   public int jobID; // required
+  public String name; // required
   public byte dbImpl; // required
+  public String custDbImpl; // optional
   public List<Query> queries; // required
   public List<SubJob> subJobs; // required
+  public Map<String,String> props; // optional
 
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements org.apache.thrift.TFieldIdEnum {
     JOB_ID((short)1, "jobID"),
-    DB_IMPL((short)2, "dbImpl"),
-    QUERIES((short)3, "queries"),
-    SUB_JOBS((short)4, "subJobs");
+    NAME((short)2, "name"),
+    DB_IMPL((short)3, "dbImpl"),
+    CUST_DB_IMPL((short)4, "custDbImpl"),
+    QUERIES((short)5, "queries"),
+    SUB_JOBS((short)6, "subJobs"),
+    PROPS((short)7, "props");
 
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -73,12 +82,18 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
       switch(fieldId) {
         case 1: // JOB_ID
           return JOB_ID;
-        case 2: // DB_IMPL
+        case 2: // NAME
+          return NAME;
+        case 3: // DB_IMPL
           return DB_IMPL;
-        case 3: // QUERIES
+        case 4: // CUST_DB_IMPL
+          return CUST_DB_IMPL;
+        case 5: // QUERIES
           return QUERIES;
-        case 4: // SUB_JOBS
+        case 6: // SUB_JOBS
           return SUB_JOBS;
+        case 7: // PROPS
+          return PROPS;
         default:
           return null;
       }
@@ -122,30 +137,40 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
   private static final int __JOBID_ISSET_ID = 0;
   private static final int __DBIMPL_ISSET_ID = 1;
   private byte __isset_bitfield = 0;
+  private _Fields optionals[] = {_Fields.CUST_DB_IMPL,_Fields.PROPS};
   public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
   static {
     Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
     tmpMap.put(_Fields.JOB_ID, new org.apache.thrift.meta_data.FieldMetaData("jobID", org.apache.thrift.TFieldRequirementType.DEFAULT, 
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
+    tmpMap.put(_Fields.NAME, new org.apache.thrift.meta_data.FieldMetaData("name", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
     tmpMap.put(_Fields.DB_IMPL, new org.apache.thrift.meta_data.FieldMetaData("dbImpl", org.apache.thrift.TFieldRequirementType.DEFAULT, 
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.BYTE)));
+    tmpMap.put(_Fields.CUST_DB_IMPL, new org.apache.thrift.meta_data.FieldMetaData("custDbImpl", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
+        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
     tmpMap.put(_Fields.QUERIES, new org.apache.thrift.meta_data.FieldMetaData("queries", org.apache.thrift.TFieldRequirementType.DEFAULT, 
         new org.apache.thrift.meta_data.ListMetaData(org.apache.thrift.protocol.TType.LIST, 
             new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, Query.class))));
     tmpMap.put(_Fields.SUB_JOBS, new org.apache.thrift.meta_data.FieldMetaData("subJobs", org.apache.thrift.TFieldRequirementType.DEFAULT, 
         new org.apache.thrift.meta_data.ListMetaData(org.apache.thrift.protocol.TType.LIST, 
             new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, SubJob.class))));
+    tmpMap.put(_Fields.PROPS, new org.apache.thrift.meta_data.FieldMetaData("props", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
+        new org.apache.thrift.meta_data.MapMetaData(org.apache.thrift.protocol.TType.MAP, 
+            new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING), 
+            new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING))));
     metaDataMap = Collections.unmodifiableMap(tmpMap);
     org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(Job.class, metaDataMap);
   }
 
   public Job() {
-    this.jobID = 0;
+    this.jobID = -1;
 
   }
 
   public Job(
     int jobID,
+    String name,
     byte dbImpl,
     List<Query> queries,
     List<SubJob> subJobs)
@@ -153,6 +178,7 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
     this();
     this.jobID = jobID;
     setJobIDIsSet(true);
+    this.name = name;
     this.dbImpl = dbImpl;
     setDbImplIsSet(true);
     this.queries = queries;
@@ -165,7 +191,13 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
   public Job(Job other) {
     __isset_bitfield = other.__isset_bitfield;
     this.jobID = other.jobID;
+    if (other.isSetName()) {
+      this.name = other.name;
+    }
     this.dbImpl = other.dbImpl;
+    if (other.isSetCustDbImpl()) {
+      this.custDbImpl = other.custDbImpl;
+    }
     if (other.isSetQueries()) {
       List<Query> __this__queries = new ArrayList<Query>(other.queries.size());
       for (Query other_element : other.queries) {
@@ -180,6 +212,10 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
       }
       this.subJobs = __this__subJobs;
     }
+    if (other.isSetProps()) {
+      Map<String,String> __this__props = new HashMap<String,String>(other.props);
+      this.props = __this__props;
+    }
   }
 
   public Job deepCopy() {
@@ -188,12 +224,15 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
 
   @Override
   public void clear() {
-    this.jobID = 0;
+    this.jobID = -1;
 
+    this.name = null;
     setDbImplIsSet(false);
     this.dbImpl = 0;
+    this.custDbImpl = null;
     this.queries = null;
     this.subJobs = null;
+    this.props = null;
   }
 
   public int getJobID() {
@@ -219,6 +258,30 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
     __isset_bitfield = EncodingUtils.setBit(__isset_bitfield, __JOBID_ISSET_ID, value);
   }
 
+  public String getName() {
+    return this.name;
+  }
+
+  public Job setName(String name) {
+    this.name = name;
+    return this;
+  }
+
+  public void unsetName() {
+    this.name = null;
+  }
+
+  /** Returns true if field name is set (has been assigned a value) and false otherwise */
+  public boolean isSetName() {
+    return this.name != null;
+  }
+
+  public void setNameIsSet(boolean value) {
+    if (!value) {
+      this.name = null;
+    }
+  }
+
   public byte getDbImpl() {
     return this.dbImpl;
   }
@@ -240,6 +303,30 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
 
   public void setDbImplIsSet(boolean value) {
     __isset_bitfield = EncodingUtils.setBit(__isset_bitfield, __DBIMPL_ISSET_ID, value);
+  }
+
+  public String getCustDbImpl() {
+    return this.custDbImpl;
+  }
+
+  public Job setCustDbImpl(String custDbImpl) {
+    this.custDbImpl = custDbImpl;
+    return this;
+  }
+
+  public void unsetCustDbImpl() {
+    this.custDbImpl = null;
+  }
+
+  /** Returns true if field custDbImpl is set (has been assigned a value) and false otherwise */
+  public boolean isSetCustDbImpl() {
+    return this.custDbImpl != null;
+  }
+
+  public void setCustDbImplIsSet(boolean value) {
+    if (!value) {
+      this.custDbImpl = null;
+    }
   }
 
   public int getQueriesSize() {
@@ -320,6 +407,41 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
     }
   }
 
+  public int getPropsSize() {
+    return (this.props == null) ? 0 : this.props.size();
+  }
+
+  public void putToProps(String key, String val) {
+    if (this.props == null) {
+      this.props = new HashMap<String,String>();
+    }
+    this.props.put(key, val);
+  }
+
+  public Map<String,String> getProps() {
+    return this.props;
+  }
+
+  public Job setProps(Map<String,String> props) {
+    this.props = props;
+    return this;
+  }
+
+  public void unsetProps() {
+    this.props = null;
+  }
+
+  /** Returns true if field props is set (has been assigned a value) and false otherwise */
+  public boolean isSetProps() {
+    return this.props != null;
+  }
+
+  public void setPropsIsSet(boolean value) {
+    if (!value) {
+      this.props = null;
+    }
+  }
+
   public void setFieldValue(_Fields field, Object value) {
     switch (field) {
     case JOB_ID:
@@ -330,11 +452,27 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
       }
       break;
 
+    case NAME:
+      if (value == null) {
+        unsetName();
+      } else {
+        setName((String)value);
+      }
+      break;
+
     case DB_IMPL:
       if (value == null) {
         unsetDbImpl();
       } else {
         setDbImpl((Byte)value);
+      }
+      break;
+
+    case CUST_DB_IMPL:
+      if (value == null) {
+        unsetCustDbImpl();
+      } else {
+        setCustDbImpl((String)value);
       }
       break;
 
@@ -354,6 +492,14 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
       }
       break;
 
+    case PROPS:
+      if (value == null) {
+        unsetProps();
+      } else {
+        setProps((Map<String,String>)value);
+      }
+      break;
+
     }
   }
 
@@ -362,14 +508,23 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
     case JOB_ID:
       return Integer.valueOf(getJobID());
 
+    case NAME:
+      return getName();
+
     case DB_IMPL:
       return Byte.valueOf(getDbImpl());
+
+    case CUST_DB_IMPL:
+      return getCustDbImpl();
 
     case QUERIES:
       return getQueries();
 
     case SUB_JOBS:
       return getSubJobs();
+
+    case PROPS:
+      return getProps();
 
     }
     throw new IllegalStateException();
@@ -384,12 +539,18 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
     switch (field) {
     case JOB_ID:
       return isSetJobID();
+    case NAME:
+      return isSetName();
     case DB_IMPL:
       return isSetDbImpl();
+    case CUST_DB_IMPL:
+      return isSetCustDbImpl();
     case QUERIES:
       return isSetQueries();
     case SUB_JOBS:
       return isSetSubJobs();
+    case PROPS:
+      return isSetProps();
     }
     throw new IllegalStateException();
   }
@@ -416,12 +577,30 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
         return false;
     }
 
+    boolean this_present_name = true && this.isSetName();
+    boolean that_present_name = true && that.isSetName();
+    if (this_present_name || that_present_name) {
+      if (!(this_present_name && that_present_name))
+        return false;
+      if (!this.name.equals(that.name))
+        return false;
+    }
+
     boolean this_present_dbImpl = true;
     boolean that_present_dbImpl = true;
     if (this_present_dbImpl || that_present_dbImpl) {
       if (!(this_present_dbImpl && that_present_dbImpl))
         return false;
       if (this.dbImpl != that.dbImpl)
+        return false;
+    }
+
+    boolean this_present_custDbImpl = true && this.isSetCustDbImpl();
+    boolean that_present_custDbImpl = true && that.isSetCustDbImpl();
+    if (this_present_custDbImpl || that_present_custDbImpl) {
+      if (!(this_present_custDbImpl && that_present_custDbImpl))
+        return false;
+      if (!this.custDbImpl.equals(that.custDbImpl))
         return false;
     }
 
@@ -440,6 +619,15 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
       if (!(this_present_subJobs && that_present_subJobs))
         return false;
       if (!this.subJobs.equals(that.subJobs))
+        return false;
+    }
+
+    boolean this_present_props = true && this.isSetProps();
+    boolean that_present_props = true && that.isSetProps();
+    if (this_present_props || that_present_props) {
+      if (!(this_present_props && that_present_props))
+        return false;
+      if (!this.props.equals(that.props))
         return false;
     }
 
@@ -469,12 +657,32 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
         return lastComparison;
       }
     }
+    lastComparison = Boolean.valueOf(isSetName()).compareTo(other.isSetName());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetName()) {
+      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.name, other.name);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
     lastComparison = Boolean.valueOf(isSetDbImpl()).compareTo(other.isSetDbImpl());
     if (lastComparison != 0) {
       return lastComparison;
     }
     if (isSetDbImpl()) {
       lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.dbImpl, other.dbImpl);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetCustDbImpl()).compareTo(other.isSetCustDbImpl());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetCustDbImpl()) {
+      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.custDbImpl, other.custDbImpl);
       if (lastComparison != 0) {
         return lastComparison;
       }
@@ -495,6 +703,16 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
     }
     if (isSetSubJobs()) {
       lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.subJobs, other.subJobs);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetProps()).compareTo(other.isSetProps());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetProps()) {
+      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.props, other.props);
       if (lastComparison != 0) {
         return lastComparison;
       }
@@ -523,9 +741,27 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
     sb.append(this.jobID);
     first = false;
     if (!first) sb.append(", ");
+    sb.append("name:");
+    if (this.name == null) {
+      sb.append("null");
+    } else {
+      sb.append(this.name);
+    }
+    first = false;
+    if (!first) sb.append(", ");
     sb.append("dbImpl:");
     sb.append(this.dbImpl);
     first = false;
+    if (isSetCustDbImpl()) {
+      if (!first) sb.append(", ");
+      sb.append("custDbImpl:");
+      if (this.custDbImpl == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.custDbImpl);
+      }
+      first = false;
+    }
     if (!first) sb.append(", ");
     sb.append("queries:");
     if (this.queries == null) {
@@ -542,6 +778,16 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
       sb.append(this.subJobs);
     }
     first = false;
+    if (isSetProps()) {
+      if (!first) sb.append(", ");
+      sb.append("props:");
+      if (this.props == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.props);
+      }
+      first = false;
+    }
     sb.append(")");
     return sb.toString();
   }
@@ -595,7 +841,15 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
             }
             break;
-          case 2: // DB_IMPL
+          case 2: // NAME
+            if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+              struct.name = iprot.readString();
+              struct.setNameIsSet(true);
+            } else { 
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+            }
+            break;
+          case 3: // DB_IMPL
             if (schemeField.type == org.apache.thrift.protocol.TType.BYTE) {
               struct.dbImpl = iprot.readByte();
               struct.setDbImplIsSet(true);
@@ -603,7 +857,15 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
             }
             break;
-          case 3: // QUERIES
+          case 4: // CUST_DB_IMPL
+            if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+              struct.custDbImpl = iprot.readString();
+              struct.setCustDbImplIsSet(true);
+            } else { 
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+            }
+            break;
+          case 5: // QUERIES
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
                 org.apache.thrift.protocol.TList _list0 = iprot.readListBegin();
@@ -622,7 +884,7 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
             }
             break;
-          case 4: // SUB_JOBS
+          case 6: // SUB_JOBS
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
                 org.apache.thrift.protocol.TList _list3 = iprot.readListBegin();
@@ -637,6 +899,26 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
                 iprot.readListEnd();
               }
               struct.setSubJobsIsSet(true);
+            } else { 
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+            }
+            break;
+          case 7: // PROPS
+            if (schemeField.type == org.apache.thrift.protocol.TType.MAP) {
+              {
+                org.apache.thrift.protocol.TMap _map6 = iprot.readMapBegin();
+                struct.props = new HashMap<String,String>(2*_map6.size);
+                for (int _i7 = 0; _i7 < _map6.size; ++_i7)
+                {
+                  String _key8;
+                  String _val9;
+                  _key8 = iprot.readString();
+                  _val9 = iprot.readString();
+                  struct.props.put(_key8, _val9);
+                }
+                iprot.readMapEnd();
+              }
+              struct.setPropsIsSet(true);
             } else { 
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
             }
@@ -659,16 +941,28 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
       oprot.writeFieldBegin(JOB_ID_FIELD_DESC);
       oprot.writeI32(struct.jobID);
       oprot.writeFieldEnd();
+      if (struct.name != null) {
+        oprot.writeFieldBegin(NAME_FIELD_DESC);
+        oprot.writeString(struct.name);
+        oprot.writeFieldEnd();
+      }
       oprot.writeFieldBegin(DB_IMPL_FIELD_DESC);
       oprot.writeByte(struct.dbImpl);
       oprot.writeFieldEnd();
+      if (struct.custDbImpl != null) {
+        if (struct.isSetCustDbImpl()) {
+          oprot.writeFieldBegin(CUST_DB_IMPL_FIELD_DESC);
+          oprot.writeString(struct.custDbImpl);
+          oprot.writeFieldEnd();
+        }
+      }
       if (struct.queries != null) {
         oprot.writeFieldBegin(QUERIES_FIELD_DESC);
         {
           oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, struct.queries.size()));
-          for (Query _iter6 : struct.queries)
+          for (Query _iter10 : struct.queries)
           {
-            _iter6.write(oprot);
+            _iter10.write(oprot);
           }
           oprot.writeListEnd();
         }
@@ -678,13 +972,28 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
         oprot.writeFieldBegin(SUB_JOBS_FIELD_DESC);
         {
           oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, struct.subJobs.size()));
-          for (SubJob _iter7 : struct.subJobs)
+          for (SubJob _iter11 : struct.subJobs)
           {
-            _iter7.write(oprot);
+            _iter11.write(oprot);
           }
           oprot.writeListEnd();
         }
         oprot.writeFieldEnd();
+      }
+      if (struct.props != null) {
+        if (struct.isSetProps()) {
+          oprot.writeFieldBegin(PROPS_FIELD_DESC);
+          {
+            oprot.writeMapBegin(new org.apache.thrift.protocol.TMap(org.apache.thrift.protocol.TType.STRING, org.apache.thrift.protocol.TType.STRING, struct.props.size()));
+            for (Map.Entry<String, String> _iter12 : struct.props.entrySet())
+            {
+              oprot.writeString(_iter12.getKey());
+              oprot.writeString(_iter12.getValue());
+            }
+            oprot.writeMapEnd();
+          }
+          oprot.writeFieldEnd();
+        }
       }
       oprot.writeFieldStop();
       oprot.writeStructEnd();
@@ -707,37 +1016,62 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
       if (struct.isSetJobID()) {
         optionals.set(0);
       }
-      if (struct.isSetDbImpl()) {
+      if (struct.isSetName()) {
         optionals.set(1);
       }
-      if (struct.isSetQueries()) {
+      if (struct.isSetDbImpl()) {
         optionals.set(2);
       }
-      if (struct.isSetSubJobs()) {
+      if (struct.isSetCustDbImpl()) {
         optionals.set(3);
       }
-      oprot.writeBitSet(optionals, 4);
+      if (struct.isSetQueries()) {
+        optionals.set(4);
+      }
+      if (struct.isSetSubJobs()) {
+        optionals.set(5);
+      }
+      if (struct.isSetProps()) {
+        optionals.set(6);
+      }
+      oprot.writeBitSet(optionals, 7);
       if (struct.isSetJobID()) {
         oprot.writeI32(struct.jobID);
+      }
+      if (struct.isSetName()) {
+        oprot.writeString(struct.name);
       }
       if (struct.isSetDbImpl()) {
         oprot.writeByte(struct.dbImpl);
       }
+      if (struct.isSetCustDbImpl()) {
+        oprot.writeString(struct.custDbImpl);
+      }
       if (struct.isSetQueries()) {
         {
           oprot.writeI32(struct.queries.size());
-          for (Query _iter8 : struct.queries)
+          for (Query _iter13 : struct.queries)
           {
-            _iter8.write(oprot);
+            _iter13.write(oprot);
           }
         }
       }
       if (struct.isSetSubJobs()) {
         {
           oprot.writeI32(struct.subJobs.size());
-          for (SubJob _iter9 : struct.subJobs)
+          for (SubJob _iter14 : struct.subJobs)
           {
-            _iter9.write(oprot);
+            _iter14.write(oprot);
+          }
+        }
+      }
+      if (struct.isSetProps()) {
+        {
+          oprot.writeI32(struct.props.size());
+          for (Map.Entry<String, String> _iter15 : struct.props.entrySet())
+          {
+            oprot.writeString(_iter15.getKey());
+            oprot.writeString(_iter15.getValue());
           }
         }
       }
@@ -746,42 +1080,65 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
     @Override
     public void read(org.apache.thrift.protocol.TProtocol prot, Job struct) throws org.apache.thrift.TException {
       TTupleProtocol iprot = (TTupleProtocol) prot;
-      BitSet incoming = iprot.readBitSet(4);
+      BitSet incoming = iprot.readBitSet(7);
       if (incoming.get(0)) {
         struct.jobID = iprot.readI32();
         struct.setJobIDIsSet(true);
       }
       if (incoming.get(1)) {
+        struct.name = iprot.readString();
+        struct.setNameIsSet(true);
+      }
+      if (incoming.get(2)) {
         struct.dbImpl = iprot.readByte();
         struct.setDbImplIsSet(true);
       }
-      if (incoming.get(2)) {
+      if (incoming.get(3)) {
+        struct.custDbImpl = iprot.readString();
+        struct.setCustDbImplIsSet(true);
+      }
+      if (incoming.get(4)) {
         {
-          org.apache.thrift.protocol.TList _list10 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
-          struct.queries = new ArrayList<Query>(_list10.size);
-          for (int _i11 = 0; _i11 < _list10.size; ++_i11)
+          org.apache.thrift.protocol.TList _list16 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
+          struct.queries = new ArrayList<Query>(_list16.size);
+          for (int _i17 = 0; _i17 < _list16.size; ++_i17)
           {
-            Query _elem12;
-            _elem12 = new Query();
-            _elem12.read(iprot);
-            struct.queries.add(_elem12);
+            Query _elem18;
+            _elem18 = new Query();
+            _elem18.read(iprot);
+            struct.queries.add(_elem18);
           }
         }
         struct.setQueriesIsSet(true);
       }
-      if (incoming.get(3)) {
+      if (incoming.get(5)) {
         {
-          org.apache.thrift.protocol.TList _list13 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
-          struct.subJobs = new ArrayList<SubJob>(_list13.size);
-          for (int _i14 = 0; _i14 < _list13.size; ++_i14)
+          org.apache.thrift.protocol.TList _list19 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
+          struct.subJobs = new ArrayList<SubJob>(_list19.size);
+          for (int _i20 = 0; _i20 < _list19.size; ++_i20)
           {
-            SubJob _elem15;
-            _elem15 = new SubJob();
-            _elem15.read(iprot);
-            struct.subJobs.add(_elem15);
+            SubJob _elem21;
+            _elem21 = new SubJob();
+            _elem21.read(iprot);
+            struct.subJobs.add(_elem21);
           }
         }
         struct.setSubJobsIsSet(true);
+      }
+      if (incoming.get(6)) {
+        {
+          org.apache.thrift.protocol.TMap _map22 = new org.apache.thrift.protocol.TMap(org.apache.thrift.protocol.TType.STRING, org.apache.thrift.protocol.TType.STRING, iprot.readI32());
+          struct.props = new HashMap<String,String>(2*_map22.size);
+          for (int _i23 = 0; _i23 < _map22.size; ++_i23)
+          {
+            String _key24;
+            String _val25;
+            _key24 = iprot.readString();
+            _val25 = iprot.readString();
+            struct.props.put(_key24, _val25);
+          }
+        }
+        struct.setPropsIsSet(true);
       }
     }
   }
