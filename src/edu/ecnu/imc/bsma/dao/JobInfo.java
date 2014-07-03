@@ -1,9 +1,14 @@
 package edu.ecnu.imc.bsma.dao;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.Properties;
 
 import rpc.Job;
 import rpc.Query;
+import rpc.SubJob;
 import weibo4j.org.json.JSONArray;
 import weibo4j.org.json.JSONException;
 import weibo4j.org.json.JSONObject;
@@ -22,8 +27,17 @@ public class JobInfo extends Job {
 	// public List<BasicJobInfo> subJobs;
 	// public Map<String, String> props;
 	// public String userDbImpl; // user provided db access implementation
+	List<BasicJobInfo> jobUnits = new ArrayList<BasicJobInfo>();
+
 	public JobInfo(Job job) {
 		super(job);
+		for (SubJob subJob : job.getSubJobs()) {
+			jobUnits.add(new BasicJobInfo(this, subJob));
+		}
+	}
+
+	public List<BasicJobInfo> getJobUnits() {
+		return jobUnits;
 	}
 
 	public JobInfo(JSONObject obj) throws JSONException {
@@ -84,6 +98,14 @@ public class JobInfo extends Job {
 		String ret = getDBImpl(dbImpl);
 		if (ret == null) {
 			ret = custDbImpl;
+		}
+		return ret;
+	}
+
+	public Properties getProperties() {
+		Properties ret = new Properties();
+		for (Entry<String, String> entry : props.entrySet()) {
+			ret.setProperty(entry.getKey(), entry.getValue());
 		}
 		return ret;
 	}

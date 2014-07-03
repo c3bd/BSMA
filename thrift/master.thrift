@@ -32,7 +32,7 @@ struct Query {
 struct SubJob {
 	1: i32 subJobID = -1,
 	2: i32 opCount,
-	3: i16 threadNum
+	3: i32 threadNum
 }
 struct Job {
   1: i32 jobID = -1,
