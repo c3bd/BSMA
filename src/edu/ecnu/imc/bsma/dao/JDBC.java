@@ -11,8 +11,6 @@ public class JDBC {
 			throws InstantiationException, IllegalAccessException,
 			ClassNotFoundException, SQLException {
 		Class.forName("com.mysql.jdbc.Driver").newInstance(); // MYSQL驱动
-		// con = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/test",
-		// "root", "root"); // 链接本地MYSQL
 		con = DriverManager.getConnection(server, user, passwd); // 链接本地MYSQL
 	}
 
@@ -22,5 +20,9 @@ public class JDBC {
 
 	public void putCon(Connection con) {
 
+	}
+
+	public void close() throws SQLException {
+		con.close();
 	}
 }

@@ -151,9 +151,10 @@ public class CoreWorkload extends Workload {
 	 */
 	@SuppressWarnings("unchecked")
 	public void init(Properties p) throws WorkloadException {
+		operationchooser = new DiscreteGenerator<String>();
 		for (int i = 1; i <= PROPORTION_PROPERTY.length; i++) {
 			double weight = Double.parseDouble(p.getProperty(
-					PROPORTION_PROPERTY[i], PROPORTION_DEFAULT[i]));
+					PROPORTION_PROPERTY[i - 1], PROPORTION_DEFAULT[i - 1]));
 			if (weight > 0.0)
 				operationchooser.addValue(weight, "Query" + i);
 		}
@@ -162,7 +163,6 @@ public class CoreWorkload extends Workload {
 				RETURN_COUNT_PROPERTY_DEFAULT));
 		timespan = p
 				.getProperty(TIME_SPAN_PROPERTY, TIME_SPAN_PROPERTY_DEFAULT);
-		operationchooser = new DiscreteGenerator<String>();
 
 		// prints below properties if exist
 		StringBuilder sb = new StringBuilder();
@@ -179,55 +179,44 @@ public class CoreWorkload extends Workload {
 		}
 		sb.delete(0, sb.length());
 
-
-		// Parse the file containing selected user IDs which will be used in
-		// these queries into a concurrent hashmap
-		if (query1proportion + query2proportion + query3proportion
-				+ query4proportion + query5proportion + query6proportion
-				+ query8proportion + query9proportion + query11proportion
-				+ query12proportion + query13proportion + query16proportion
-				+ query17proportion + query18proportion + query19proportion > 0) {
-			uidchm = Utils.getConcurrentHashMap(Utils
-					.getFilePath(USER_ID_FILE_NAME));
-			uidchmsize = uidchm.size();
-		}
-
-		// Parse the file containing selected tags which will be used in these
-		// queries into a concurrent hashmap
-		if (query9proportion + query15proportion > 0) {
-			tagchm = Utils.getConcurrentHashMap(Utils
-					.getFilePath(EVENT_TAG_FILE_NAME));
-			tagchmsize = tagchm.size();
-		}
-
-		// Parse the file containing selected date times which will be used in
-		// these queries into a concurrent hashmap
-		if (query7proportion + query10proportion + query14proportion > 0) {
-			timechm = Utils.getConcurrentHashMap(Utils
-					.getFilePath(TIME_FILE_NAME));
-			timechmsize = timechm.size();
-		}
-
-		// Parse the file containing selected times for users which will be used
-		// in these queries into a concurrent hashmap
-		if (query6proportion + query11proportion + query12proportion
-				+ query13proportion + query16proportion + query17proportion
-				+ query18proportion + query19proportion > 0) {
-			uidtimechm = Utils.getConcurrentHashMap(
-					Utils.getFilePath(USER_TIME_FILE_NAME), SEPARATOR,
-					SUBSEPARATOR, TIME_COUNT_FOR_USER);
-			uidtimechmsize = uidtimechm.size();
-		}
-
-		// Parse the file containing selected times for tags which will be used
-		// in these queries into a concurrent hashmap
-		if (query9proportion + query15proportion > 0) {
-			tagtimechm = Utils.getConcurrentHashMap(
-					Utils.getFilePath(TAG_TIME_FILE_NAME), SEPARATOR,
-					SUBSEPARATOR, TIME_COUNT_FOR_TAG);
-			tagtimechmsize = tagtimechm.size();
-		}
-
+		/*
+		 * // Parse the file containing selected user IDs which will be used in
+		 * // these queries into a concurrent hashmap if (query1proportion +
+		 * query2proportion + query3proportion + query4proportion +
+		 * query5proportion + query6proportion + query8proportion +
+		 * query9proportion + query11proportion + query12proportion +
+		 * query13proportion + query16proportion + query17proportion +
+		 * query18proportion + query19proportion > 0) { uidchm =
+		 * Utils.getConcurrentHashMap(Utils .getFilePath(USER_ID_FILE_NAME));
+		 * uidchmsize = uidchm.size(); }
+		 * 
+		 * // Parse the file containing selected tags which will be used in
+		 * these // queries into a concurrent hashmap if (query9proportion +
+		 * query15proportion > 0) { tagchm = Utils.getConcurrentHashMap(Utils
+		 * .getFilePath(EVENT_TAG_FILE_NAME)); tagchmsize = tagchm.size(); }
+		 * 
+		 * // Parse the file containing selected date times which will be used
+		 * in // these queries into a concurrent hashmap if (query7proportion +
+		 * query10proportion + query14proportion > 0) { timechm =
+		 * Utils.getConcurrentHashMap(Utils .getFilePath(TIME_FILE_NAME));
+		 * timechmsize = timechm.size(); }
+		 * 
+		 * // Parse the file containing selected times for users which will be
+		 * used // in these queries into a concurrent hashmap if
+		 * (query6proportion + query11proportion + query12proportion +
+		 * query13proportion + query16proportion + query17proportion +
+		 * query18proportion + query19proportion > 0) { uidtimechm =
+		 * Utils.getConcurrentHashMap( Utils.getFilePath(USER_TIME_FILE_NAME),
+		 * SEPARATOR, SUBSEPARATOR, TIME_COUNT_FOR_USER); uidtimechmsize =
+		 * uidtimechm.size(); }
+		 * 
+		 * // Parse the file containing selected times for tags which will be
+		 * used // in these queries into a concurrent hashmap if
+		 * (query9proportion + query15proportion > 0) { tagtimechm =
+		 * Utils.getConcurrentHashMap( Utils.getFilePath(TAG_TIME_FILE_NAME),
+		 * SEPARATOR, SUBSEPARATOR, TIME_COUNT_FOR_TAG); tagtimechmsize =
+		 * tagtimechm.size(); }
+		 */
 	}
 
 	/**
@@ -286,7 +275,8 @@ public class CoreWorkload extends Workload {
 
 	public void doAnalysisQuery1(DB db) {
 		// get a userID randomly
-		String userID = uidchm.get(random.nextInt(uidchmsize));
+		// String userID = uidchm.get(random.nextInt(uidchmsize));
+		String userID = "";
 		db.BSMAQuery1(userID, returncount);
 	}
 

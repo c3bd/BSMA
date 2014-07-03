@@ -75,13 +75,15 @@ public class DiscreteGenerator<ValueType> extends Generator<ValueType> {
 				pair._weight = sum;
 				sum += tmp;
 			}
+			inited = true;
 			assert sum > 1.0 - 0.000000000001;
 		}
 
 		double val = _random.nextDouble();
 		int idx = Collections.binarySearch(_values, new Pair(val, null), comp);
 		idx = Math.abs(idx + 1);
-		assert idx < _values.size();
+		if (idx == _values.size())
+			idx--;
 		
 		return _values.get(idx)._value;
 	}

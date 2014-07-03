@@ -22,8 +22,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Properties;
 
-import edu.ecnu.imc.bsma.measurements.exporter.MeasurementsExporter;
-import edu.ecnu.imc.bsma.measurements.exporter.RuntimeExporter;
+import edu.ecnu.imc.bsma.measurements.exporter.DBExporter;
 
 /**
  * Collects latency measurements, and reports them when requested.
@@ -93,7 +92,7 @@ public class Measurements {
 	 * @throws IOException
 	 *             Thrown if the export failed.
 	 */
-	public void exportMeasurements(MeasurementsExporter exporter)
+	public void exportMeasurements(DBExporter exporter)
 			throws IOException {
 		for (OneMeasurement measurement : data.values()) {
 			measurement.exportMeasurements(exporter);
@@ -103,7 +102,7 @@ public class Measurements {
 	/**
 	 * Return the summary of the measurements.
 	 */
-	public void getSummary(RuntimeExporter reporter) {
+	public void getSummary(DBExporter reporter) {
 		for (OneMeasurement m : data.values()) {
 			m.getSummary(reporter);
 		}

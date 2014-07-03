@@ -41,7 +41,8 @@ struct Job {
   4: optional string custDbImpl,
   5: list<Query> queries, //fractions of each query
   6: list<SubJob> subJobs,
-  7: optional map<string, string> props
+  7: optional map<string, string> props,
+  8: string description
 }
 
 /**

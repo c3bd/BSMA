@@ -1,11 +1,13 @@
 package edu.ecnu.imc.bsma.dao;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Properties;
 
+import edu.ecnu.imc.bsma.Scheduler;
 import rpc.Job;
 import rpc.Query;
 import rpc.SubJob;
@@ -21,23 +23,98 @@ import weibo4j.org.json.JSONObject;
  * 
  */
 public class JobInfo extends Job {
-	// public int jobID;
-	// public byte dbImpl; // the implementation of database access class
-	// public List<Query> queries;
-	// public List<BasicJobInfo> subJobs;
-	// public Map<String, String> props;
-	// public String userDbImpl; // user provided db access implementation
-	List<BasicJobInfo> jobUnits = new ArrayList<BasicJobInfo>();
+	public static final byte WAITING = 0;
+	public static final byte RUNNING = 1;
+	public static final byte FINISH = 2;
+	public static final byte CANCEL = 3;
 
-	public JobInfo(Job job) {
+	public byte state = WAITING;
+
+	Dao dao;
+
+	public JobInfo(Dao dao, byte state) {
+		this.dao = dao;
+		this.state = state;
+	}
+
+	public JobInfo(Job job, Dao dao) {
 		super(job);
-		for (SubJob subJob : job.getSubJobs()) {
-			jobUnits.add(new BasicJobInfo(this, subJob));
+		this.dao = dao;
+
+		/**
+		 * rather strange here
+		 */
+		List<SubJob> tmp = new ArrayList<SubJob>(subJobs);
+		if (tmp != null) {
+			subJobs.clear();
+			for (SubJob subJob : tmp) {
+				this.addToSubJobs(subJob);
+			}
 		}
 	}
 
-	public List<BasicJobInfo> getJobUnits() {
-		return jobUnits;
+	public int numOfJobs() {
+		return subJobs.size();
+	}
+
+	int idx = -1;
+
+	/**
+	 * 返回下一条需要执行的任务
+	 * 
+	 * @return
+	 * @throws SQLException
+	 */
+	public BasicJobInfo runNextJob() throws SQLException {
+		if (idx != -1) {
+			((BasicJobInfo) subJobs.get(idx)).setState(FINISH);
+		}
+		if (++idx < subJobs.size()) {
+			BasicJobInfo ret = (BasicJobInfo) subJobs.get(idx);
+			ret.setState(RUNNING);
+			return ret;
+		} else {
+			return null;
+		}
+	}
+
+	public BasicJobInfo getCurJob() {
+		if (idx < 0 || idx >= subJobs.size())
+			return null;
+		return (BasicJobInfo) subJobs.get(idx);
+	}
+
+	public void start() throws SQLException {
+		setState(RUNNING);
+		idx = -1;
+	}
+
+	/**
+	 * @throws SQLException
+	 * 
+	 */
+	public void finish() throws SQLException {
+		setState(FINISH);
+		idx = -1;
+	}
+
+	/**
+	 * 整个任务失败，更新状态
+	 * 
+	 * @throws SQLException
+	 */
+	public void cancel() throws SQLException {
+		setState(CANCEL);
+		for (int i = idx; 0 <= i && i < subJobs.size(); i++) {
+			((BasicJobInfo) subJobs.get(i)).setState(CANCEL);
+		}
+	}
+
+	public void setState(byte state) throws SQLException {
+		this.state = state;
+		if (dao != null) {
+			dao.updateJobState(this);
+		}
 	}
 
 	public JobInfo(JSONObject obj) throws JSONException {
@@ -79,13 +156,16 @@ public class JobInfo extends Job {
 	}
 
 	private static HashMap<Byte, String> dbImpls = new HashMap<Byte, String>();
+	public static final byte TEST_DB = -1;
 	public static final byte HIVE_DB = 0;
 	public static final byte SHARK_DB = 1;
 	public static final byte MONETDB_DB = 2;
+
 	static {
-		dbImpls.put(HIVE_DB, "edu.ecnu.imc.bsma.dbimpl.HiveDBImpl");
-		dbImpls.put(SHARK_DB, "edu.ecnu.imc.bsma.dbimpl.SparkDBImpl");
-		dbImpls.put(MONETDB_DB, "edu.ecnu.imc.bsma.dbimpl.MonetDBImpl");
+		dbImpls.put(TEST_DB, "edu.ecnu.imc.bsma.db.TestDBImpl");
+		dbImpls.put(HIVE_DB, "edu.ecnu.imc.bsma.db.HiveDBImpl");
+		dbImpls.put(SHARK_DB, "edu.ecnu.imc.bsma.db.SparkDBImpl");
+		dbImpls.put(MONETDB_DB, "edu.ecnu.imc.bsma.db.MonetDBImpl");
 	}
 
 	public static String getDBImpl(byte idx) {
@@ -103,10 +183,40 @@ public class JobInfo extends Job {
 	}
 
 	public Properties getProperties() {
-		Properties ret = new Properties();
-		for (Entry<String, String> entry : props.entrySet()) {
-			ret.setProperty(entry.getKey(), entry.getValue());
+		Properties ret = new Properties(Scheduler.instance.getProps());
+		if (props != null) {
+			for (Entry<String, String> entry : props.entrySet()) {
+				ret.setProperty(entry.getKey(), entry.getValue());
+			}
+		}
+		for (Query query : queries) {
+			ret.setProperty(String.format("query%dproportion", query.getQID()),
+					Double.toString(query.getFrac()));
 		}
 		return ret;
+	}
+
+	public byte getState() {
+		return state;
+	}
+
+	public void save() throws SQLException {
+		dao.insertJobInfo(this);
+	}
+
+	public void setBasicJobs(List<BasicJobInfo> subJobs) {
+		for (BasicJobInfo basic : subJobs) {
+			this.addToSubJobs(basic);
+		}
+	}
+
+	@Override
+	public void addToSubJobs(SubJob subJob) {
+		super.addToSubJobs(new BasicJobInfo(this, subJob, dao));
+	}
+
+	public void addBasicJob(BasicJobInfo subjob) {
+		subjob.setJobInfo(this);
+		super.addToSubJobs(subjob);
 	}
 }

@@ -15,20 +15,18 @@ import weibo4j.org.json.JSONObject;
  */
 public class RunningReport {
 	public int subJobId;
-	public int seqId;
 	public long time;
 	public int totalOps;
-	public double throughput;
-
+	public float curThroughput;
 	public List<QueryRunningReport> qStatus = new ArrayList<QueryRunningReport>();
 
 	public JSONObject asJson() throws JSONException {
 		JSONObject obj = new JSONObject();
 		obj.put("id", subJobId);
-		obj.put("seq", seqId);
+		// obj.put("seq", seqId);
 		obj.put("time", time);
 		obj.put("totalOps", totalOps);
-		obj.put("throughput", throughput);
+		obj.put("throughput", curThroughput);
 
 		JSONArray arr = new JSONArray();
 		obj.put("qStatus", arr);
@@ -42,11 +40,11 @@ public class RunningReport {
 	public static void main(String[] args) throws JSONException {
 		RunningReport rp = new RunningReport();
 		rp.subJobId = 1;
-		rp.seqId = 1;
+		// rp.seqId = 1;
 		rp.time = 1;
-		;
+
 		rp.totalOps = 1;
-		rp.throughput = 1;
+		// rp.throughput = 1;
 
 		QueryRunningReport qRt = new QueryRunningReport();
 		qRt.avgLatency = 1;

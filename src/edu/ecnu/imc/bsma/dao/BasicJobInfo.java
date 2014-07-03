@@ -1,25 +1,32 @@
 package edu.ecnu.imc.bsma.dao;
 
+import java.sql.SQLException;
+
 import rpc.SubJob;
 import weibo4j.org.json.JSONException;
 import weibo4j.org.json.JSONObject;
 
 public class BasicJobInfo extends SubJob {
-	public static final byte WAITING = 0;
-	public static final byte RUNNING = 0;
-	public static final byte STOP = 0;
-	public static final byte CANCEL = 0;
-
-	public byte state = WAITING;// waiting, running, stop, cancel
+	public byte state = JobInfo.WAITING;// waiting, running, finish, cancel
 	JobInfo jobInfo;
+	Dao dao;
 
-	public BasicJobInfo(JobInfo jobInfo, SubJob subJob) {
+	public BasicJobInfo(Dao dao, Byte state) {
+		this.dao = dao;
+		this.state = state;
+	}
+
+	public BasicJobInfo(JobInfo jobInfo, SubJob subJob, Dao dao) {
 		super(subJob);
 		this.jobInfo = jobInfo;
 	}
 
 	public JobInfo getJobInfo() {
 		return jobInfo;
+	}
+
+	public void setJobInfo(JobInfo jobInfo) {
+		this.jobInfo = jobInfo;
 	}
 
 	/**
@@ -30,10 +37,15 @@ public class BasicJobInfo extends SubJob {
 	}
 
 	/**
-	 * @param state the state to set
+	 * @param state
+	 *            the state to set
+	 * @throws SQLException
 	 */
-	public void setState(byte state) {
+	public void setState(byte state) throws SQLException {
 		this.state = state;
+		if (dao != null) {
+			dao.updateSubJobStatus(this);
+		}
 	}
 
 	public BasicJobInfo(JSONObject obj) throws JSONException {

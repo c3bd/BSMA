@@ -19,11 +19,15 @@
 package edu.ecnu.imc.bsma.measurements;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Properties;
 
-import edu.ecnu.imc.bsma.measurements.exporter.MeasurementsExporter;
-import edu.ecnu.imc.bsma.measurements.exporter.RuntimeExporter;
+import edu.ecnu.imc.bsma.measurements.exporter.DBExporter;
 
 /**
  * Take measurements and maintain a histogram of a given metric, such as Query1
@@ -102,57 +106,80 @@ public class OneMeasurementHistogram extends OneMeasurement {
 		}
 	}
 
+	public static final HashMap<String, Byte> qIDs = new HashMap<String, Byte>();
+	static {
+		for (Byte i = 1; i < 20; i++)
+			qIDs.put("Query" + i, i);
+	}
+
+	public byte getQID(String query) {
+		if (qIDs.containsKey(query)) {
+			return qIDs.get(query);
+		} else if (query.equals("overall")) {
+			return 0;
+		} else {
+			// unknown type
+			return -1;
+		}
+	}
+
+	public byte getQueryID() {
+		return getQID(getName());
+	}
+
 	@Override
-	public void exportMeasurements(MeasurementsExporter exporter)
-			throws IOException {
-		exporter.write(getName(), "Operations", operations);
+	public void exportMeasurements(DBExporter exporter) throws IOException {
+		List<Integer> latencyHist = new ArrayList<Integer>(4);
+		List<Float> latencyStats = new ArrayList<Float>(3);
+		Collections.fill(latencyHist, 0);
+		Collections.fill(latencyStats, 0.0f);
 		// Just in case there's only one query.
-		if (1 == operations) {
-			exporter.write(getName(), "Latency(ms)",
-					(((double) totallatency) / ((double) operations)));
-		} else if (operations > 1) {
-			exporter.write(getName(), "AverageLatency(ms)",
-					(((double) totallatency) / ((double) operations)));
-			exporter.write(getName(), "MinLatency(ms)", min);
-			exporter.write(getName(), "MaxLatency(ms)", max);
 
-			int opcounter = 0;
-			boolean done50th = false;
-			boolean done75th = false;
-			boolean done95th = false;
-			for (int i = 0; i < _buckets; i++) {
-				opcounter += histogram[i];
-				if ((!done50th)
-						&& (((double) opcounter) / ((double) operations) >= 0.50)) {
-					exporter.write(getName(), "50thPercentileLatency(ms)",
-							(i + 1) * interval);
-					done50th = true;
-				}
-				if ((!done75th)
-						&& (((double) opcounter) / ((double) operations) >= 0.75)) {
-					exporter.write(getName(), "75thPercentileLatency(ms)",
-							(i + 1) * interval);
-					done75th = true;
-				}
-				if ((!done95th)
-						&& (((double) opcounter) / ((double) operations) >= 0.95)) {
-					exporter.write(getName(), "95thPercentileLatency(ms)",
-							(i + 1) * interval);
-					done95th = true;
-				}
-				if (((double) opcounter) / ((double) operations) >= 0.99) {
-					exporter.write(getName(), "99thPercentileLatency(ms)",
-							(i + 1) * interval);
-					break;
-				}
+		latencyStats.set(0, (float) min);
+		latencyStats.set(0, (float) (((double) totallatency) / operations));
+		latencyStats.set(0, (float) max);
+
+		int opcounter = 0;
+		boolean done50th = false;
+		boolean done75th = false;
+		boolean done95th = false;
+		for (int i = 0; i < _buckets; i++) {
+			opcounter += histogram[i];
+			int latency = (i + 1) * interval;
+			if ((!done50th)
+					&& (((double) opcounter) / ((double) operations) >= 0.50)) {
+				latencyHist.set(0, latency);
+				done50th = true;
+			}
+			if ((!done75th)
+					&& (((double) opcounter) / ((double) operations) >= 0.75)) {
+				latencyHist.set(1, latency);
+				done75th = true;
+			}
+			if ((!done95th)
+					&& (((double) opcounter) / ((double) operations) >= 0.95)) {
+
+				latencyHist.set(2, latency);
+				done95th = true;
+			}
+			if (((double) opcounter) / ((double) operations) >= 0.99) {
+				latencyHist.set(3, latency);
+				break;
 			}
 
-			for (int i = 0; i < _buckets; i++) {
-				exporter.write(getName(), "[" + i * interval + "ms-" + (i + 1)
-						* interval + "ms)", histogram[i]);
+			try {
+				exporter.reportSubJobResult(getQueryID(), latencyHist,
+						latencyStats);
+			} catch (SQLException e) {
+				throw new IOException(e);
 			}
-			exporter.write(getName(), ">" + _buckets * interval + "ms",
-					histogramoverflow);
+
+			/*
+			 * for (int i = 0; i < _buckets; i++) { exporter.write(getName(),
+			 * "[" + i * interval + "ms-" + (i + 1) interval + "ms)",
+			 * histogram[i]); } exporter.write(getName(), ">" + _buckets *
+			 * interval + "ms", histogramoverflow);
+			 */
 		}
 	}
 
@@ -171,7 +198,7 @@ public class OneMeasurementHistogram extends OneMeasurement {
 	}
 
 	@Override
-	public void getSummary(RuntimeExporter exporter) {
+	public void getSummary(DBExporter exporter) {
 		double report = 0;
 		if (windowoperations != 0) {
 			report = ((double) windowtotallatency)
@@ -179,6 +206,6 @@ public class OneMeasurementHistogram extends OneMeasurement {
 			windowtotallatency = 0;
 			windowoperations = 0;
 		}
-		exporter.reportOneM(getName(), report);
+		exporter.reportOneMeasure(getQueryID(), report);
 	}
 }
