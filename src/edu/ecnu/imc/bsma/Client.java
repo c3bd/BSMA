@@ -26,6 +26,9 @@ import java.util.Properties;
 import java.util.Random;
 import java.util.Vector;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import edu.ecnu.imc.bsma.dao.BasicJobInfo;
 import edu.ecnu.imc.bsma.dao.JobInfo;
 import edu.ecnu.imc.bsma.db.DB;
@@ -45,7 +48,7 @@ import edu.ecnu.imc.bsma.measurements.exporter.TextMeasurementsExporter;
  * 
  */
 class StatusThread extends Thread {
-	BasicJobInfo _jobInfo;
+	JobInfo _jobInfo;
 	Vector<Thread> _threads;
 	Measurements _measurements;
 	RuntimeExporter _exporter;
@@ -55,9 +58,9 @@ class StatusThread extends Thread {
 	 * status every 100 seconds.
 	 */
 	// public static final long sleeptime = 10000;
-	public static final long sleeptime = 100000;
+	public static final String sleeptime = "100000";
 
-	public StatusThread(BasicJobInfo jobInfo, Vector<Thread> threads,
+	public StatusThread(JobInfo jobInfo, Vector<Thread> threads,
 			Measurements measurements) {
 		_jobInfo = jobInfo;
 		_threads = threads;
@@ -74,7 +77,8 @@ class StatusThread extends Thread {
 		long lasttotalops = 0;
 
 		boolean alldone;
-
+		long period = Long.parseLong(_jobInfo.getProperties().getProperty(
+				"report_period", sleeptime));
 		do {
 			alldone = true;
 
@@ -106,13 +110,13 @@ class StatusThread extends Thread {
 			try {
 				_exporter.endReport();
 			} catch (SQLException e1) {
+				// we can do nothing
 				e1.printStackTrace();
 			}
 
 			try {
-				sleep(sleeptime);
+				sleep(period);
 			} catch (InterruptedException e) {
-				// do nothing
 			}
 
 		} while (!alldone);
@@ -262,6 +266,7 @@ class ClientThread extends Thread {
  * Main class for executing BSMA.
  */
 public class Client extends Thread {
+	public static Logger logger = LoggerFactory.getLogger(Client.class);
 	// BasicJobInfo basicJobInfo;
 	JobInfo jobInfo;
 
@@ -323,143 +328,143 @@ public class Client extends Thread {
 
 	@Override
 	public void run() {
-		// compute the target throughput
-		double targetperthreadperms = -1;
-		if (basicJobInfo.opCount > 0) {
-			double targetperthread = ((double) basicJobInfo.opCount)
-					/ ((double) basicJobInfo.threadCount);
-			targetperthreadperms = targetperthread / 1000.0;
-		}
+		// load argument files
 
-		System.out.println("BSMA Client 0.1");
-		System.out.print("Command line:");
-		System.out.println();
-		System.err.println("Loading workload...");
+		for (BasicJobInfo basicJobInfo : jobInfo.getJobUnits()) {
 
-		// show a warning message that creating the workload is taking a while
-		// but only do so if it is taking longer than 2 seconds
-		// (showing the message right away if the setup wasn't taking very long
-		// was confusing people)
-		Thread warningthread = new Thread() {
-			public void run() {
-				try {
-					sleep(2000);
-				} catch (InterruptedException e) {
-					return;
-				}
-				System.err
-						.println(" (might take a few minutes for large data sets)");
+			// compute the target throughput
+			double targetperthreadperms = -1;
+			if (basicJobInfo.opCount > 0) {
+				double targetperthread = ((double) basicJobInfo.opCount)
+						/ ((double) basicJobInfo.threadNum);
+				targetperthreadperms = targetperthread / 1000.0;
 			}
-		};
-		warningthread.start();
 
-		// load the workload
-		ClassLoader classLoader = Client.class.getClassLoader();
-		Workload workload = null;
-		try {
-			Class workloadclass = classLoader.loadClass(jobInfo.getWorkload());
+			logger.info("BSMA Client 0.1");
+			logger.info("Loading workload...");
 
-			workload = (Workload) workloadclass.newInstance();
-		} catch (Exception e) {
-			e.printStackTrace();
-			e.printStackTrace(System.out);
-			System.exit(0);
-		}
-		Properties props = constructProp();
-		try {
-			workload.init(props);
-		} catch (WorkloadException e) {
-			e.printStackTrace();
-			e.printStackTrace(System.out);
-			System.exit(0);
-		}
+			// show a warning message that creating the workload is taking a
+			// while
+			// but only do so if it is taking longer than 2 seconds
+			// (showing the message right away if the setup wasn't taking very
+			// long
+			// was confusing people)
+			Thread warningthread = new Thread() {
+				public void run() {
+					try {
+						sleep(2000);
+					} catch (InterruptedException e) {
+						return;
+					}
+					System.err
+							.println(" (might take a few minutes for large data sets)");
+				}
+			};
+			warningthread.start();
 
-		warningthread.interrupt();
-
-		// run the workload
-
-		System.err.println("Starting test.");
-		System.out.println(" query results and latencies:");
-
-		int opcount = Integer.parseInt(props.getProperty(
-				OPERATION_COUNT_PROPERTY, "0"));
-
-		// if the workload has more threads than operations, the number of
-		// threads will be changed to the number of operations.
-		if (opcount < basicJobInfo.threadCount) {
-			System.err
-					.println("warning: the number of threads is bigger than that of operations!"
-							.toUpperCase());
-			basicJobInfo.threadCount = opcount;
-		}
-
-		Vector<Thread> threads = new Vector<Thread>();
-		Measurements measurements = new Measurements(props);
-		for (int threadid = 0; threadid < basicJobInfo.threadCount; threadid++) {
-			DB db = null;
+			// load the workload
+			ClassLoader classLoader = Client.class.getClassLoader();
+			Workload workload = null;
 			try {
-				db = DBFactory.newDB(jobInfo.getDBImpl(), props, measurements);
-			} catch (UnknownDBException e) {
-				System.out.println("Unknown DB " + jobInfo.getDBImpl());
+				Class workloadclass = classLoader.loadClass(jobInfo
+						.getWorkload());
+
+				workload = (Workload) workloadclass.newInstance();
+			} catch (Exception e) {
+				e.printStackTrace();
+				e.printStackTrace(System.out);
+				System.exit(0);
+			}
+			Properties props = constructProp();
+			try {
+				workload.init(props);
+			} catch (WorkloadException e) {
+				e.printStackTrace();
+				e.printStackTrace(System.out);
 				System.exit(0);
 			}
 
-			Thread t = new ClientThread(db, workload, threadid, threadcount,
-					props, opcount / threadcount, targetperthreadperms,
-					measurements);
+			warningthread.interrupt();
 
-			threads.add(t);
-			// t.start();
-		}
+			// run the workload
 
-		StatusThread statusthread = null;
+			System.err.println("Starting test.");
+			System.out.println(" query results and latencies:");
 
-		if (status) {
-			statusthread = new StatusThread(jobInfo, threads, measurements);
-			statusthread.start();
-		}
+			int opcount = basicJobInfo.getOpCount();
 
-		long st = System.currentTimeMillis();
-
-		for (Thread t : threads) {
-			t.start();
-		}
-
-		for (Thread t : threads) {
-			try {
-				t.join();
-			} catch (InterruptedException e) {
+			// if the workload has more threads than operations, the number of
+			// threads will be changed to the number of operations.
+			if (opcount < basicJobInfo.threadNum) {
+				System.err
+						.println("warning: the number of threads is bigger than that of operations!"
+								.toUpperCase());
+				basicJobInfo.threadNum = opcount;
 			}
-		}
 
-		long en = System.currentTimeMillis();
+			Vector<Thread> threads = new Vector<Thread>();
+			Measurements measurements = new Measurements(props);
+			for (int threadid = 0; threadid < basicJobInfo.threadNum; threadid++) {
+				DB db = null;
+				try {
+					db = DBFactory.newDB(jobInfo.getDBImpl(), props,
+							measurements);
+				} catch (UnknownDBException ex) {
+					// TODO Handle this exception
+					// System.exit(0);
+				}
 
-		if (status) {
+				Thread t = new ClientThread(db, workload, threadid,
+						basicJobInfo.getThreadNum(), props, opcount
+								/ basicJobInfo.getThreadNum(),
+						targetperthreadperms, measurements);
+				threads.add(t);
+			}
+
+			// start the status thread
+			StatusThread statusthread = new StatusThread(jobInfo, threads,
+					measurements);
+			statusthread.start();
+
+			long st = System.currentTimeMillis();
+
+			for (Thread t : threads) {
+				t.start();
+			}
+
+			for (Thread t : threads) {
+				try {
+					t.join();
+				} catch (InterruptedException e) {
+				}
+			}
+
+			long en = System.currentTimeMillis();
+
 			statusthread.interrupt();
-		}
 
-		try {
-			workload.cleanup();
-		} catch (WorkloadException e) {
-			e.printStackTrace();
-			e.printStackTrace(System.out);
-			System.exit(0);
-		}
+			try {
+				workload.cleanup();
+			} catch (WorkloadException e) {
+				e.printStackTrace();
+				e.printStackTrace(System.out);
+				System.exit(0);
+			}
 
-		try {
-			exportMeasurements(props, opcount, en - st, measurements);
-		} catch (IOException e) {
-			System.err.println("Could not export measurements, error: "
-					+ e.getMessage());
-			e.printStackTrace();
-			System.exit(-1);
-		}
+			try {
+				exportMeasurements(props, opcount, en - st, measurements);
+			} catch (IOException e) {
+				System.err.println("Could not export measurements, error: "
+						+ e.getMessage());
+				e.printStackTrace();
+				System.exit(-1);
+			}
 
-		System.exit(0);
+		}
 	}
 
 	Properties constructProp() {
-		return null;
+		return jobInfo.getProperties();
 	}
 
 	/**

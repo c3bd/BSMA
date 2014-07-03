@@ -1,6 +1,6 @@
 package edu.ecnu.imc.bsma.dao;
 
-public class JobFinalReport {
+public class SubJobFinalReport {
 	public int subjobid; //identifier
 	public int queryid;
 	public int latency50;

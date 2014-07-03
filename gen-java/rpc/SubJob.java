@@ -37,7 +37,7 @@ public class SubJob implements org.apache.thrift.TBase<SubJob, SubJob._Fields>, 
 
   private static final org.apache.thrift.protocol.TField SUB_JOB_ID_FIELD_DESC = new org.apache.thrift.protocol.TField("subJobID", org.apache.thrift.protocol.TType.I32, (short)1);
   private static final org.apache.thrift.protocol.TField OP_COUNT_FIELD_DESC = new org.apache.thrift.protocol.TField("opCount", org.apache.thrift.protocol.TType.I32, (short)2);
-  private static final org.apache.thrift.protocol.TField THREAD_NUM_FIELD_DESC = new org.apache.thrift.protocol.TField("threadNum", org.apache.thrift.protocol.TType.I16, (short)3);
+  private static final org.apache.thrift.protocol.TField THREAD_NUM_FIELD_DESC = new org.apache.thrift.protocol.TField("threadNum", org.apache.thrift.protocol.TType.I32, (short)3);
 
   private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
   static {
@@ -47,7 +47,7 @@ public class SubJob implements org.apache.thrift.TBase<SubJob, SubJob._Fields>, 
 
   public int subJobID; // required
   public int opCount; // required
-  public short threadNum; // required
+  public int threadNum; // required
 
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements org.apache.thrift.TFieldIdEnum {
@@ -126,7 +126,7 @@ public class SubJob implements org.apache.thrift.TBase<SubJob, SubJob._Fields>, 
     tmpMap.put(_Fields.OP_COUNT, new org.apache.thrift.meta_data.FieldMetaData("opCount", org.apache.thrift.TFieldRequirementType.DEFAULT, 
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
     tmpMap.put(_Fields.THREAD_NUM, new org.apache.thrift.meta_data.FieldMetaData("threadNum", org.apache.thrift.TFieldRequirementType.DEFAULT, 
-        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I16)));
+        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
     metaDataMap = Collections.unmodifiableMap(tmpMap);
     org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(SubJob.class, metaDataMap);
   }
@@ -139,7 +139,7 @@ public class SubJob implements org.apache.thrift.TBase<SubJob, SubJob._Fields>, 
   public SubJob(
     int subJobID,
     int opCount,
-    short threadNum)
+    int threadNum)
   {
     this();
     this.subJobID = subJobID;
@@ -220,11 +220,11 @@ public class SubJob implements org.apache.thrift.TBase<SubJob, SubJob._Fields>, 
     __isset_bitfield = EncodingUtils.setBit(__isset_bitfield, __OPCOUNT_ISSET_ID, value);
   }
 
-  public short getThreadNum() {
+  public int getThreadNum() {
     return this.threadNum;
   }
 
-  public SubJob setThreadNum(short threadNum) {
+  public SubJob setThreadNum(int threadNum) {
     this.threadNum = threadNum;
     setThreadNumIsSet(true);
     return this;
@@ -265,7 +265,7 @@ public class SubJob implements org.apache.thrift.TBase<SubJob, SubJob._Fields>, 
       if (value == null) {
         unsetThreadNum();
       } else {
-        setThreadNum((Short)value);
+        setThreadNum((Integer)value);
       }
       break;
 
@@ -281,7 +281,7 @@ public class SubJob implements org.apache.thrift.TBase<SubJob, SubJob._Fields>, 
       return Integer.valueOf(getOpCount());
 
     case THREAD_NUM:
-      return Short.valueOf(getThreadNum());
+      return Integer.valueOf(getThreadNum());
 
     }
     throw new IllegalStateException();
@@ -483,8 +483,8 @@ public class SubJob implements org.apache.thrift.TBase<SubJob, SubJob._Fields>, 
             }
             break;
           case 3: // THREAD_NUM
-            if (schemeField.type == org.apache.thrift.protocol.TType.I16) {
-              struct.threadNum = iprot.readI16();
+            if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
+              struct.threadNum = iprot.readI32();
               struct.setThreadNumIsSet(true);
             } else { 
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
@@ -512,7 +512,7 @@ public class SubJob implements org.apache.thrift.TBase<SubJob, SubJob._Fields>, 
       oprot.writeI32(struct.opCount);
       oprot.writeFieldEnd();
       oprot.writeFieldBegin(THREAD_NUM_FIELD_DESC);
-      oprot.writeI16(struct.threadNum);
+      oprot.writeI32(struct.threadNum);
       oprot.writeFieldEnd();
       oprot.writeFieldStop();
       oprot.writeStructEnd();
@@ -549,7 +549,7 @@ public class SubJob implements org.apache.thrift.TBase<SubJob, SubJob._Fields>, 
         oprot.writeI32(struct.opCount);
       }
       if (struct.isSetThreadNum()) {
-        oprot.writeI16(struct.threadNum);
+        oprot.writeI32(struct.threadNum);
       }
     }
 
@@ -566,7 +566,7 @@ public class SubJob implements org.apache.thrift.TBase<SubJob, SubJob._Fields>, 
         struct.setOpCountIsSet(true);
       }
       if (incoming.get(2)) {
-        struct.threadNum = iprot.readI16();
+        struct.threadNum = iprot.readI32();
         struct.setThreadNumIsSet(true);
       }
     }
