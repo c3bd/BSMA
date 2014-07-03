@@ -49,11 +49,11 @@ Q4:
 SELECT DISTINCT f1.friendID
 FROM
 (SELECT friendIDFROM friendList
-WHERE uid = "A")  f1,
+WHERE uid = "A")  f1 JOIN
 (SELECT friendID
 FROM friendList
 WHERE uid = "B")  f2
-WHERE f1.friendID = f2.friendID;
+ON(f1.friendID = f2.friendID);
 
 
 Q5:
@@ -67,14 +67,12 @@ friends.friendID is not null;
 
 Q6:
 SELECT microblog.uid
-FROM microblog,mention,
-(SELECT DISTINCT mention.uid AS uid
-FROM microblog,mention
-WHERE microblog.mid = mention.mid AND
-microblog.uid = "A") AS x
-WHERE microblog.mid = mention.mid AND
-mention.uid = x.uid AND
-microblog.uid<> "A" AND
+FROM microblog JOIN mention ON(microblog.mid = mention.mid)
+JOIN (SELECT DISTINCT mention.uid AS uid
+FROM microblog JOIN mention ON (microblog.mid = mention.mid)
+WHERE  microblog.uid = "A") AS x 
+ON (mention.uid = x.uid)
+WHERE microblog.uid<> "A" AND
 microblog.time BETWEEN TO_DAYS('YYYY-MM-DDHH:MM:SS')
 AND DATE_ADD('YYYY-MM-DD HH:MM:SS',INTERVAL 1HOUR)
 GROUP BY microblog.uid
@@ -83,9 +81,8 @@ LIMIT 10;
 
 Q7:
 SELECT mention.uid
-FROM microblog,mention
-WHERE microblog.mid = mention.mid AND
-microblog.time BETWEEN TO_DAYS('YYYY-MM-DDHH:MM:SS')
+FROM microblog JOIN mention ON (microblog.mid = mention.mid)
+WHERE microblog.time BETWEEN TO_DAYS('YYYY-MM-DDHH:MM:SS')
 AND DATE_ADD('YYYY-MM-DD HH:MM:SS',INTERVAL 1HOUR)
 GROUP BY mention.uid
 ORDER BY COUNT(*)DESC
@@ -100,7 +97,8 @@ FROM friendList
 WHERE uid = "A") UNION
 (SELECT b.friendID as friendID
 FROM friendList a join friendList b
-WHERE a.uid = "A" a.friendID = b.uid)) friends
+ON (a.friendID = b.uid)
+WHERE a.uid = "A" )) friends
 ON (microblog.uid in friends.friendID)
 WHERE friends.friendID is not null
 ORDER BY microblog.time DESC

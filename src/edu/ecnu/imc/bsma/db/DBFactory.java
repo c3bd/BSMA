@@ -20,26 +20,23 @@ package edu.ecnu.imc.bsma.db;
 import java.util.Properties;
 
 import edu.ecnu.imc.bsma.UnknownDBException;
+import edu.ecnu.imc.bsma.dao.JobInfo;
 import edu.ecnu.imc.bsma.measurements.Measurements;
 
 /**
  * Creates a DB layer by dynamically classloading the specified DB class.
  */
 public class DBFactory {
-	public static DB newDB(String dbname, Properties properties,
+	public static DB newDB(JobInfo job, Properties properties,
 			Measurements measurements) throws UnknownDBException {
 		ClassLoader classLoader = DBFactory.class.getClassLoader();
 
 		DB ret = null;
-
 		try {
-			Class dbclass = classLoader.loadClass(dbname);
-			// System.out.println("dbclass.getName() = " + dbclass.getName());
-
-			ret = (DB) dbclass.newInstance();
+			Class dbClass = job.getDBClass();
+			ret = (DB) dbClass.newInstance();
 		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
+			throw new UnknownDBException(e);
 		}
 
 		ret.setProperties(properties);

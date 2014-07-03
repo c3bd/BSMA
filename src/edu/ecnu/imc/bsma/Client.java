@@ -18,8 +18,7 @@
 
 package edu.ecnu.imc.bsma;
 
-import java.io.IOException;
-import java.io.OutputStream;
+import java.net.MalformedURLException;
 import java.sql.SQLException;
 import java.util.Properties;
 import java.util.Vector;
@@ -34,8 +33,6 @@ import edu.ecnu.imc.bsma.dao.JobInfo;
 import edu.ecnu.imc.bsma.db.DB;
 import edu.ecnu.imc.bsma.db.DBFactory;
 import edu.ecnu.imc.bsma.measurements.Measurements;
-import edu.ecnu.imc.bsma.measurements.exporter.MeasurementsExporter;
-import edu.ecnu.imc.bsma.measurements.exporter.TextMeasurementsExporter;
 
 /**
  * Thread responsible for managing the execution of a benchmark job a benchmark
@@ -56,6 +53,7 @@ public class Client extends Thread {
 	public void run() {
 
 		// load argument files
+		prepareJob(jobInfo);
 
 		// update job status
 		try {
@@ -146,8 +144,7 @@ public class Client extends Thread {
 				for (int threadid = 0; threadid < basicJobInfo.threadNum; threadid++) {
 					DB db = null;
 					try {
-						db = DBFactory.newDB(jobInfo.getDBImpl(), props,
-								measurements);
+						db = DBFactory.newDB(jobInfo, props, measurements);
 					} catch (UnknownDBException ex) {
 						// TODO Handle this exception
 						// System.exit(0);
@@ -205,6 +202,24 @@ public class Client extends Thread {
 			} catch (SQLException e) {
 
 			}
+		}
+	}
+
+	private void prepareJob(JobInfo jobInfo) {
+		/**
+		 *  TODO
+		 *  collect needed resources
+		 *  
+		 */
+
+		try {
+			jobInfo.getDBClass();
+		} catch (MalformedURLException e) {
+			// TODO hmm, we needed to copy jars now
+			
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 

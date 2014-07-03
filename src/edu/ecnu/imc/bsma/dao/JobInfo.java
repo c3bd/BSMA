@@ -1,5 +1,6 @@
 package edu.ecnu.imc.bsma.dao;
 
+import java.net.MalformedURLException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -7,13 +8,15 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Properties;
 
-import edu.ecnu.imc.bsma.Scheduler;
 import rpc.Job;
 import rpc.Query;
 import rpc.SubJob;
 import weibo4j.org.json.JSONArray;
 import weibo4j.org.json.JSONException;
 import weibo4j.org.json.JSONObject;
+import edu.ecnu.imc.bsma.Scheduler;
+import edu.ecnu.imc.bsma.db.DBFactory;
+import edu.ecnu.imc.bsma.util.JarLoader;
 
 /**
  * a job may consists of multiple sub-jobs, web ui pass json format storing the
@@ -53,6 +56,30 @@ public class JobInfo extends Job {
 		}
 	}
 
+	public JobInfo(JSONObject obj) throws JSONException {
+		jobID = obj.getInt("id");
+		JSONArray arr = obj.getJSONArray("subjobs");
+
+		for (int i = 0; i < arr.length(); i++) {
+			subJobs.add(new BasicJobInfo(arr.getJSONObject(i)));
+		}
+
+		JSONObject map = obj.getJSONObject("queries");
+		arr = map.names();
+		for (int i = 0; i < arr.length(); i++) {
+			JSONObject qObj = arr.getJSONObject(i);
+			queries.add(new Query((byte) qObj.getInt("type"), qObj
+					.getDouble("frac")));
+		}
+
+		map = obj.getJSONObject("props");
+		arr = map.names();
+		for (int i = 0; i < arr.length(); i++) {
+			String key = arr.getString(i);
+			props.put(key, map.getString(key));
+		}
+	}
+
 	public int numOfJobs() {
 		return subJobs.size();
 	}
@@ -69,13 +96,15 @@ public class JobInfo extends Job {
 		if (idx != -1) {
 			((BasicJobInfo) subJobs.get(idx)).setState(FINISH);
 		}
-		if (++idx < subJobs.size()) {
+
+		while (++idx < subJobs.size()) {
 			BasicJobInfo ret = (BasicJobInfo) subJobs.get(idx);
-			ret.setState(RUNNING);
-			return ret;
-		} else {
-			return null;
+			if (ret.getState() == WAITING) {
+				ret.setState(RUNNING);
+				return ret;
+			}
 		}
+		return null;
 	}
 
 	public BasicJobInfo getCurJob() {
@@ -117,30 +146,6 @@ public class JobInfo extends Job {
 		}
 	}
 
-	public JobInfo(JSONObject obj) throws JSONException {
-		jobID = obj.getInt("id");
-		JSONArray arr = obj.getJSONArray("subjobs");
-
-		for (int i = 0; i < arr.length(); i++) {
-			subJobs.add(new BasicJobInfo(arr.getJSONObject(i)));
-		}
-
-		JSONObject map = obj.getJSONObject("queries");
-		arr = map.names();
-		for (int i = 0; i < arr.length(); i++) {
-			JSONObject qObj = arr.getJSONObject(i);
-			queries.add(new Query((byte) qObj.getInt("type"), qObj
-					.getDouble("frac")));
-		}
-
-		map = obj.getJSONObject("props");
-		arr = map.names();
-		for (int i = 0; i < arr.length(); i++) {
-			String key = arr.getString(i);
-			props.put(key, map.getString(key));
-		}
-	}
-
 	private static HashMap<Integer, String> workloads = new HashMap<Integer, String>();
 	public static final int COREWORKLOAD = 0;
 	static {
@@ -160,6 +165,7 @@ public class JobInfo extends Job {
 	public static final byte HIVE_DB = 0;
 	public static final byte SHARK_DB = 1;
 	public static final byte MONETDB_DB = 2;
+	public static final byte USER_CUSTDB = Byte.MAX_VALUE;
 
 	static {
 		dbImpls.put(TEST_DB, "edu.ecnu.imc.bsma.db.TestDBImpl");
@@ -172,7 +178,11 @@ public class JobInfo extends Job {
 		return dbImpls.get(idx);
 	}
 
-	public static final String CUST_DBIMPL = "db.";
+	public boolean isCustDB() {
+		return dbImpl == USER_CUSTDB;
+	}
+
+	Class dbClass = null;
 
 	public String getDBImpl() {
 		String ret = getDBImpl(dbImpl);
@@ -180,6 +190,26 @@ public class JobInfo extends Job {
 			ret = custDbImpl;
 		}
 		return ret;
+	}
+
+	/**
+	 * load the db class
+	 * @return
+	 * @throws MalformedURLException
+	 * @throws ClassNotFoundException
+	 */
+	public Class getDBClass() throws MalformedURLException,
+			ClassNotFoundException {
+		if (dbClass == null) {
+			if (this.isCustDB()) {
+				// TODO jar dir
+				JarLoader.loadClass("", jars, this.getCustDbImpl());
+			} else {
+				ClassLoader classLoader = JobInfo.class.getClassLoader();
+				dbClass = classLoader.loadClass(getDBImpl());
+			}
+		}
+		return dbClass;
 	}
 
 	public Properties getProperties() {

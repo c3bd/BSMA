@@ -1,8 +1,10 @@
 package edu.ecnu.imc.bsma.util;
 
 import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.List;
 
 import edu.ecnu.imc.bsma.db.DBFactory;
 
@@ -13,17 +15,24 @@ import edu.ecnu.imc.bsma.db.DBFactory;
  * 
  */
 public class JarLoader {
-	public static Object load(String[] jars, String className) throws Exception {
-		File file = new File(className);
-		URLClassLoader loader = new URLClassLoader(new URL[] { file.toURI()
-				.toURL() });
-		Class clazz = loader.loadClass(className);// "oracle.jdbc.driver.OracleDriver"
-		return clazz.newInstance();
+	public static Class loadClass(String jarDir, List<String> jars,
+			String className) throws ClassNotFoundException,
+			MalformedURLException {
+		URL[] urls = new URL[jars.size()];
+		for (int i = 0; i < jars.size(); i++) {
+			File file = new File(jarDir, jars.get(i));
+			urls[i] = file.toURI().toURL();
+		}
+		URLClassLoader loader = new URLClassLoader(urls);
+		// Class clazz = loader.loadClass(className);//
+		// "oracle.jdbc.driver.OracleDriver"
+		return loader.loadClass(className);
 	}
 
-	public static DBFactory loadFactory(String[] jars, String className)
-			throws Exception {
-		DBFactory factory = (DBFactory) load(jars, className);
+	public static DBFactory loadFactory(String jarDir, List<String> jars,
+			String className) throws Exception {
+		DBFactory factory = (DBFactory) loadClass(jarDir, jars, className)
+				.newInstance();
 		return factory;
 	}
 }

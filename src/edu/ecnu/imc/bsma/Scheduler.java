@@ -17,6 +17,9 @@ import edu.ecnu.imc.bsma.dao.Dao;
 /**
  * TODO: 接受任务
  * 
+ * 1. 如果用户提供自定义的db实现，那么所有的jar文件都会复制到workingdir
+ * 下面的当前任务对应的目录的jar目录下面
+ * 
  * @author xiafan
  * 
  */
@@ -50,6 +53,17 @@ public class Scheduler implements BSMAService.Iface {
 			System.exit(e.getErrorCode());
 		}
 
+		/**
+		 * TODO
+		 * if recover from failure, need to do the following cleaning:
+		 * 1. reset all running job to be waiting, delete their related status report
+		 */
+
+		/**
+		 * TODO
+		 * cleaning resources of finished jobs
+		 * 1. delete related jars
+		 */
 	}
 
 	Properties props = new Properties();

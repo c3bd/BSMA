@@ -43,6 +43,7 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
   private static final org.apache.thrift.protocol.TField SUB_JOBS_FIELD_DESC = new org.apache.thrift.protocol.TField("subJobs", org.apache.thrift.protocol.TType.LIST, (short)6);
   private static final org.apache.thrift.protocol.TField PROPS_FIELD_DESC = new org.apache.thrift.protocol.TField("props", org.apache.thrift.protocol.TType.MAP, (short)7);
   private static final org.apache.thrift.protocol.TField DESCRIPTION_FIELD_DESC = new org.apache.thrift.protocol.TField("description", org.apache.thrift.protocol.TType.STRING, (short)8);
+  private static final org.apache.thrift.protocol.TField JARS_FIELD_DESC = new org.apache.thrift.protocol.TField("jars", org.apache.thrift.protocol.TType.LIST, (short)9);
 
   private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
   static {
@@ -58,6 +59,7 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
   public List<SubJob> subJobs; // required
   public Map<String,String> props; // optional
   public String description; // required
+  public List<String> jars; // required
 
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements org.apache.thrift.TFieldIdEnum {
@@ -68,7 +70,8 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
     QUERIES((short)5, "queries"),
     SUB_JOBS((short)6, "subJobs"),
     PROPS((short)7, "props"),
-    DESCRIPTION((short)8, "description");
+    DESCRIPTION((short)8, "description"),
+    JARS((short)9, "jars");
 
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -99,6 +102,8 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
           return PROPS;
         case 8: // DESCRIPTION
           return DESCRIPTION;
+        case 9: // JARS
+          return JARS;
         default:
           return null;
       }
@@ -166,6 +171,9 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
             new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING))));
     tmpMap.put(_Fields.DESCRIPTION, new org.apache.thrift.meta_data.FieldMetaData("description", org.apache.thrift.TFieldRequirementType.DEFAULT, 
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+    tmpMap.put(_Fields.JARS, new org.apache.thrift.meta_data.FieldMetaData("jars", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+        new org.apache.thrift.meta_data.ListMetaData(org.apache.thrift.protocol.TType.LIST, 
+            new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING))));
     metaDataMap = Collections.unmodifiableMap(tmpMap);
     org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(Job.class, metaDataMap);
   }
@@ -181,7 +189,8 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
     byte dbImpl,
     List<Query> queries,
     List<SubJob> subJobs,
-    String description)
+    String description,
+    List<String> jars)
   {
     this();
     this.jobID = jobID;
@@ -192,6 +201,7 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
     this.queries = queries;
     this.subJobs = subJobs;
     this.description = description;
+    this.jars = jars;
   }
 
   /**
@@ -228,6 +238,10 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
     if (other.isSetDescription()) {
       this.description = other.description;
     }
+    if (other.isSetJars()) {
+      List<String> __this__jars = new ArrayList<String>(other.jars);
+      this.jars = __this__jars;
+    }
   }
 
   public Job deepCopy() {
@@ -246,6 +260,7 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
     this.subJobs = null;
     this.props = null;
     this.description = null;
+    this.jars = null;
   }
 
   public int getJobID() {
@@ -479,6 +494,45 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
     }
   }
 
+  public int getJarsSize() {
+    return (this.jars == null) ? 0 : this.jars.size();
+  }
+
+  public java.util.Iterator<String> getJarsIterator() {
+    return (this.jars == null) ? null : this.jars.iterator();
+  }
+
+  public void addToJars(String elem) {
+    if (this.jars == null) {
+      this.jars = new ArrayList<String>();
+    }
+    this.jars.add(elem);
+  }
+
+  public List<String> getJars() {
+    return this.jars;
+  }
+
+  public Job setJars(List<String> jars) {
+    this.jars = jars;
+    return this;
+  }
+
+  public void unsetJars() {
+    this.jars = null;
+  }
+
+  /** Returns true if field jars is set (has been assigned a value) and false otherwise */
+  public boolean isSetJars() {
+    return this.jars != null;
+  }
+
+  public void setJarsIsSet(boolean value) {
+    if (!value) {
+      this.jars = null;
+    }
+  }
+
   public void setFieldValue(_Fields field, Object value) {
     switch (field) {
     case JOB_ID:
@@ -545,6 +599,14 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
       }
       break;
 
+    case JARS:
+      if (value == null) {
+        unsetJars();
+      } else {
+        setJars((List<String>)value);
+      }
+      break;
+
     }
   }
 
@@ -574,6 +636,9 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
     case DESCRIPTION:
       return getDescription();
 
+    case JARS:
+      return getJars();
+
     }
     throw new IllegalStateException();
   }
@@ -601,6 +666,8 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
       return isSetProps();
     case DESCRIPTION:
       return isSetDescription();
+    case JARS:
+      return isSetJars();
     }
     throw new IllegalStateException();
   }
@@ -687,6 +754,15 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
       if (!(this_present_description && that_present_description))
         return false;
       if (!this.description.equals(that.description))
+        return false;
+    }
+
+    boolean this_present_jars = true && this.isSetJars();
+    boolean that_present_jars = true && that.isSetJars();
+    if (this_present_jars || that_present_jars) {
+      if (!(this_present_jars && that_present_jars))
+        return false;
+      if (!this.jars.equals(that.jars))
         return false;
     }
 
@@ -786,6 +862,16 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
         return lastComparison;
       }
     }
+    lastComparison = Boolean.valueOf(isSetJars()).compareTo(other.isSetJars());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetJars()) {
+      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.jars, other.jars);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
     return 0;
   }
 
@@ -863,6 +949,14 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
       sb.append("null");
     } else {
       sb.append(this.description);
+    }
+    first = false;
+    if (!first) sb.append(", ");
+    sb.append("jars:");
+    if (this.jars == null) {
+      sb.append("null");
+    } else {
+      sb.append(this.jars);
     }
     first = false;
     sb.append(")");
@@ -1008,6 +1102,24 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
             }
             break;
+          case 9: // JARS
+            if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
+              {
+                org.apache.thrift.protocol.TList _list10 = iprot.readListBegin();
+                struct.jars = new ArrayList<String>(_list10.size);
+                for (int _i11 = 0; _i11 < _list10.size; ++_i11)
+                {
+                  String _elem12;
+                  _elem12 = iprot.readString();
+                  struct.jars.add(_elem12);
+                }
+                iprot.readListEnd();
+              }
+              struct.setJarsIsSet(true);
+            } else { 
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+            }
+            break;
           default:
             org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
         }
@@ -1045,9 +1157,9 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
         oprot.writeFieldBegin(QUERIES_FIELD_DESC);
         {
           oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, struct.queries.size()));
-          for (Query _iter10 : struct.queries)
+          for (Query _iter13 : struct.queries)
           {
-            _iter10.write(oprot);
+            _iter13.write(oprot);
           }
           oprot.writeListEnd();
         }
@@ -1057,9 +1169,9 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
         oprot.writeFieldBegin(SUB_JOBS_FIELD_DESC);
         {
           oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, struct.subJobs.size()));
-          for (SubJob _iter11 : struct.subJobs)
+          for (SubJob _iter14 : struct.subJobs)
           {
-            _iter11.write(oprot);
+            _iter14.write(oprot);
           }
           oprot.writeListEnd();
         }
@@ -1070,10 +1182,10 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
           oprot.writeFieldBegin(PROPS_FIELD_DESC);
           {
             oprot.writeMapBegin(new org.apache.thrift.protocol.TMap(org.apache.thrift.protocol.TType.STRING, org.apache.thrift.protocol.TType.STRING, struct.props.size()));
-            for (Map.Entry<String, String> _iter12 : struct.props.entrySet())
+            for (Map.Entry<String, String> _iter15 : struct.props.entrySet())
             {
-              oprot.writeString(_iter12.getKey());
-              oprot.writeString(_iter12.getValue());
+              oprot.writeString(_iter15.getKey());
+              oprot.writeString(_iter15.getValue());
             }
             oprot.writeMapEnd();
           }
@@ -1083,6 +1195,18 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
       if (struct.description != null) {
         oprot.writeFieldBegin(DESCRIPTION_FIELD_DESC);
         oprot.writeString(struct.description);
+        oprot.writeFieldEnd();
+      }
+      if (struct.jars != null) {
+        oprot.writeFieldBegin(JARS_FIELD_DESC);
+        {
+          oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, struct.jars.size()));
+          for (String _iter16 : struct.jars)
+          {
+            oprot.writeString(_iter16);
+          }
+          oprot.writeListEnd();
+        }
         oprot.writeFieldEnd();
       }
       oprot.writeFieldStop();
@@ -1127,7 +1251,10 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
       if (struct.isSetDescription()) {
         optionals.set(7);
       }
-      oprot.writeBitSet(optionals, 8);
+      if (struct.isSetJars()) {
+        optionals.set(8);
+      }
+      oprot.writeBitSet(optionals, 9);
       if (struct.isSetJobID()) {
         oprot.writeI32(struct.jobID);
       }
@@ -1143,40 +1270,49 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
       if (struct.isSetQueries()) {
         {
           oprot.writeI32(struct.queries.size());
-          for (Query _iter13 : struct.queries)
+          for (Query _iter17 : struct.queries)
           {
-            _iter13.write(oprot);
+            _iter17.write(oprot);
           }
         }
       }
       if (struct.isSetSubJobs()) {
         {
           oprot.writeI32(struct.subJobs.size());
-          for (SubJob _iter14 : struct.subJobs)
+          for (SubJob _iter18 : struct.subJobs)
           {
-            _iter14.write(oprot);
+            _iter18.write(oprot);
           }
         }
       }
       if (struct.isSetProps()) {
         {
           oprot.writeI32(struct.props.size());
-          for (Map.Entry<String, String> _iter15 : struct.props.entrySet())
+          for (Map.Entry<String, String> _iter19 : struct.props.entrySet())
           {
-            oprot.writeString(_iter15.getKey());
-            oprot.writeString(_iter15.getValue());
+            oprot.writeString(_iter19.getKey());
+            oprot.writeString(_iter19.getValue());
           }
         }
       }
       if (struct.isSetDescription()) {
         oprot.writeString(struct.description);
       }
+      if (struct.isSetJars()) {
+        {
+          oprot.writeI32(struct.jars.size());
+          for (String _iter20 : struct.jars)
+          {
+            oprot.writeString(_iter20);
+          }
+        }
+      }
     }
 
     @Override
     public void read(org.apache.thrift.protocol.TProtocol prot, Job struct) throws org.apache.thrift.TException {
       TTupleProtocol iprot = (TTupleProtocol) prot;
-      BitSet incoming = iprot.readBitSet(8);
+      BitSet incoming = iprot.readBitSet(9);
       if (incoming.get(0)) {
         struct.jobID = iprot.readI32();
         struct.setJobIDIsSet(true);
@@ -1195,43 +1331,43 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
       }
       if (incoming.get(4)) {
         {
-          org.apache.thrift.protocol.TList _list16 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
-          struct.queries = new ArrayList<Query>(_list16.size);
-          for (int _i17 = 0; _i17 < _list16.size; ++_i17)
+          org.apache.thrift.protocol.TList _list21 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
+          struct.queries = new ArrayList<Query>(_list21.size);
+          for (int _i22 = 0; _i22 < _list21.size; ++_i22)
           {
-            Query _elem18;
-            _elem18 = new Query();
-            _elem18.read(iprot);
-            struct.queries.add(_elem18);
+            Query _elem23;
+            _elem23 = new Query();
+            _elem23.read(iprot);
+            struct.queries.add(_elem23);
           }
         }
         struct.setQueriesIsSet(true);
       }
       if (incoming.get(5)) {
         {
-          org.apache.thrift.protocol.TList _list19 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
-          struct.subJobs = new ArrayList<SubJob>(_list19.size);
-          for (int _i20 = 0; _i20 < _list19.size; ++_i20)
+          org.apache.thrift.protocol.TList _list24 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
+          struct.subJobs = new ArrayList<SubJob>(_list24.size);
+          for (int _i25 = 0; _i25 < _list24.size; ++_i25)
           {
-            SubJob _elem21;
-            _elem21 = new SubJob();
-            _elem21.read(iprot);
-            struct.subJobs.add(_elem21);
+            SubJob _elem26;
+            _elem26 = new SubJob();
+            _elem26.read(iprot);
+            struct.subJobs.add(_elem26);
           }
         }
         struct.setSubJobsIsSet(true);
       }
       if (incoming.get(6)) {
         {
-          org.apache.thrift.protocol.TMap _map22 = new org.apache.thrift.protocol.TMap(org.apache.thrift.protocol.TType.STRING, org.apache.thrift.protocol.TType.STRING, iprot.readI32());
-          struct.props = new HashMap<String,String>(2*_map22.size);
-          for (int _i23 = 0; _i23 < _map22.size; ++_i23)
+          org.apache.thrift.protocol.TMap _map27 = new org.apache.thrift.protocol.TMap(org.apache.thrift.protocol.TType.STRING, org.apache.thrift.protocol.TType.STRING, iprot.readI32());
+          struct.props = new HashMap<String,String>(2*_map27.size);
+          for (int _i28 = 0; _i28 < _map27.size; ++_i28)
           {
-            String _key24;
-            String _val25;
-            _key24 = iprot.readString();
-            _val25 = iprot.readString();
-            struct.props.put(_key24, _val25);
+            String _key29;
+            String _val30;
+            _key29 = iprot.readString();
+            _val30 = iprot.readString();
+            struct.props.put(_key29, _val30);
           }
         }
         struct.setPropsIsSet(true);
@@ -1239,6 +1375,19 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
       if (incoming.get(7)) {
         struct.description = iprot.readString();
         struct.setDescriptionIsSet(true);
+      }
+      if (incoming.get(8)) {
+        {
+          org.apache.thrift.protocol.TList _list31 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRING, iprot.readI32());
+          struct.jars = new ArrayList<String>(_list31.size);
+          for (int _i32 = 0; _i32 < _list31.size; ++_i32)
+          {
+            String _elem33;
+            _elem33 = iprot.readString();
+            struct.jars.add(_elem33);
+          }
+        }
+        struct.setJarsIsSet(true);
       }
     }
   }

@@ -42,7 +42,8 @@ struct Job {
   5: list<Query> queries, //fractions of each query
   6: list<SubJob> subJobs,
   7: optional map<string, string> props,
-  8: string description
+  8: string description,
+  9: list<string> jars //the name of the jar file
 }
 
 /**
