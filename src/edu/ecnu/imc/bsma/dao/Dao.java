@@ -32,8 +32,8 @@ public class Dao {
 	public void insertQueryFinalResult(QueryFinalReport report)
 			throws SQLException {
 		String sql = String.format(
-				"insert into QueryFinalReport(subjobid,queryid,latency50, 75latency,95latency,"
-						+ "99latency,avglatency,minlatency,maxlatency) "
+				"insert into QueryFinalReport(subjobid,queryid,latency50, latency75,latency95,"
+						+ "latency99,avglatency,minlatency,maxlatency) "
 						+ "values(%d,%d,%d,%d,%d,%d,%f,%f,%f);",
 				report.subjobid, report.queryid, report.latency50,
 				report.latency75, report.latency95, report.latency99,
@@ -57,9 +57,9 @@ public class Dao {
 
 	public void insertRunningResults(RunningReport report) throws SQLException {
 		String sql = String.format(
-				"insert into RunningReport(subjobid,time,totalops)"
-						+ "values(%d,%d,%d);", report.subJobId, report.time,
-				report.totalOps);
+				"insert into RunningReport(subjobid,time,totalops,throughput)"
+						+ "values(%d,%d,%d,%f);", report.subJobId, report.time,
+				report.totalOps, report.curThroughput);
 		Connection conn = jdbc.getCon();
 		Statement stmt = conn.createStatement();
 		stmt.addBatch(sql);
@@ -219,8 +219,8 @@ public class Dao {
 
 	public void updateJobState(JobInfo jobInfo) throws SQLException {
 		String sql = String.format(
-				"update JobInfo set state=%d where jobID = %d;",
-				jobInfo.getState(), jobInfo.getJobID());
+				"update JobInfo set state=%d, msg = \"%s\"where jobID = %d;",
+				jobInfo.getState(), jobInfo.getMsg(), jobInfo.getJobID());
 		Connection conn = jdbc.getCon();
 		Statement stmt = conn.createStatement();
 		stmt.executeUpdate(sql);

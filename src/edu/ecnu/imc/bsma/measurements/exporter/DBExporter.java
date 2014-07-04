@@ -39,14 +39,19 @@ public class DBExporter implements Closeable {
 		if (idx < report.qStatus.size() - 1) {
 			report.qStatus.subList(idx + 1, report.qStatus.size()).clear();
 		}
-		dao.insertRunningResults(report);
+		BasicJobInfo sub = job.getCurJob();
+		if (sub != null) {
+			report.subJobId = job.getCurJob().getSubJobID();
+			dao.insertRunningResults(report);
+		}
 		idx = 0;
 	}
 
 	/**
 	 * 整体的运行时状态
 	 * 
-	 * @param time 逝去的时间
+	 * @param time
+	 *            逝去的时间
 	 * @param totalOps
 	 * @param throughput
 	 */

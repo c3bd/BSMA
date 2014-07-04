@@ -2,6 +2,7 @@ package edu.ecnu.imc.bsma;
 
 import java.util.Properties;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import edu.ecnu.imc.bsma.db.DB;
 import edu.ecnu.imc.bsma.db.DBException;
@@ -28,6 +29,7 @@ class QueryExecThread extends Thread {
 	Object _workloadstate;
 	Properties _props;
 	Measurements _measurements;
+	AtomicBoolean _state = null;
 
 	/**
 	 * Constructor.
@@ -47,10 +49,12 @@ class QueryExecThread extends Thread {
 	 * @param targetperthreadperms
 	 *            target number of operations per thread per ms
 	 */
-	public QueryExecThread(DB db, Workload workload, int threadid,
-			int threadcount, Properties props, int opcount,
+	public QueryExecThread(AtomicBoolean state, DB db, Workload workload,
+			int threadid, int threadcount, Properties props, int opcount,
 			double targetperthreadperms, Measurements measurements) {
+		super("query exec");
 		// TODO: consider removing threadcount and threadid
+		_state = state;
 		_db = db;
 		_workload = workload;
 		_opcount = opcount;
@@ -101,7 +105,7 @@ class QueryExecThread extends Thread {
 		try {
 			long st = System.currentTimeMillis();
 
-			while ((_opcount == 0) || (_opsdone < _opcount)) {
+			while (_state.get() && (_opcount == 0) || (_opsdone < _opcount)) {
 
 				if (!_workload.doAnalysis(_db, _workloadstate)) {
 					break;
@@ -133,7 +137,7 @@ class QueryExecThread extends Thread {
 		} catch (Exception e) {
 			e.printStackTrace();
 			e.printStackTrace(System.out);
-			//System.exit(0);
+			// System.exit(0);
 		}
 
 		try {

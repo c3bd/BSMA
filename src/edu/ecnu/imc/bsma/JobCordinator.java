@@ -18,10 +18,11 @@
 
 package edu.ecnu.imc.bsma;
 
-import java.net.MalformedURLException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
-import java.util.Vector;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,15 +40,22 @@ import edu.ecnu.imc.bsma.measurements.Measurements;
  * job consists of a set of small jobs, each consists of a threadnum and target
  * operation
  */
-public class Client extends Thread {
-	public static Logger logger = LoggerFactory.getLogger(Client.class);
+public class JobCordinator extends Thread {
+	public static Logger logger = LoggerFactory.getLogger(JobCordinator.class);
 	JobInfo jobInfo;
 	Dao dao = new Dao(Scheduler.instance.getProps());
 	String exitCode = "";
 
-	public Client(Job job) {
+	List<QueryExecThread> qThreads = new ArrayList<QueryExecThread>();
+	StatusThread statusthread = null;
+
+	AtomicBoolean state = new AtomicBoolean(true);
+
+	public JobCordinator(Job job) {
 		this.jobInfo = new JobInfo(job, dao);
 	}
+
+	// CountDownLatch latch = null;
 
 	@Override
 	public void run() {
@@ -66,7 +74,8 @@ public class Client extends Thread {
 
 		BasicJobInfo basicJobInfo = null;
 		try {
-			while (null != (basicJobInfo = jobInfo.runNextJob())) {
+			while (!jobInfo.haveExited()
+					&& null != (basicJobInfo = jobInfo.runNextJob())) {
 				// compute the target throughput
 				double targetperthreadperms = -1;
 				if (basicJobInfo.opCount > 0) {
@@ -92,14 +101,13 @@ public class Client extends Thread {
 						} catch (InterruptedException e) {
 							return;
 						}
-						System.err
-								.println(" (might take a few minutes for large data sets)");
+						logger.info(" (might take a few minutes for large data sets)");
 					}
 				};
 				warningthread.start();
 
 				// load the workload
-				ClassLoader classLoader = Client.class.getClassLoader();
+				ClassLoader classLoader = JobCordinator.class.getClassLoader();
 				Workload workload = null;
 				try {
 					Class workloadclass = classLoader.loadClass(jobInfo
@@ -124,8 +132,7 @@ public class Client extends Thread {
 
 				// run the workload
 
-				System.err.println("Starting test.");
-				System.out.println(" query results and latencies:");
+				logger.info("Starting test.");
 
 				int opcount = basicJobInfo.getOpCount();
 
@@ -133,55 +140,40 @@ public class Client extends Thread {
 				// of
 				// threads will be changed to the number of operations.
 				if (opcount < basicJobInfo.threadNum) {
-					System.err
-							.println("warning: the number of threads is bigger than that of operations!"
-									.toUpperCase());
+					logger.warn("warning: the number of threads is bigger than that of operations!"
+							.toUpperCase());
 					basicJobInfo.threadNum = opcount;
 				}
 
-				Vector<Thread> threads = new Vector<Thread>();
 				Measurements measurements = new Measurements(props);
+				qThreads.clear();
+				// latch = new CountDownLatch(basicJobInfo.threadNum + 1);
 				for (int threadid = 0; threadid < basicJobInfo.threadNum; threadid++) {
 					DB db = null;
 					try {
 						db = DBFactory.newDB(jobInfo, props, measurements);
 					} catch (UnknownDBException ex) {
-						// TODO Handle this exception
-						// System.exit(0);
+
 					}
 
-					Thread t = new QueryExecThread(db, workload, threadid,
-							basicJobInfo.getThreadNum(), props, opcount
-									/ basicJobInfo.getThreadNum(),
+					QueryExecThread t = new QueryExecThread(state, db,
+							workload, threadid, basicJobInfo.getThreadNum(),
+							props, opcount / basicJobInfo.getThreadNum(),
 							targetperthreadperms, measurements);
-					threads.add(t);
+					qThreads.add(t);
 				}
 
 				// start the status thread
-				StatusThread statusthread = new StatusThread(jobInfo, threads,
-						measurements);
+				statusthread = new StatusThread(this, measurements);
 				statusthread.start();
 
-				for (Thread t : threads) {
+				for (Thread t : qThreads) {
 					t.start();
 				}
 
-				for (Thread t : threads) {
-					try {
-						t.join();
-					} catch (InterruptedException e) {
-					}
-				}
+				waitForFinish();
 
-				while (statusthread.getState().equals(State.TERMINATED)) {
-					try {
-						statusthread.join();
-						break;
-					} catch (InterruptedException e1) {
-						e1.printStackTrace();
-					}
-				}
-
+				logger.info("query executor and status thread have terminated");
 				try {
 					workload.cleanup();
 				} catch (WorkloadException e) {
@@ -189,11 +181,9 @@ public class Client extends Thread {
 					e.printStackTrace(System.out);
 					System.exit(0);
 				}
-
-				// mark subjob as finish
-				jobInfo.setState(JobInfo.FINISH);
 			}
-			jobInfo.finish();
+			if (!jobInfo.haveExited())
+				jobInfo.finish();
 		} catch (SQLException e) {
 			error(e);
 		} finally {
@@ -207,16 +197,12 @@ public class Client extends Thread {
 
 	private void prepareJob(JobInfo jobInfo) {
 		/**
-		 *  TODO
-		 *  collect needed resources
-		 *  
+		 * TODO collect needed resources
+		 * 
 		 */
 
 		try {
 			jobInfo.getDBClass();
-		} catch (MalformedURLException e) {
-			// TODO hmm, we needed to copy jars now
-			
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -229,14 +215,44 @@ public class Client extends Thread {
 	 * @param ex
 	 */
 	public void error(Exception ex) {
+		state.set(false);
+		//if wait for termination, may never stop
+		// waitForFinish();
+
 		exitCode = ex.getMessage();
 		try {
-			jobInfo.cancel();
+			jobInfo.cancel(ex.getMessage());
 		} catch (SQLException e) {
 			// 和db的连接出错，无法继续执行
 			throw new RuntimeException(
-					"fatal error caused by connection to mysql server");
+					"fatal error caused by connection to mysql server:"
+							+ e.getMessage());
 		}
+	}
+
+	/**
+	 * 等待所有相关的线程结束
+	 */
+	private void waitForFinish() {
+
+		for (QueryExecThread thread : qThreads) {
+			while (true) {
+				try {
+					thread.join();
+					break;
+				} catch (InterruptedException e) {
+				}
+			}
+		}
+
+		while (true) {
+			try {
+				statusthread.join();
+				break;
+			} catch (InterruptedException e) {
+			}
+		}
+
 	}
 
 	Properties constructProp() {
@@ -260,5 +276,17 @@ public class Client extends Thread {
 	public boolean cancel(int subID) {
 		// TODO Auto-generated method stub
 		return true;
+	}
+
+	public AtomicBoolean getWorkingState() {
+		return state;
+	}
+
+	public JobInfo getJobInfo() {
+		return jobInfo;
+	}
+
+	public List<QueryExecThread> getQueryThreads() {
+		return qThreads;
 	}
 }

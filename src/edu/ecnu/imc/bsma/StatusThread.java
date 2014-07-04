@@ -1,16 +1,15 @@
 package edu.ecnu.imc.bsma;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.sql.SQLException;
-import java.util.Properties;
-import java.util.Vector;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import edu.ecnu.imc.bsma.dao.JobInfo;
 import edu.ecnu.imc.bsma.measurements.Measurements;
 import edu.ecnu.imc.bsma.measurements.exporter.DBExporter;
-import edu.ecnu.imc.bsma.measurements.exporter.MeasurementsExporter;
-import edu.ecnu.imc.bsma.measurements.exporter.TextMeasurementsExporter;
 
 /**
  * A thread to periodically show the status of the experiment, to reassure you
@@ -21,23 +20,27 @@ import edu.ecnu.imc.bsma.measurements.exporter.TextMeasurementsExporter;
  * 
  */
 class StatusThread extends Thread {
+	// public static final long sleeptime = 10000;
+	public static final String sleeptime = "1000";
+	public static final Logger logger = LoggerFactory
+			.getLogger(StatusThread.class);
 	JobInfo _jobInfo;
-	Vector<Thread> _threads;
 	Measurements _measurements;
 	DBExporter _exporter;
+	AtomicBoolean _state = null;
+	JobCordinator coord = null;
 
 	/**
 	 * The interval for reporting status. To set it to 100000 means to report
 	 * status every 100 seconds.
 	 */
-	// public static final long sleeptime = 10000;
-	public static final String sleeptime = "100000";
 
-	public StatusThread(JobInfo jobInfo, Vector<Thread> threads,
-			Measurements measurements) {
-		_jobInfo = jobInfo;
+	public StatusThread(JobCordinator coord, Measurements measurements) {
+		super("status " + coord.getJobInfo().getJobID());
+		this.coord = coord;
+		_state = coord.getWorkingState();
+		_jobInfo = coord.getJobInfo();
 		_exporter = new DBExporter(_jobInfo, Scheduler.instance.getProps());
-		_threads = threads;
 		_measurements = measurements;
 	}
 
@@ -59,7 +62,7 @@ class StatusThread extends Thread {
 			int totalops = 0;
 
 			// terminate this thread when all the worker threads are done
-			for (Thread t : _threads) {
+			for (Thread t : coord.getQueryThreads()) {
 				if (t.getState() != Thread.State.TERMINATED) {
 					alldone = false;
 				}
@@ -73,20 +76,22 @@ class StatusThread extends Thread {
 			long interval = en - st;
 			// double throughput=1000.0*((double)totalops)/((double)interval);
 
-			double curthroughput = 1000.0 * (((double) (totalops - lasttotalops)) / ((double) (en - lasten)));
+			double curthroughput = 0.0;
+			if (en - lasten > 0)
+				curthroughput = 1000.0 * (((double) (totalops - lasttotalops)) / ((double) (en - lasten)));
 
 			lasttotalops = totalops;
 			lasten = en;
-
-			_exporter.newReport();
-			_exporter.reportOverall(interval / 1000, totalops,
-					(float) curthroughput);
-			_measurements.getSummary(_exporter);
-			try {
-				_exporter.endReport();
-			} catch (SQLException e1) {
-				// we can do nothing
-				e1.printStackTrace();
+			if (!alldone) {
+				_exporter.newReport();
+				_exporter.reportOverall(interval / 1000, totalops,
+						(float) curthroughput);
+				_measurements.getSummary(_exporter);
+				try {
+					_exporter.endReport();
+				} catch (SQLException e) {
+					coord.error(e);
+				}
 			}
 
 			try {
@@ -94,7 +99,14 @@ class StatusThread extends Thread {
 			} catch (InterruptedException e) {
 			}
 
-		} while (!alldone);
+		} while (!alldone && _state.get());
+
+		try {
+			exportMeasurements((System.currentTimeMillis() - st) / 1000);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			coord.error(e);
+		}
 	}
 
 	/**
@@ -106,14 +118,14 @@ class StatusThread extends Thread {
 	 *             it.
 	 * @throws SQLException
 	 */
-	private void exportMeasurements(long runtime, Measurements measurements)
-			throws IOException, SQLException {
+	private void exportMeasurements(long runtime) throws IOException,
+			SQLException {
 		try {
-			if (_jobInfo.getCurJob().getOpCount() > 1) {
+			if (_jobInfo.getCurJob().getOpCount() >= 1) {
 				_exporter.reportJobResult(runtime / 1000, _jobInfo.getCurJob()
 						.getOpCount());
 			}// modified out by WeiJinxian
-			measurements.exportMeasurements(_exporter);
+			_measurements.exportMeasurements(_exporter);
 
 		} finally {
 			if (_exporter != null) {

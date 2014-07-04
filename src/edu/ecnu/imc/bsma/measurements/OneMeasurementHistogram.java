@@ -131,13 +131,13 @@ public class OneMeasurementHistogram extends OneMeasurement {
 	public void exportMeasurements(DBExporter exporter) throws IOException {
 		List<Integer> latencyHist = new ArrayList<Integer>(4);
 		List<Float> latencyStats = new ArrayList<Float>(3);
-		Collections.fill(latencyHist, 0);
-		Collections.fill(latencyStats, 0.0f);
+		for (int i = 0; i < 4; i++)
+			latencyHist.add(0);
 		// Just in case there's only one query.
 
-		latencyStats.set(0, (float) min);
-		latencyStats.set(0, (float) (((double) totallatency) / operations));
-		latencyStats.set(0, (float) max);
+		latencyStats.add((float) min);
+		latencyStats.add((float) (((double) totallatency) / operations));
+		latencyStats.add((float) max);
 
 		int opcounter = 0;
 		boolean done50th = false;
@@ -166,20 +166,11 @@ public class OneMeasurementHistogram extends OneMeasurement {
 				latencyHist.set(3, latency);
 				break;
 			}
-
-			try {
-				exporter.reportSubJobResult(getQueryID(), latencyHist,
-						latencyStats);
-			} catch (SQLException e) {
-				throw new IOException(e);
-			}
-
-			/*
-			 * for (int i = 0; i < _buckets; i++) { exporter.write(getName(),
-			 * "[" + i * interval + "ms-" + (i + 1) interval + "ms)",
-			 * histogram[i]); } exporter.write(getName(), ">" + _buckets *
-			 * interval + "ms", histogramoverflow);
-			 */
+		}
+		try {
+			exporter.reportSubJobResult(getQueryID(), latencyHist, latencyStats);
+		} catch (SQLException e) {
+			throw new IOException(e);
 		}
 	}
 

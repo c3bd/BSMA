@@ -72,7 +72,7 @@ public class DBWrapper extends DB {
 		String result = _db.BSMAQuery1(userID, returncount);
 		long en = System.currentTimeMillis();
 		_measurements.measure("Query1", (int) (en - st));
-		System.out.println(result);
+		// System.out.println(result);
 		return result;
 	}
 
@@ -81,7 +81,7 @@ public class DBWrapper extends DB {
 		String result = _db.BSMAQuery2(userID, returncount);
 		long en = System.currentTimeMillis();
 		_measurements.measure("Query2", (int) (en - st));
-		System.out.println(result);
+		// System.out.println(result);
 		return result;
 	}
 
@@ -90,7 +90,7 @@ public class DBWrapper extends DB {
 		String result = _db.BSMAQuery3(userID, returncount);
 		long en = System.currentTimeMillis();
 		_measurements.measure("Query3", (int) (en - st));
-		System.out.println(result);
+		// System.out.println(result);
 		return result;
 	}
 
@@ -99,7 +99,7 @@ public class DBWrapper extends DB {
 		String result = _db.BSMAQuery4(userID1, userID2);
 		long en = System.currentTimeMillis();
 		_measurements.measure("Query4", (int) (en - st));
-		System.out.println(result);
+		// System.out.println(result);
 		return result;
 	}
 
@@ -108,7 +108,7 @@ public class DBWrapper extends DB {
 		String result = _db.BSMAQuery5(userID1, userID2);
 		long en = System.currentTimeMillis();
 		_measurements.measure("Query5", (int) (en - st));
-		System.out.println(result);
+		// System.out.println(result);
 		return result;
 	}
 
@@ -118,7 +118,7 @@ public class DBWrapper extends DB {
 		String result = _db.BSMAQuery6(userID, returncount, datetime, timespan);
 		long en = System.currentTimeMillis();
 		_measurements.measure("Query6", (int) (en - st));
-		System.out.println(result);
+		// System.out.println(result);
 		return result;
 	}
 
@@ -127,7 +127,7 @@ public class DBWrapper extends DB {
 		String result = _db.BSMAQuery7(returncount, datetime, timespan);
 		long en = System.currentTimeMillis();
 		_measurements.measure("Query7", (int) (en - st));
-		System.out.println(result);
+		// System.out.println(result);
 		return result;
 	}
 
@@ -136,7 +136,7 @@ public class DBWrapper extends DB {
 		String result = _db.BSMAQuery8(returncount, userID);
 		long en = System.currentTimeMillis();
 		_measurements.measure("Query8", (int) (en - st));
-		System.out.println(result);
+		// System.out.println(result);
 		return result;
 	}
 
@@ -147,7 +147,7 @@ public class DBWrapper extends DB {
 				timespan);
 		long en = System.currentTimeMillis();
 		_measurements.measure("Query9", (int) (en - st));
-		System.out.println(result);
+		// System.out.println(result);
 		return result;
 	}
 
@@ -156,7 +156,7 @@ public class DBWrapper extends DB {
 		String result = _db.BSMAQuery10(returncount, datetime, timespan);
 		long en = System.currentTimeMillis();
 		_measurements.measure("Query10", (int) (en - st));
-		System.out.println(result);
+		// System.out.println(result);
 		return result;
 	}
 
@@ -167,7 +167,7 @@ public class DBWrapper extends DB {
 				.BSMAQuery11(userID, returncount, datetime, timespan);
 		long en = System.currentTimeMillis();
 		_measurements.measure("Query11", (int) (en - st));
-		System.out.println(result);
+		// System.out.println(result);
 		return result;
 	}
 
@@ -178,7 +178,7 @@ public class DBWrapper extends DB {
 				.BSMAQuery12(userID, returncount, datetime, timespan);
 		long en = System.currentTimeMillis();
 		_measurements.measure("Query12", (int) (en - st));
-		System.out.println(result);
+		// System.out.println(result);
 		return result;
 	}
 
@@ -189,7 +189,7 @@ public class DBWrapper extends DB {
 				.BSMAQuery13(userID, returncount, datetime, timespan);
 		long en = System.currentTimeMillis();
 		_measurements.measure("Query13", (int) (en - st));
-		System.out.println(result);
+		// System.out.println(result);
 		return result;
 	}
 
@@ -198,7 +198,7 @@ public class DBWrapper extends DB {
 		String result = _db.BSMAQuery14(returncount, datetime, timespan);
 		long en = System.currentTimeMillis();
 		_measurements.measure("Query14", (int) (en - st));
-		System.out.println(result);
+		// System.out.println(result);
 		return result;
 	}
 
@@ -208,7 +208,7 @@ public class DBWrapper extends DB {
 		String result = _db.BSMAQuery15(tag, returncount, datetime, timespan);
 		long en = System.currentTimeMillis();
 		_measurements.measure("Query15", (int) (en - st));
-		System.out.println(result);
+		// System.out.println(result);
 		return result;
 	}
 
@@ -219,7 +219,7 @@ public class DBWrapper extends DB {
 				.BSMAQuery16(userID, returncount, datetime, timespan);
 		long en = System.currentTimeMillis();
 		_measurements.measure("Query16", (int) (en - st));
-		System.out.println(result);
+		// System.out.println(result);
 		return result;
 	}
 
@@ -230,7 +230,7 @@ public class DBWrapper extends DB {
 				.BSMAQuery17(userID, returncount, datetime, timespan);
 		long en = System.currentTimeMillis();
 		_measurements.measure("Query17", (int) (en - st));
-		System.out.println(result);
+		// System.out.println(result);
 		return result;
 	}
 
@@ -241,7 +241,7 @@ public class DBWrapper extends DB {
 				.BSMAQuery18(userID, returncount, datetime, timespan);
 		long en = System.currentTimeMillis();
 		_measurements.measure("Query18", (int) (en - st));
-		System.out.println(result);
+		// System.out.println(result);
 		return result;
 	}
 
@@ -252,7 +252,7 @@ public class DBWrapper extends DB {
 				.BSMAQuery19(userID, returncount, datetime, timespan);
 		long en = System.currentTimeMillis();
 		_measurements.measure("Query19", (int) (en - st));
-		System.out.println(result);
+		// System.out.println(result);
 		return result;
 	}
 

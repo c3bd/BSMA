@@ -7,11 +7,12 @@ package edu.ecnu.imc.bsma.db;
  * 
  */
 public class TestDBImpl extends DB {
+	int sleepTime = 30;
 
 	@Override
 	public String BSMAQuery1(String userID, int returncount) {
 		try {
-			Thread.sleep(10);
+			Thread.sleep(sleepTime);
 		} catch (InterruptedException e) {
 
 			e.printStackTrace();
@@ -22,7 +23,7 @@ public class TestDBImpl extends DB {
 	@Override
 	public String BSMAQuery2(String userID, int returncount) {
 		try {
-			Thread.sleep(10);
+			Thread.sleep(sleepTime);
 		} catch (InterruptedException e) {
 
 			e.printStackTrace();
@@ -33,7 +34,7 @@ public class TestDBImpl extends DB {
 	@Override
 	public String BSMAQuery3(String userID, int returncount) {
 		try {
-			Thread.sleep(10);
+			Thread.sleep(sleepTime);
 		} catch (InterruptedException e) {
 
 			e.printStackTrace();
@@ -45,7 +46,7 @@ public class TestDBImpl extends DB {
 	@Override
 	public String BSMAQuery4(String userID1, String userID2) {
 		try {
-			Thread.sleep(10);
+			Thread.sleep(sleepTime);
 		} catch (InterruptedException e) {
 
 			e.printStackTrace();
@@ -57,7 +58,7 @@ public class TestDBImpl extends DB {
 	@Override
 	public String BSMAQuery5(String userID1, String userID2) {
 		try {
-			Thread.sleep(10);
+			Thread.sleep(sleepTime);
 		} catch (InterruptedException e) {
 
 			e.printStackTrace();
@@ -70,7 +71,7 @@ public class TestDBImpl extends DB {
 	public String BSMAQuery6(String userID, int returncount, String datetime,
 			String timespan) {
 		try {
-			Thread.sleep(10);
+			Thread.sleep(sleepTime);
 		} catch (InterruptedException e) {
 
 			e.printStackTrace();
@@ -82,7 +83,7 @@ public class TestDBImpl extends DB {
 	@Override
 	public String BSMAQuery7(int returncount, String datetime, String timespan) {
 		try {
-			Thread.sleep(10);
+			Thread.sleep(sleepTime);
 		} catch (InterruptedException e) {
 
 			e.printStackTrace();
@@ -94,7 +95,7 @@ public class TestDBImpl extends DB {
 	@Override
 	public String BSMAQuery8(int returncount, String userID) {
 		try {
-			Thread.sleep(10);
+			Thread.sleep(sleepTime);
 		} catch (InterruptedException e) {
 
 			e.printStackTrace();
@@ -107,7 +108,7 @@ public class TestDBImpl extends DB {
 	public String BSMAQuery9(String userID, String tag, int returncount,
 			String datetime, String timespan) {
 		try {
-			Thread.sleep(10);
+			Thread.sleep(sleepTime);
 		} catch (InterruptedException e) {
 
 			e.printStackTrace();
@@ -119,7 +120,7 @@ public class TestDBImpl extends DB {
 	@Override
 	public String BSMAQuery10(int returncount, String datetime, String timespan) {
 		try {
-			Thread.sleep(10);
+			Thread.sleep(sleepTime);
 		} catch (InterruptedException e) {
 
 			e.printStackTrace();
@@ -132,7 +133,7 @@ public class TestDBImpl extends DB {
 	public String BSMAQuery11(String userID, int returncount, String datetime,
 			String timespan) {
 		try {
-			Thread.sleep(10);
+			Thread.sleep(sleepTime);
 		} catch (InterruptedException e) {
 
 			e.printStackTrace();
@@ -145,7 +146,7 @@ public class TestDBImpl extends DB {
 	public String BSMAQuery12(String userID, int returncount, String datetime,
 			String timespan) {
 		try {
-			Thread.sleep(10);
+			Thread.sleep(sleepTime);
 		} catch (InterruptedException e) {
 
 			e.printStackTrace();
@@ -158,7 +159,7 @@ public class TestDBImpl extends DB {
 	public String BSMAQuery13(String userID, int returncount, String datetime,
 			String timespan) {
 		try {
-			Thread.sleep(10);
+			Thread.sleep(sleepTime);
 		} catch (InterruptedException e) {
 
 			e.printStackTrace();
@@ -170,7 +171,7 @@ public class TestDBImpl extends DB {
 	@Override
 	public String BSMAQuery14(int returncount, String datetime, String timespan) {
 		try {
-			Thread.sleep(10);
+			Thread.sleep(sleepTime);
 		} catch (InterruptedException e) {
 
 			e.printStackTrace();
@@ -183,7 +184,7 @@ public class TestDBImpl extends DB {
 	public String BSMAQuery15(String tag, int returncount, String datetime,
 			String timespan) {
 		try {
-			Thread.sleep(10);
+			Thread.sleep(sleepTime);
 		} catch (InterruptedException e) {
 
 			e.printStackTrace();
@@ -196,7 +197,7 @@ public class TestDBImpl extends DB {
 	public String BSMAQuery16(String userID, int returncount, String datetime,
 			String timespan) {
 		try {
-			Thread.sleep(10);
+			Thread.sleep(sleepTime);
 		} catch (InterruptedException e) {
 
 			e.printStackTrace();
@@ -209,7 +210,7 @@ public class TestDBImpl extends DB {
 	public String BSMAQuery17(String userID, int returncount, String datetime,
 			String timespan) {
 		try {
-			Thread.sleep(10);
+			Thread.sleep(sleepTime);
 		} catch (InterruptedException e) {
 
 			e.printStackTrace();
@@ -222,7 +223,7 @@ public class TestDBImpl extends DB {
 	public String BSMAQuery18(String userID, int returncount, String datetime,
 			String timespan) {
 		try {
-			Thread.sleep(10);
+			Thread.sleep(sleepTime);
 		} catch (InterruptedException e) {
 
 			e.printStackTrace();
@@ -235,7 +236,7 @@ public class TestDBImpl extends DB {
 	public String BSMAQuery19(String userID, int returncount, String datetime,
 			String timespan) {
 		try {
-			Thread.sleep(10);
+			Thread.sleep(sleepTime);
 		} catch (InterruptedException e) {
 
 			e.printStackTrace();

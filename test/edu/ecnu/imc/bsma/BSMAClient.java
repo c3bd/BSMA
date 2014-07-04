@@ -2,8 +2,6 @@ package edu.ecnu.imc.bsma;
 
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TProtocol;
-import org.apache.thrift.transport.TSSLTransportFactory;
-import org.apache.thrift.transport.TSSLTransportFactory.TSSLTransportParameters;
 import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransport;
 
@@ -28,16 +26,17 @@ public class BSMAClient {
 			job.setName("test");
 			job.setDescription("hello");
 			job.setCustDbImpl("");
-			for (int i = 0; i < 4; i++) {
+			for (int i = 1; i < 5; i++) {
 				SubJob subjob = new SubJob();
 				subjob.setSubJobID(i);
-				subjob.setOpCount(i);
+				subjob.setOpCount(1000);
 				subjob.setThreadNum(i);
 				job.addToSubJobs(subjob);
 			}
 
-			for (int i = 1; i <= 1; i++) {
-				job.addToQueries(new Query((byte) i, 1.0));
+			int queries = 1;
+			for (int i = 1; i <= queries; i++) {
+				job.addToQueries(new Query((byte) i, 1.0f / queries));
 			}
 			System.out.println("before submit job is :" + job);
 			job = client.submit(job);

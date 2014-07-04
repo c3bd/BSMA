@@ -15,7 +15,7 @@ import weibo4j.org.json.JSONArray;
 import weibo4j.org.json.JSONException;
 import weibo4j.org.json.JSONObject;
 import edu.ecnu.imc.bsma.Scheduler;
-import edu.ecnu.imc.bsma.db.DBFactory;
+import edu.ecnu.imc.bsma.util.Config;
 import edu.ecnu.imc.bsma.util.JarLoader;
 
 /**
@@ -32,7 +32,7 @@ public class JobInfo extends Job {
 	public static final byte CANCEL = 3;
 
 	public byte state = WAITING;
-
+	public String msg = "";
 	Dao dao;
 
 	public JobInfo(Dao dao, byte state) {
@@ -123,6 +123,7 @@ public class JobInfo extends Job {
 	 * 
 	 */
 	public void finish() throws SQLException {
+		msg = "success";
 		setState(FINISH);
 		idx = -1;
 	}
@@ -132,7 +133,8 @@ public class JobInfo extends Job {
 	 * 
 	 * @throws SQLException
 	 */
-	public void cancel() throws SQLException {
+	public void cancel(String errMsg) throws SQLException {
+		msg = errMsg;
 		setState(CANCEL);
 		for (int i = idx; 0 <= i && i < subJobs.size(); i++) {
 			((BasicJobInfo) subJobs.get(i)).setState(CANCEL);
@@ -194,16 +196,20 @@ public class JobInfo extends Job {
 
 	/**
 	 * load the db class
+	 * 
 	 * @return
 	 * @throws MalformedURLException
 	 * @throws ClassNotFoundException
 	 */
-	public Class getDBClass() throws MalformedURLException,
-			ClassNotFoundException {
+	public Class getDBClass() throws ClassNotFoundException {
 		if (dbClass == null) {
 			if (this.isCustDB()) {
-				// TODO jar dir
-				JarLoader.loadClass("", jars, this.getCustDbImpl());
+				try {
+					JarLoader.loadClass(Config.instance.getJarDir(), jars,
+							this.getCustDbImpl());
+				} catch (MalformedURLException e) {
+					// TODO copy jar files
+				}
 			} else {
 				ClassLoader classLoader = JobInfo.class.getClassLoader();
 				dbClass = classLoader.loadClass(getDBImpl());
@@ -248,5 +254,18 @@ public class JobInfo extends Job {
 	public void addBasicJob(BasicJobInfo subjob) {
 		subjob.setJobInfo(this);
 		super.addToSubJobs(subjob);
+	}
+
+	public boolean haveExited() {
+		return state == CANCEL || state == FINISH;
+	}
+
+	/**
+	 * 退出时的信息
+	 * 
+	 * @return
+	 */
+	public Object getMsg() {
+		return msg;
 	}
 }
