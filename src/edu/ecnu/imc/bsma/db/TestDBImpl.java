@@ -245,4 +245,59 @@ public class TestDBImpl extends DB {
 
 	}
 
+	@Override
+	public String BSMAQuery20(String eventID) {
+		try {
+			Thread.sleep(sleepTime);
+		} catch (InterruptedException e) {
+
+			e.printStackTrace();
+		}
+		return "";
+	}
+
+	@Override
+	public String BSMAQuery21(String eventID) {
+		try {
+			Thread.sleep(sleepTime);
+		} catch (InterruptedException e) {
+
+			e.printStackTrace();
+		}
+		return "";
+	}
+
+	@Override
+	public String BSMAQuery22(String mid) {
+		try {
+			Thread.sleep(sleepTime);
+		} catch (InterruptedException e) {
+
+			e.printStackTrace();
+		}
+		return "";
+	}
+
+	@Override
+	public String BSMAQuery23(String eventID) {
+		try {
+			Thread.sleep(sleepTime);
+		} catch (InterruptedException e) {
+
+			e.printStackTrace();
+		}
+		return "";
+	}
+
+	@Override
+	public String BSMAQuery24(String eventID) {
+		try {
+			Thread.sleep(sleepTime);
+		} catch (InterruptedException e) {
+
+			e.printStackTrace();
+		}
+		return "";
+	}
+
 }

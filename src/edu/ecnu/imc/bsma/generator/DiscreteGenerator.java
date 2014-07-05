@@ -20,47 +20,31 @@ package edu.ecnu.imc.bsma.generator;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 
 import edu.ecnu.imc.bsma.WorkloadException;
+import edu.ecnu.imc.bsma.util.Pair;
 
 /**
  * Generates a distribution by choosing from a discrete set of values.
  * @modify xiafan
  */
 public class DiscreteGenerator<ValueType> extends Generator<ValueType> {
-	class Pair {
-		public double _weight;
-		public ValueType _value;
 
-		Pair(double weight, ValueType value) {
-			_weight = weight;
-			_value = value;
-		}
-	}
-
-	List<Pair> _values;
+	List<Pair<ValueType>> _values;
 	Random _random;
 	ValueType _lastvalue;
 
 	public DiscreteGenerator() {
-		_values = new ArrayList<Pair>();
+		_values = new ArrayList<Pair<ValueType>>();
 		_random = new Random();
 		_lastvalue = null;
 	}
 
 	boolean inited = false;
 
-	class PairComp implements Comparator<Pair> {
-		@Override
-		public int compare(Pair arg0, Pair arg1) {
-			return Double.compare(arg0._weight, arg1._weight);
-		}
-	}
-
-	PairComp comp = new PairComp();
+	Pair.PairComp comp = new Pair.PairComp();
 
 	/**
 	 * Generate the next string in the distribution.
@@ -70,7 +54,7 @@ public class DiscreteGenerator<ValueType> extends Generator<ValueType> {
 			Collections.sort(_values, comp);
 
 			double sum = 0.0f;
-			for (Pair pair : _values) {
+			for (Pair<ValueType> pair : _values) {
 				double tmp = pair._weight;
 				pair._weight = sum;
 				sum += tmp;
@@ -80,11 +64,12 @@ public class DiscreteGenerator<ValueType> extends Generator<ValueType> {
 		}
 
 		double val = _random.nextDouble();
-		int idx = Collections.binarySearch(_values, new Pair(val, null), comp);
+		int idx = Collections.binarySearch(_values, new Pair<ValueType>(val,
+				null), comp);
 		idx = Math.abs(idx + 1);
 		if (idx == _values.size())
 			idx--;
-		
+
 		return _values.get(idx)._value;
 	}
 
@@ -115,6 +100,6 @@ public class DiscreteGenerator<ValueType> extends Generator<ValueType> {
 	}
 
 	public void addValue(double weight, ValueType value) {
-		_values.add(new Pair(weight, value));
+		_values.add(new Pair<ValueType>(weight, value));
 	}
 }

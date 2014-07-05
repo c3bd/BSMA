@@ -279,3 +279,58 @@ AND DATE_ADD('YYYY-MM-DD HH:MM:SS', INTERVAL 1HOUR)
 GROUP BY event.tag
 ORDER BY num DESC
 LIMIT 10;
+
+Q20: compute the distribution of retweets over the time line
+SELECT time, count(*) RTTweet FROM
+Microblog JOIN Rel_Event_Microblog ON 
+(Microblog. mid = Rel_Event_Microblog. mid) 
+JOIN Retweet ON (Microblog. mid = Retweet. mid)
+where
+Rel_Event_Microblog.eventID = $eventID$
+and Retweet.reMid != -1 group by time
+
+Q21:
+SELECT mood, time, count(*) RTTweet FROM
+Microblog JOIN Rel_Event_Microblog ON 
+(Microblog. mid = Rel_Event_Microblog. mid) 
+JOIN Rel_Mood_Microblog 
+ON (Mood. mid = Rel_Mood_Microblog. mid) 
+JOIN Mood 
+ON (Rel_Mood_Microblog.moodID = Mood.moodID)
+where 
+Rel_Event_Microblog.eventID = $eventID$
+and Retweet.reMid != -1 group by mood,time
+
+Q22:
+WITH RECURSIVE rtTree(id, rtMid) As(
+	Select id , reMid 
+	From microblog
+	Where id = $id$
+	UNION ALL
+	Select id, rtMid
+	From Retweet
+	JOIN rtTree on Retweet.rtMid = rtTree.id
+)
+Select id, rtMid, time from rtTree, Tweet where rtTree.rtMid = Tweet.mid. 
+
+
+Q23:
+select city,gender, count(*) as RTTweet from
+Tweet JOIN TweetEventMapping 
+ON (Tweet. mid = TweetEventMapping. mid)
+JOIN Location ON (Tweet.locationId= Location.locationId)
+JOIN User (Tweet.uid = User.uid)
+where 
+TweetEventMapping.eventID = $eventID$ 
+group by city, gender.
+
+
+Q24:
+select friendsNumber, count(*) as userNumber from
+Tweet JOIN TweetEventMapping 
+ON (Tweet. mid = TweetEventMapping. mid)
+JOIN User (Tweet.uid = User.uid)
+where 
+TweetEventMapping.eventID = $eventID$
+group by friendsNumber
+

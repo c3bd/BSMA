@@ -20,8 +20,9 @@ public class Dao {
 
 	public Dao(Properties props) {
 		try {
-			jdbc = new JDBC(props.getProperty("server"),
-					props.getProperty("user"), props.getProperty("passwd"));
+			jdbc = new JDBC(props.getProperty("report_server"),
+					props.getProperty("report_user"),
+					props.getProperty("report_passwd"));
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			throw new RuntimeException("init jdbc object fails:"

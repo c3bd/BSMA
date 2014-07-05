@@ -22,8 +22,8 @@ public class HiveDBImpl extends DB {
 	public void init() throws DBException {
 		try {
 			Class.forName("org.apache.hive.jdbc.HiveDriver").newInstance();
-			conn = DriverManager.getConnection(_p.getProperty("server"),
-					_p.getProperty("user"), _p.getProperty("passwd"));
+			conn = DriverManager.getConnection(_p.getProperty("hserver"),
+					_p.getProperty("huser"), _p.getProperty("hpasswd"));
 		} catch (Exception e) {
 			throw new DBException(e);
 		}
@@ -239,79 +239,442 @@ public class HiveDBImpl extends DB {
 		return "";
 	}
 
+	public static final String QUERY9 = "SELECT x.reuid,COUNT(*) "
+			+ "FROM microblog JOIN "
+			+ "(SELECT retweet.mid as mid, microblog.uid as reuid "
+			+ "FROM microblog JOIN retweet ON (microblog.mid = retweet.remid)) x "
+			+ "ON (microblog.mid = x.mid) WHERE microblog.time "
+			+ "BETWEEN TO_DAYS('%s') AND " + "DATE_ADD('%1', INTERVAL 1HOUR) "
+			+ "GROUP BY x.reuid ORDER BY num DESC LIMIT 10;";
+
 	@Override
 	public String BSMAQuery9(String userID, String tag, int returncount,
 			String datetime, String timespan) {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			Statement stmt = conn.createStatement();
+			ResultSet result = stmt.executeQuery(String.format(QUERY8, userID));
+			StringBuffer buf = new StringBuffer();
+			while (result.next()) {
+				buf.append(result.getString(1));
+				buf.append(",");
+				buf.append(result.getString(2));
+			}
+			return buf.toString();
+		} catch (SQLException e) {
+
+		}
+		return "";
 	}
+
+	public static final String QUERY10 = "SELECT x.reuid,COUNT(*) "
+			+ "FROM microblog JOIN "
+			+ "(SELECT retweet.mid as mid, microblog.uid as reuid "
+			+ "FROM microblog JOIN"
+			+ " retweet ON (microblog.mid = retweet.remid)) x "
+			+ "ON (microblog.mid = x.mid) WHERE "
+			+ "microblog.time BETWEEN TO_DAYS('%s') "
+			+ "AND DATE_ADD('%1', INTERVAL 1HOUR) "
+			+ "GROUP BY x.reuid ORDER BY num DESC LIMIT 10;";
 
 	@Override
 	public String BSMAQuery10(int returncount, String datetime, String timespan) {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			Statement stmt = conn.createStatement();
+			ResultSet result = stmt.executeQuery(String.format(QUERY10,
+					datetime));
+			StringBuffer buf = new StringBuffer();
+			while (result.next()) {
+				buf.append(result.getString(1));
+				buf.append(",");
+				buf.append(result.getString(2));
+			}
+			return buf.toString();
+		} catch (SQLException e) {
+
+		}
+		return "";
 	}
+
+	public static final String QUERY11 = "SELECT microblog.uid, COUNT(*) num "
+			+ "FROM microblog JOIN "
+			+ "(SELECT retweet.mid as mid,microblog.uid as reuid FROM microblog "
+			+ "JOIN retweet ON (microblog.mid = retweet.remid)) x "
+			+ "ON (microblog.mid = x.mid) WHERE x.reuid = \"%s\" "
+			+ "AND microblog.time BETWEEN TO_DAYS('%s') "
+			+ "AND DATE_ADD('%2',INTERVAL 1HOUR) "
+			+ "GROUP BY microblog.uid ORDER BY num DESC LIMIT 10;";
 
 	@Override
 	public String BSMAQuery11(String userID, int returncount, String datetime,
 			String timespan) {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			Statement stmt = conn.createStatement();
+			ResultSet result = stmt.executeQuery(String.format(QUERY11, userID,
+					datetime));
+			StringBuffer buf = new StringBuffer();
+			while (result.next()) {
+				buf.append(result.getString(1));
+				buf.append(",");
+				buf.append(result.getString(2));
+			}
+			return buf.toString();
+		} catch (SQLException e) {
+
+		}
+		return "";
 	}
+
+	public static final String QUERY12 = "SELECT x.remid, COUNT(*) num "
+			+ "FROM microblog JOIN "
+			+ "(SELECT retweet.mid AS mid,retweet.remid AS remid "
+			+ "FROM microblog,retweet WHERE microblog.mid = retweet.remid) x "
+			+ "ON (microblog.mid = x.mid ) LEFT OUTER JOIN "
+			+ "((SELECT friendID FROM friendList WHERE uid = \"%s\") "
+			+ "UNION (SELECT b.friendID as friendID "
+			+ "FROM friendList a join friendList b "
+			+ "WHERE a.uid = \"%1\" a.friendID = b.uid)) friends ON "
+			+ " (microblog.uid = friends.friendID) WHERE "
+			+ "friends.friendID is not null AND microblog.time "
+			+ "BETWEEN TO_DAYS('%s') AND" + " DATE_ADD('%1',INTERVAL 1HOUR) "
+			+ "GROUP BY x.remid ORDER BY num DESC LIMIT 10;";
 
 	@Override
 	public String BSMAQuery12(String userID, int returncount, String datetime,
 			String timespan) {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			Statement stmt = conn.createStatement();
+			ResultSet result = stmt.executeQuery(String.format(QUERY11, userID,
+					datetime));
+			StringBuffer buf = new StringBuffer();
+			while (result.next()) {
+				buf.append(result.getString(1));
+				buf.append(",");
+				buf.append(result.getString(2));
+			}
+			return buf.toString();
+		} catch (SQLException e) {
+
+		}
+		return "";
 	}
+
+	public static final String QUERY13 = "SELECT microblog.uid FROM microblog "
+			+ "JOIN event ON (microblog.mid = event.mid) "
+			+ "LEFT OUTER JOIN (SELECT DISTINCT tag FROM "
+			+ "event,microblog WHERE microblog.mid = event.mid "
+			+ "AND microblog.uid = \"%s\") atags ON (event.tag = atags.tag) "
+			+ "LEFT OUTER JOIN (SELECT friendID FROM friendList "
+			+ "WHERE uid = \"%1\") afriends ON (microblog.uid = afriends.uid)"
+			+ " WHERE microblog.uid<> \"%1\" AND atags is not null"
+			+ " AND afriends.uid is null AND microblog.time "
+			+ "BETWEEN TO_DAYS('%s') AND " + "DATE_ADD('%2', INTERVAL 1HOUR) "
+			+ "GROUP BY microblog.uid ORDER BY COUNT(event.tag) DESC LIMIT 10;";
 
 	@Override
 	public String BSMAQuery13(String userID, int returncount, String datetime,
 			String timespan) {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			Statement stmt = conn.createStatement();
+			ResultSet result = stmt.executeQuery(String.format(QUERY13, userID,
+					datetime));
+			StringBuffer buf = new StringBuffer();
+			while (result.next()) {
+				buf.append(result.getString(1));
+				buf.append(",");
+			}
+			return buf.toString();
+		} catch (SQLException e) {
+
+		}
+		return "";
 	}
+
+	public static final String QUERY14 = "SELECT event.tag,COUNT(*) num "
+			+ "FROM microblog JOIN event " + "ON (microblog.mid = event.mid) "
+			+ "WHERE microblog.time BETWEEN " + "TO_DAYS('%s) AND "
+			+ "DATE_ADD('%1', INTERVAL 1HOUR)"
+			+ " GROUP BY event.tag ORDER BY num DESC LIMIT 10;";
 
 	@Override
 	public String BSMAQuery14(int returncount, String datetime, String timespan) {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			Statement stmt = conn.createStatement();
+			ResultSet result = stmt.executeQuery(String.format(QUERY14,
+					datetime));
+			StringBuffer buf = new StringBuffer();
+			while (result.next()) {
+				buf.append(result.getString(1));
+				buf.append(",");
+				buf.append(result.getString(2));
+			}
+			return buf.toString();
+		} catch (SQLException e) {
+
+		}
+		return "";
 	}
+
+	public static final String QUERY15 = "SELECT microblog.uid "
+			+ "FROM microblog JOIN event ON (microblog.mid = event.mid)"
+			+ " WHERE event.tag=\"%s\" AND microblog.time "
+			+ "BETWEEN TO_DAYS('%s') AND " + "DATE_ADD('%2',INTERVAL 1HOUR)"
+			+ " GROUP BY microblog.uid ORDER BY COUNT(*) DESC LIMIT 10;";
 
 	@Override
 	public String BSMAQuery15(String tag, int returncount, String datetime,
 			String timespan) {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			Statement stmt = conn.createStatement();
+			ResultSet result = stmt.executeQuery(String.format(QUERY15, tag,
+					datetime));
+			StringBuffer buf = new StringBuffer();
+			while (result.next()) {
+				buf.append(result.getString(1));
+				buf.append(",");
+				buf.append(result.getString(2));
+			}
+			return buf.toString();
+		} catch (SQLException e) {
+
+		}
+		return "";
 	}
+
+	public static final String QUERY16 = "SELECT x.reuid,COUNT(*) num FROM "
+			+ "microblog JOIN (SELECT retweet.mid as mid,"
+			+ "microblog.uid as reuid FROM microblog "
+			+ "JOIN retweet ON(microblog.mid = retweet.remid)) x "
+			+ "ON ( microblog.mid = x.mid) LEFT OUTER JOIN"
+			+ " (SELECT friendID FROM friendList WHERE uid = \"%s\") "
+			+ "afriends ON (microblog.uid = afriends.friendID) "
+			+ "WHERE afriends.friendID is not null AND microblog.time "
+			+ "BETWEEN TO_DAYS('%s') AND " + "DATE_ADD('%2’,INTERVAL 1HOUR) "
+			+ "GROUP BY x.reuid ORDER BY num DESC LIMIT 10;";
 
 	@Override
 	public String BSMAQuery16(String userID, int returncount, String datetime,
 			String timespan) {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			Statement stmt = conn.createStatement();
+			ResultSet result = stmt.executeQuery(String.format(QUERY16, userID,
+					datetime));
+			StringBuffer buf = new StringBuffer();
+			while (result.next()) {
+				buf.append(result.getString(1));
+				buf.append(",");
+				buf.append(result.getString(2));
+			}
+			return buf.toString();
+		} catch (SQLException e) {
+
+		}
+		return "";
 	}
+
+	public static final String QUERY17 = "SELECT mention.uid,COUNT(*) num"
+			+ " FROM microblog JOIN mention ON "
+			+ "(microblog.mid = mention.mid) LEFT OUTER JOIN "
+			+ "(SELECT friendID FROM friendList WHERE uid = \"%s\") "
+			+ "afriends ON (microblog.uid = afriends.friendID) "
+			+ "WHERE afriends.friendID is not null AND microblog.time "
+			+ "BETWEEN TO_DAYS('%s') AND " + "DATE_ADD('%2',INTERVAL 1HOUR) "
+			+ "GROUP BY mention.uid ORDER BY num DESC LIMIT 10;";
 
 	@Override
 	public String BSMAQuery17(String userID, int returncount, String datetime,
 			String timespan) {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			Statement stmt = conn.createStatement();
+			ResultSet result = stmt.executeQuery(String.format(QUERY17, userID,
+					datetime));
+			StringBuffer buf = new StringBuffer();
+			while (result.next()) {
+				buf.append(result.getString(1));
+				buf.append(",");
+				buf.append(result.getString(2));
+			}
+			return buf.toString();
+		} catch (SQLException e) {
+
+		}
+		return "";
 	}
+
+	public static final String Query18 = "SELECT mention.uid,COUNT(*) num "
+			+ "FROM microblog JOIN mention ON (microblog.mid = mention.mid) "
+			+ "LEFT OUTER JOIN (SELECT uid FROM friendList WHERE friendID = \"%s\") "
+			+ "afans ON (microblog.uid = afans.uid) WHERE "
+			+ "mention.uid=\"%1\" AND afans.uid is not null "
+			+ "AND microblog.time BETWEEN TO_DAYS('%s')"
+			+ " AND DATE_ADD('%2', INTERVAL 1HOUR) "
+			+ "GROUP BY mention.uid ORDER BY num DESC LIMIT 10;";
 
 	@Override
 	public String BSMAQuery18(String userID, int returncount, String datetime,
 			String timespan) {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			Statement stmt = conn.createStatement();
+			ResultSet result = stmt.executeQuery(String.format(Query18, userID,
+					datetime));
+			StringBuffer buf = new StringBuffer();
+			while (result.next()) {
+				buf.append(result.getString(1));
+				buf.append(",");
+				buf.append(result.getString(2));
+			}
+			return buf.toString();
+		} catch (SQLException e) {
+
+		}
+		return "";
 	}
+
+	public static final String QUERY19 = "SELECT event.tag,COUNT(*) num "
+			+ "FROM microblog JOIN event ON ( microblog.mid = event.mid) "
+			+ "LEFT OUTER JOIN ((SELECT friendID FROM friendList WHERE uid = \"%s\") "
+			+ "UNION (SELECT b.friendID as friendID "
+			+ "FROM friendList a join friendList b WHERE"
+			+ " a.uid = \"%1\" a.friendID = b.uid)) friends "
+			+ "ON (microblog.uid = friends.friendID) WHERE "
+			+ "microblog.uid<> \"%1\" AND friends.friendID is not null "
+			+ "AND microblog.time BETWEEN TO_DAYS('%s') "
+			+ "AND DATE_ADD('%2', INTERVAL 1HOUR)"
+			+ " GROUP BY event.tag ORDER BY num DESC LIMIT 10; ";
 
 	@Override
 	public String BSMAQuery19(String userID, int returncount, String datetime,
 			String timespan) {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			Statement stmt = conn.createStatement();
+			ResultSet result = stmt.executeQuery(String.format(QUERY19, userID,
+					datetime));
+			StringBuffer buf = new StringBuffer();
+			while (result.next()) {
+				buf.append(result.getString(1));
+				buf.append(",");
+				buf.append(result.getString(2));
+			}
+			return buf.toString();
+		} catch (SQLException e) {
+
+		}
+		return "";
+	}
+
+	public static final String QUERY20 = "SELECT time, count(*) RTTweet"
+			+ " FROM Microblog JOIN Rel_Event_Microblog ON "
+			+ "(Microblog. mid = Rel_Event_Microblog. mid) JOIN "
+			+ "Retweet ON (Microblog. mid = Retweet. mid) "
+			+ "where Rel_Event_Microblog.eventID = \"$s\""
+			+ " and Retweet.reMid != -1 group by time";
+
+	@Override
+	public String BSMAQuery20(String eventID) {
+		try {
+			Statement stmt = conn.createStatement();
+			ResultSet result = stmt.executeQuery(String
+					.format(QUERY20, eventID));
+			StringBuffer buf = new StringBuffer();
+			while (result.next()) {
+				buf.append(result.getString(1));
+				buf.append(",");
+				buf.append(result.getString(2));
+			}
+			return buf.toString();
+		} catch (SQLException e) {
+
+		}
+		return "";
+	}
+
+	public static final String QUERY21 = "SELECT mood, time, count(*) RTTweet "
+			+ "FROM Microblog JOIN Rel_Event_Microblog "
+			+ "ON (Microblog. mid = Rel_Event_Microblog. mid) "
+			+ "JOIN Rel_Mood_Microblog ON (Mood. mid = Rel_Mood_Microblog. mid) "
+			+ "JOIN Mood ON (Rel_Mood_Microblog.moodID = Mood.moodID) "
+			+ "where Rel_Event_Microblog.eventID = \"%s\" "
+			+ "and Retweet.reMid != -1 group by mood,time";
+
+	@Override
+	public String BSMAQuery21(String eventID) {
+		try {
+			Statement stmt = conn.createStatement();
+			ResultSet result = stmt.executeQuery(String
+					.format(QUERY21, eventID));
+			StringBuffer buf = new StringBuffer();
+			while (result.next()) {
+				buf.append(result.getString(1));
+				buf.append(",");
+				buf.append(result.getString(2));
+				buf.append(",");
+				buf.append(result.getString(3));
+			}
+			return buf.toString();
+		} catch (SQLException e) {
+
+		}
+		return "";
+	}
+
+	public static final String QUERY22 = "WITH RECURSIVE rtTree(id, rtMid) As( Select id , reMid From microblog Where id = $id$ UNION ALL Select id, rtMid From Retweet JOIN rtTree on Retweet.rtMid = rtTree.id ) Select id, rtMid, time from rtTree, Tweet where rtTree.rtMid = Tweet.mid.";
+
+	@Override
+	public String BSMAQuery22(String mid) {
+		return "";
+	}
+
+	public static final String QUERY23 = "select city,gender, count(*) as RTTweet "
+			+ "from Tweet JOIN TweetEventMapping"
+			+ " ON (Tweet. mid = TweetEventMapping. mid) "
+			+ "JOIN Location ON (Tweet.locationId= Location.locationId) "
+			+ "JOIN User (Tweet.uid = User.uid)"
+			+ " where TweetEventMapping.eventID = \"%s\" group by city, gender;";
+
+	@Override
+	public String BSMAQuery23(String eventID) {
+		try {
+			Statement stmt = conn.createStatement();
+			ResultSet result = stmt.executeQuery(String
+					.format(QUERY23, eventID));
+			StringBuffer buf = new StringBuffer();
+			while (result.next()) {
+				buf.append(result.getString(1));
+				buf.append(",");
+				buf.append(result.getString(2));
+				buf.append(",");
+				buf.append(result.getString(3));
+			}
+			return buf.toString();
+		} catch (SQLException e) {
+
+		}
+		return "";
+	}
+
+	public static final String QUERY24 = "select friendsNumber, count(*) as userNumber "
+			+ "from Tweet JOIN TweetEventMapping ON"
+			+ " (Tweet. mid = TweetEventMapping. mid) "
+			+ "JOIN User (Tweet.uid = User.uid) where"
+			+ " TweetEventMapping.eventID = \"%s\""
+			+ " group by friendsNumber  ";
+
+	@Override
+	public String BSMAQuery24(String eventID) {
+		try {
+			Statement stmt = conn.createStatement();
+			ResultSet result = stmt.executeQuery(String
+					.format(QUERY24, eventID));
+			StringBuffer buf = new StringBuffer();
+			while (result.next()) {
+				buf.append(result.getString(1));
+				buf.append(",");
+				buf.append(result.getString(2));
+			}
+			return buf.toString();
+		} catch (SQLException e) {
+
+		}
+		return "";
 	}
 
 	public static void main(String[] args) throws IOException {
@@ -342,4 +705,5 @@ public class HiveDBImpl extends DB {
 		System.out.println(buf.toString());
 		br.close();
 	}
+
 }

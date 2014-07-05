@@ -256,4 +256,48 @@ public class DBWrapper extends DB {
 		return result;
 	}
 
+	@Override
+	public String BSMAQuery20(String eventID) {
+		long st = System.currentTimeMillis();
+		String result = _db.BSMAQuery20(eventID);
+		long en = System.currentTimeMillis();
+		_measurements.measure("Query20", (int) (en - st));
+		return result;
+	}
+
+	@Override
+	public String BSMAQuery21(String eventID) {
+		long st = System.currentTimeMillis();
+		String result = _db.BSMAQuery21(eventID);
+		long en = System.currentTimeMillis();
+		_measurements.measure("Query21", (int) (en - st));
+		return result;
+	}
+
+	@Override
+	public String BSMAQuery22(String mid) {
+		long st = System.currentTimeMillis();
+		String result = _db.BSMAQuery22(mid);
+		long en = System.currentTimeMillis();
+		_measurements.measure("Query22", (int) (en - st));
+		return result;
+	}
+
+	@Override
+	public String BSMAQuery23(String eventID) {
+		long st = System.currentTimeMillis();
+		String result = _db.BSMAQuery23(eventID);
+		long en = System.currentTimeMillis();
+		_measurements.measure("Query23", (int) (en - st));
+		return result;
+	}
+
+	@Override
+	public String BSMAQuery24(String eventID) {
+		long st = System.currentTimeMillis();
+		String result = _db.BSMAQuery24(eventID);
+		long en = System.currentTimeMillis();
+		_measurements.measure("Query24", (int) (en - st));
+		return result;
+	}
 }

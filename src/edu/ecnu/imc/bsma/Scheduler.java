@@ -18,6 +18,7 @@ import edu.ecnu.imc.bsma.dao.Dao;
 import edu.ecnu.imc.bsma.dao.JobInfo;
 import edu.ecnu.imc.bsma.util.Config;
 import edu.ecnu.imc.bsma.util.LoggerInitializer;
+import edu.ecnu.imc.bsma.util.SeedFileLoader;
 
 /**
  * TODO: 接受任务
@@ -58,6 +59,7 @@ public class Scheduler implements BSMAService.Iface {
 			e1.printStackTrace();
 		}
 
+		SeedFileLoader.instance.init(Config.instance.getProps());
 		// 初始化jobID,subJobID
 		dao = new Dao(Scheduler.instance.getProps());
 

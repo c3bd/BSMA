@@ -59,10 +59,8 @@ public class JobCordinator extends Thread {
 
 	@Override
 	public void run() {
-
 		// load argument files
 		prepareJob(jobInfo);
-
 		// update job status
 		try {
 			jobInfo.save();
@@ -216,7 +214,7 @@ public class JobCordinator extends Thread {
 	 */
 	public void error(Exception ex) {
 		state.set(false);
-		//if wait for termination, may never stop
+		// if wait for termination, may never stop
 		// waitForFinish();
 
 		exitCode = ex.getMessage();
