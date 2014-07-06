@@ -5,6 +5,8 @@ import java.sql.SQLException;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.thrift.TException;
@@ -40,7 +42,9 @@ public class Scheduler implements BSMAService.Iface {
 	private AtomicInteger subJobIDGen = new AtomicInteger(0);
 
 	ConcurrentHashMap<Integer, JobCordinator> runningJobs = new ConcurrentHashMap<Integer, JobCordinator>();
-	ConcurrentLinkedQueue<JobInfo> waitingJobs = new ConcurrentLinkedQueue<JobInfo>();
+
+	// ConcurrentLinkedQueue<JobInfo> waitingJobs = new
+	// ConcurrentLinkedQueue<JobInfo>();
 
 	private Scheduler() {
 
@@ -91,14 +95,18 @@ public class Scheduler implements BSMAService.Iface {
 		return Config.instance.getProps();
 	}
 
-	private void launchJob(Job job) {
-		JobCordinator client = new JobCordinator(job);
-		client.start();
-		runningJobs.put(job.getJobID(), client);
-	}
+	ExecutorService executors = Executors.newFixedThreadPool(2);
 
-	public void scheduleJob(Job job) {
+	/**
+	 * add the job to the schedule queue
+	 * @param job
+	 * @throws SQLException
+	 */
+	public void scheduleJob(Job job) throws SQLException {
 		JobInfo newJob = new JobInfo(job, dao);
+		newJob.save();
+		JobCordinator task = new JobCordinator(job);
+		executors.submit(task);
 	}
 
 	@Override
@@ -109,7 +117,11 @@ public class Scheduler implements BSMAService.Iface {
 			subJob.setSubJobID(subJobIDGen.incrementAndGet());
 		}
 		// start the job
-		launchJob(job);
+		try {
+			scheduleJob(job);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 		return job;
 	}
 

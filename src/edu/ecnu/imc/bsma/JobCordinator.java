@@ -40,7 +40,7 @@ import edu.ecnu.imc.bsma.measurements.Measurements;
  * job consists of a set of small jobs, each consists of a threadnum and target
  * operation
  */
-public class JobCordinator extends Thread {
+public class JobCordinator implements Runnable {
 	public static Logger logger = LoggerFactory.getLogger(JobCordinator.class);
 	JobInfo jobInfo;
 	Dao dao = new Dao(Scheduler.instance.getProps());

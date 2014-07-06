@@ -90,7 +90,7 @@ public class DBExporter implements Closeable {
 	public void reportSubJobResult(int qID, List<Integer> latencyHist,
 			List<Float> latencyStats) throws SQLException {
 		BasicJobInfo curJob = job.getCurJob();
-		QueryFinalReport report = new QueryFinalReport();
+		QueryFinalReport report = jobReport.newQueryFinalReport();
 		report.subjobid = curJob.getSubJobID();
 		report.queryid = qID;
 		report.latency50 = latencyHist.get(0);
@@ -100,15 +100,18 @@ public class DBExporter implements Closeable {
 		report.MinLatency = latencyStats.get(0);
 		report.AverageLatency = latencyStats.get(1);
 		report.MaxLatency = latencyStats.get(2);
-		dao.insertQueryFinalResult(report);
 	}
 
 	public void reportJobResult(long time, int totalOps) throws SQLException {
-		JobFinalReport report = new JobFinalReport();
-		report.jobid = job.getCurJob().getSubJobID();
-		report.totaltime = time;
-		report.ops = totalOps;
-		dao.insertJobFinalResult(report);
+		jobReport.jobid = job.getCurJob().getSubJobID();
+		jobReport.totaltime = time;
+		jobReport.ops = totalOps;
+	}
+
+	JobFinalReport jobReport = new JobFinalReport();
+
+	public void reportFinalReport() throws SQLException {
+		dao.insertJobFinalResult(jobReport);
 	}
 
 	@Override

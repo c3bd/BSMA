@@ -19,8 +19,11 @@
 package edu.ecnu.imc.bsma.measurements;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import edu.ecnu.imc.bsma.measurements.exporter.DBExporter;
 
@@ -35,8 +38,10 @@ import edu.ecnu.imc.bsma.measurements.exporter.DBExporter;
  * 
  */
 public class Measurements {
+	public static final Logger logger = LoggerFactory
+			.getLogger(Measurements.class);
 
-	// static Measurements singleton = null;
+	static final String OVERALL = "OVERALL";
 
 	static Properties measurementproperties = null;
 
@@ -44,7 +49,7 @@ public class Measurements {
 		measurementproperties = props;
 	}
 
-	HashMap<String, OneMeasurement> data;
+	ConcurrentHashMap<String, OneMeasurement> data;
 
 	private Properties _props;
 
@@ -52,7 +57,7 @@ public class Measurements {
 	 * Create a new object with the specified properties.
 	 */
 	public Measurements(Properties props) {
-		data = new HashMap<String, OneMeasurement>();
+		data = new ConcurrentHashMap<String, OneMeasurement>();
 
 		_props = props;
 
@@ -66,21 +71,31 @@ public class Measurements {
 	 * Report a single value of a single metric. E.g. for BSMAQuery1 latency,
 	 * operation="Query1" and latency is the measured value.
 	 */
-	public synchronized void measure(String operation, int latency) {
+	public void measure(String operation, int latency) {
+		measure_intern(operation, latency);
+		measure_intern(OVERALL, latency);
+	}
+
+	/**
+	 * Report a single value of a single metric. E.g. for BSMAQuery1 latency,
+	 * operation="Query1" and latency is the measured value.
+	 */
+	public void measure_intern(String operation, int latency) {
+		OneMeasurement one = null;
 		if (!data.containsKey(operation)) {
-			synchronized (this) {
-				if (!data.containsKey(operation)) {
-					data.put(operation, constructOneMeasurement(operation));
-				}
-			}
+			one = constructOneMeasurement(operation);
+			OneMeasurement tmp = data.putIfAbsent(operation, one);
+			if (tmp != null)
+				one = tmp;
+		} else {
+			one = data.get(operation);
 		}
+
 		try {
-			data.get(operation).measure(latency);
+			one.measure(latency);
 		} catch (java.lang.ArrayIndexOutOfBoundsException e) {
-			System.out
-					.println("ERROR: java.lang.ArrayIndexOutOfBoundsException - ignoring and continuing");
-			e.printStackTrace();
-			e.printStackTrace(System.out);
+			logger.error("java.lang.ArrayIndexOutOfBoundsException - ignoring and continuing");
+			logger.error(e.getMessage());
 		}
 	}
 
@@ -92,8 +107,7 @@ public class Measurements {
 	 * @throws IOException
 	 *             Thrown if the export failed.
 	 */
-	public void exportMeasurements(DBExporter exporter)
-			throws IOException {
+	public void exportMeasurements(DBExporter exporter) throws IOException {
 		for (OneMeasurement measurement : data.values()) {
 			measurement.exportMeasurements(exporter);
 		}

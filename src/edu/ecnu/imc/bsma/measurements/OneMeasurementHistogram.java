@@ -115,7 +115,7 @@ public class OneMeasurementHistogram extends OneMeasurement {
 	public byte getQID(String query) {
 		if (qIDs.containsKey(query)) {
 			return qIDs.get(query);
-		} else if (query.equals("overall")) {
+		} else if (query.equals(Measurements.OVERALL)) {
 			return 0;
 		} else {
 			// unknown type

@@ -30,7 +30,7 @@ public class Dao {
 		}
 	}
 
-	public void insertQueryFinalResult(QueryFinalReport report)
+	public void insertQueryFinalResult(Statement stmt, QueryFinalReport report)
 			throws SQLException {
 		String sql = String.format(
 				"insert into QueryFinalReport(subjobid,queryid,latency50, latency75,latency95,"
@@ -39,10 +39,7 @@ public class Dao {
 				report.subjobid, report.queryid, report.latency50,
 				report.latency75, report.latency95, report.latency99,
 				report.AverageLatency, report.MinLatency, report.MaxLatency);
-		Connection conn = jdbc.getCon();
-		Statement stmt = conn.createStatement();
-		stmt.executeUpdate(sql);
-		jdbc.putCon(conn);
+		stmt.addBatch(sql);
 	}
 
 	public void insertJobFinalResult(JobFinalReport report) throws SQLException {
@@ -52,9 +49,15 @@ public class Dao {
 				report.totaltime);
 		Connection conn = jdbc.getCon();
 		Statement stmt = conn.createStatement();
-		stmt.executeUpdate(sql);
+		stmt.addBatch(sql);
+		for (QueryFinalReport subReport : report.getQueryFReportList()) {
+			insertQueryFinalResult(stmt, subReport);
+		}
+		stmt.executeBatch();
 		jdbc.putCon(conn);
 	}
+	
+	
 
 	public void insertRunningResults(RunningReport report) throws SQLException {
 		String sql = String.format(

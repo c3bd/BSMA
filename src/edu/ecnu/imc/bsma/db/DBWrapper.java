@@ -26,7 +26,7 @@ import edu.ecnu.imc.bsma.measurements.Measurements;
  */
 /**
  * @author rhein
- * 
+ * @author xiafan
  */
 public class DBWrapper extends DB {
 	DB _db;
