@@ -122,7 +122,7 @@ class StatusThread extends Thread {
 			SQLException {
 		try {
 			if (_jobInfo.getCurJob().getOpCount() >= 1) {
-				_exporter.reportJobResult(runtime / 1000, _jobInfo.getCurJob()
+				_exporter.reportSubJobResult(runtime / 1000, _jobInfo.getCurJob()
 						.getOpCount());
 			}// modified out by WeiJinxian
 			_measurements.exportMeasurements(_exporter);

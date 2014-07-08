@@ -7,7 +7,7 @@ public class QueryFinalReport {
 	public int latency75;
 	public int latency95;
 	public int latency99;
-	public float AverageLatency;
-	public float MinLatency;
-	public float MaxLatency;
+	public float avglatency;
+	public float minlatency;
+	public float maxlatency;
 }

@@ -1,6 +1,8 @@
 package edu.ecnu.imc.bsma.dao;
 
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 
 import junit.framework.Assert;
 
@@ -31,6 +33,9 @@ public class JobInfoPersistenceTest {
 		jobInfo.setName("test");
 		jobInfo.setDescription("hello");
 		jobInfo.setCustDbImpl("");
+		Map<String, String> props = new HashMap<String, String>();
+		props.put("a", "b");
+		jobInfo.setProps(props);
 		for (int i = 0; i < 4; i++) {
 			BasicJobInfo subjob = new BasicJobInfo(dao, JobInfo.WAITING);
 			subjob.setSubJobID(i);

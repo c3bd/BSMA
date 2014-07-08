@@ -265,7 +265,11 @@ public class JobInfo extends Job {
 	 * 
 	 * @return
 	 */
-	public Object getMsg() {
+	public String getMsg() {
 		return msg;
+	}
+
+	public void setMsg(String msg) {
+		this.msg = msg;
 	}
 }

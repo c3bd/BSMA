@@ -8,7 +8,7 @@ import java.util.Properties;
 
 import edu.ecnu.imc.bsma.dao.BasicJobInfo;
 import edu.ecnu.imc.bsma.dao.Dao;
-import edu.ecnu.imc.bsma.dao.JobFinalReport;
+import edu.ecnu.imc.bsma.dao.SubJobFinalReport;
 import edu.ecnu.imc.bsma.dao.JobInfo;
 import edu.ecnu.imc.bsma.dao.QueryFinalReport;
 import edu.ecnu.imc.bsma.dao.QueryRunningReport;
@@ -97,21 +97,21 @@ public class DBExporter implements Closeable {
 		report.latency75 = latencyHist.get(1);
 		report.latency95 = latencyHist.get(2);
 		report.latency99 = latencyHist.get(3);
-		report.MinLatency = latencyStats.get(0);
-		report.AverageLatency = latencyStats.get(1);
-		report.MaxLatency = latencyStats.get(2);
+		report.minlatency = latencyStats.get(0);
+		report.avglatency = latencyStats.get(1);
+		report.maxlatency = latencyStats.get(2);
 	}
 
-	public void reportJobResult(long time, int totalOps) throws SQLException {
+	public void reportSubJobResult(long time, int totalOps) throws SQLException {
 		jobReport.jobid = job.getCurJob().getSubJobID();
 		jobReport.totaltime = time;
 		jobReport.ops = totalOps;
 	}
 
-	JobFinalReport jobReport = new JobFinalReport();
+	SubJobFinalReport jobReport = new SubJobFinalReport();
 
 	public void reportFinalReport() throws SQLException {
-		dao.insertJobFinalResult(jobReport);
+		dao.insertSubJobFinalResult(jobReport);
 	}
 
 	@Override
