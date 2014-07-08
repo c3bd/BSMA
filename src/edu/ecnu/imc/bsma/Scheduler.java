@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -53,8 +52,6 @@ public class Scheduler implements BSMAService.Iface {
 	Dao dao = null;
 
 	public void init() {
-		// 初始化logger
-
 		// 初始化config
 		try {
 			Config.instance.init();
@@ -64,9 +61,9 @@ public class Scheduler implements BSMAService.Iface {
 		}
 
 		SeedFileLoader.instance.init(Config.instance.getProps());
+
 		// 初始化jobID,subJobID
 		dao = new Dao(Scheduler.instance.getProps());
-
 		try {
 			jobIDGen.set(dao.getMaxJobID());
 			subJobIDGen.set(dao.getMaxSubJobID());

@@ -63,7 +63,6 @@ public class JobCordinator implements Runnable {
 		prepareJob(jobInfo);
 		// update job status
 		try {
-			jobInfo.save();
 			jobInfo.start();
 		} catch (SQLException e1) {
 			error(e1);
