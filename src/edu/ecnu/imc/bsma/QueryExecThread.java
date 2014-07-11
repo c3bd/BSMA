@@ -72,14 +72,6 @@ class QueryExecThread extends Thread {
 
 	public void run() {
 		try {
-			_db.init();
-		} catch (DBException e) {
-			e.printStackTrace();
-			e.printStackTrace(System.out);
-			return;
-		}
-
-		try {
 			_workloadstate = _workload.initThread(_props, _threadid,
 					_threadcount);
 		} catch (WorkloadException e) {

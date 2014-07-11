@@ -28,6 +28,7 @@ import edu.ecnu.imc.bsma.util.Pair;
 
 /**
  * Generates a distribution by choosing from a discrete set of values.
+ * 
  * @modify xiafan
  */
 public class DiscreteGenerator<ValueType> extends Generator<ValueType> {
@@ -35,6 +36,12 @@ public class DiscreteGenerator<ValueType> extends Generator<ValueType> {
 	List<Pair<ValueType>> _values;
 	Random _random;
 	ValueType _lastvalue;
+
+	public DiscreteGenerator(List<Pair<ValueType>> values) {
+		_values = values;
+		_random = new Random();
+		_lastvalue = null;
+	}
 
 	public DiscreteGenerator() {
 		_values = new ArrayList<Pair<ValueType>>();

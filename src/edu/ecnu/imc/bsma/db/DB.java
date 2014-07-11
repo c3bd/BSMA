@@ -146,7 +146,7 @@ public abstract class DB {
 	 * 
 	 */
 	public abstract String BSMAQuery6(String userID, int returncount,
-			String datetime, String timespan);
+			long datetime, long timespan);
 
 	/**
 	 * Perform query7 for a set of records in the database. Result will be
@@ -162,8 +162,8 @@ public abstract class DB {
 	 *         returned record
 	 * 
 	 */
-	public abstract String BSMAQuery7(int returncount, String datetime,
-			String timespan);
+	public abstract String BSMAQuery7(int returncount, long datetime,
+			long timespan);
 
 	/**
 	 * Perform query8 for a set of records in the database. Result will be
@@ -198,7 +198,7 @@ public abstract class DB {
 	 * 
 	 */
 	public abstract String BSMAQuery9(String userID, String tag,
-			int returncount, String datetime, String timespan);
+			int returncount, long datetime, long timespan);
 
 	/**
 	 * Perform query10 for a set of records in the database. Result will be
@@ -214,8 +214,8 @@ public abstract class DB {
 	 *         returned record
 	 * 
 	 */
-	public abstract String BSMAQuery10(int returncount, String datetime,
-			String timespan);
+	public abstract String BSMAQuery10(int returncount, long datetime,
+			long timespan);
 
 	/**
 	 * Perform query11 for a set of records in the database. Result will be
@@ -234,7 +234,7 @@ public abstract class DB {
 	 * 
 	 */
 	public abstract String BSMAQuery11(String userID, int returncount,
-			String datetime, String timespan);
+			long datetime, long timespan);
 
 	/**
 	 * Perform query12 for a set of records in the database. Result will be
@@ -253,7 +253,7 @@ public abstract class DB {
 	 * 
 	 */
 	public abstract String BSMAQuery12(String userID, int returncount,
-			String datetime, String timespan);
+			long datetime, long timespan);
 
 	/**
 	 * Perform query13 for a set of records in the database. Result will be
@@ -272,7 +272,7 @@ public abstract class DB {
 	 * 
 	 */
 	public abstract String BSMAQuery13(String userID, int returncount,
-			String datetime, String timespan);
+			long datetime,long timespan);
 
 	/**
 	 * Perform query14 for a set of records in the database. Result will be
@@ -288,8 +288,8 @@ public abstract class DB {
 	 *         returned record
 	 * 
 	 */
-	public abstract String BSMAQuery14(int returncount, String datetime,
-			String timespan);
+	public abstract String BSMAQuery14(int returncount, long datetime,
+			long timespan);
 
 	/**
 	 * Perform query15 for a set of records in the database. Result will be
@@ -308,7 +308,7 @@ public abstract class DB {
 	 * 
 	 */
 	public abstract String BSMAQuery15(String tag, int returncount,
-			String datetime, String timespan);
+			long datetime, long timespan);
 
 	/**
 	 * Perform query16 for a set of records in the database. Result will be
@@ -327,7 +327,7 @@ public abstract class DB {
 	 * 
 	 */
 	public abstract String BSMAQuery16(String userID, int returncount,
-			String datetime, String timespan);
+			long datetime, long timespan);
 
 	/**
 	 * Perform query17 for a set of records in the database. Result will be
@@ -346,7 +346,7 @@ public abstract class DB {
 	 * 
 	 */
 	public abstract String BSMAQuery17(String userID, int returncount,
-			String datetime, String timespan);
+			long datetime, long timespan);
 
 	/**
 	 * Perform query18 for a set of records in the database. Result will be
@@ -365,7 +365,7 @@ public abstract class DB {
 	 * 
 	 */
 	public abstract String BSMAQuery18(String userID, int returncount,
-			String datetime, String timespan);
+			long datetime, long timespan);
 
 	/**
 	 * Perform query19 for a set of records in the database. Result will be
@@ -384,7 +384,7 @@ public abstract class DB {
 	 * 
 	 */
 	public abstract String BSMAQuery19(String userID, int returncount,
-			String datetime, String timespan);
+			long datetime, long timespan);
 
 	/**
 	 * compute the distribution of retweets over the time line

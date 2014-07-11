@@ -37,6 +37,7 @@ public class Query implements org.apache.thrift.TBase<Query, Query._Fields>, jav
 
   private static final org.apache.thrift.protocol.TField Q_ID_FIELD_DESC = new org.apache.thrift.protocol.TField("qID", org.apache.thrift.protocol.TType.BYTE, (short)1);
   private static final org.apache.thrift.protocol.TField FRAC_FIELD_DESC = new org.apache.thrift.protocol.TField("frac", org.apache.thrift.protocol.TType.DOUBLE, (short)2);
+  private static final org.apache.thrift.protocol.TField TYPE_FIELD_DESC = new org.apache.thrift.protocol.TField("type", org.apache.thrift.protocol.TType.STRING, (short)3);
 
   private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
   static {
@@ -46,11 +47,13 @@ public class Query implements org.apache.thrift.TBase<Query, Query._Fields>, jav
 
   public byte qID; // required
   public double frac; // required
+  public String type; // required
 
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements org.apache.thrift.TFieldIdEnum {
     Q_ID((short)1, "qID"),
-    FRAC((short)2, "frac");
+    FRAC((short)2, "frac"),
+    TYPE((short)3, "type");
 
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -69,6 +72,8 @@ public class Query implements org.apache.thrift.TBase<Query, Query._Fields>, jav
           return Q_ID;
         case 2: // FRAC
           return FRAC;
+        case 3: // TYPE
+          return TYPE;
         default:
           return null;
       }
@@ -119,6 +124,8 @@ public class Query implements org.apache.thrift.TBase<Query, Query._Fields>, jav
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.BYTE)));
     tmpMap.put(_Fields.FRAC, new org.apache.thrift.meta_data.FieldMetaData("frac", org.apache.thrift.TFieldRequirementType.DEFAULT, 
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.DOUBLE)));
+    tmpMap.put(_Fields.TYPE, new org.apache.thrift.meta_data.FieldMetaData("type", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
     metaDataMap = Collections.unmodifiableMap(tmpMap);
     org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(Query.class, metaDataMap);
   }
@@ -128,13 +135,15 @@ public class Query implements org.apache.thrift.TBase<Query, Query._Fields>, jav
 
   public Query(
     byte qID,
-    double frac)
+    double frac,
+    String type)
   {
     this();
     this.qID = qID;
     setQIDIsSet(true);
     this.frac = frac;
     setFracIsSet(true);
+    this.type = type;
   }
 
   /**
@@ -144,6 +153,9 @@ public class Query implements org.apache.thrift.TBase<Query, Query._Fields>, jav
     __isset_bitfield = other.__isset_bitfield;
     this.qID = other.qID;
     this.frac = other.frac;
+    if (other.isSetType()) {
+      this.type = other.type;
+    }
   }
 
   public Query deepCopy() {
@@ -156,6 +168,7 @@ public class Query implements org.apache.thrift.TBase<Query, Query._Fields>, jav
     this.qID = 0;
     setFracIsSet(false);
     this.frac = 0.0;
+    this.type = null;
   }
 
   public byte getQID() {
@@ -204,6 +217,30 @@ public class Query implements org.apache.thrift.TBase<Query, Query._Fields>, jav
     __isset_bitfield = EncodingUtils.setBit(__isset_bitfield, __FRAC_ISSET_ID, value);
   }
 
+  public String getType() {
+    return this.type;
+  }
+
+  public Query setType(String type) {
+    this.type = type;
+    return this;
+  }
+
+  public void unsetType() {
+    this.type = null;
+  }
+
+  /** Returns true if field type is set (has been assigned a value) and false otherwise */
+  public boolean isSetType() {
+    return this.type != null;
+  }
+
+  public void setTypeIsSet(boolean value) {
+    if (!value) {
+      this.type = null;
+    }
+  }
+
   public void setFieldValue(_Fields field, Object value) {
     switch (field) {
     case Q_ID:
@@ -222,6 +259,14 @@ public class Query implements org.apache.thrift.TBase<Query, Query._Fields>, jav
       }
       break;
 
+    case TYPE:
+      if (value == null) {
+        unsetType();
+      } else {
+        setType((String)value);
+      }
+      break;
+
     }
   }
 
@@ -232,6 +277,9 @@ public class Query implements org.apache.thrift.TBase<Query, Query._Fields>, jav
 
     case FRAC:
       return Double.valueOf(getFrac());
+
+    case TYPE:
+      return getType();
 
     }
     throw new IllegalStateException();
@@ -248,6 +296,8 @@ public class Query implements org.apache.thrift.TBase<Query, Query._Fields>, jav
       return isSetQID();
     case FRAC:
       return isSetFrac();
+    case TYPE:
+      return isSetType();
     }
     throw new IllegalStateException();
   }
@@ -280,6 +330,15 @@ public class Query implements org.apache.thrift.TBase<Query, Query._Fields>, jav
       if (!(this_present_frac && that_present_frac))
         return false;
       if (this.frac != that.frac)
+        return false;
+    }
+
+    boolean this_present_type = true && this.isSetType();
+    boolean that_present_type = true && that.isSetType();
+    if (this_present_type || that_present_type) {
+      if (!(this_present_type && that_present_type))
+        return false;
+      if (!this.type.equals(that.type))
         return false;
     }
 
@@ -319,6 +378,16 @@ public class Query implements org.apache.thrift.TBase<Query, Query._Fields>, jav
         return lastComparison;
       }
     }
+    lastComparison = Boolean.valueOf(isSetType()).compareTo(other.isSetType());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetType()) {
+      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.type, other.type);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
     return 0;
   }
 
@@ -345,6 +414,14 @@ public class Query implements org.apache.thrift.TBase<Query, Query._Fields>, jav
     if (!first) sb.append(", ");
     sb.append("frac:");
     sb.append(this.frac);
+    first = false;
+    if (!first) sb.append(", ");
+    sb.append("type:");
+    if (this.type == null) {
+      sb.append("null");
+    } else {
+      sb.append(this.type);
+    }
     first = false;
     sb.append(")");
     return sb.toString();
@@ -407,6 +484,14 @@ public class Query implements org.apache.thrift.TBase<Query, Query._Fields>, jav
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
             }
             break;
+          case 3: // TYPE
+            if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+              struct.type = iprot.readString();
+              struct.setTypeIsSet(true);
+            } else { 
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+            }
+            break;
           default:
             org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
         }
@@ -428,6 +513,11 @@ public class Query implements org.apache.thrift.TBase<Query, Query._Fields>, jav
       oprot.writeFieldBegin(FRAC_FIELD_DESC);
       oprot.writeDouble(struct.frac);
       oprot.writeFieldEnd();
+      if (struct.type != null) {
+        oprot.writeFieldBegin(TYPE_FIELD_DESC);
+        oprot.writeString(struct.type);
+        oprot.writeFieldEnd();
+      }
       oprot.writeFieldStop();
       oprot.writeStructEnd();
     }
@@ -452,19 +542,25 @@ public class Query implements org.apache.thrift.TBase<Query, Query._Fields>, jav
       if (struct.isSetFrac()) {
         optionals.set(1);
       }
-      oprot.writeBitSet(optionals, 2);
+      if (struct.isSetType()) {
+        optionals.set(2);
+      }
+      oprot.writeBitSet(optionals, 3);
       if (struct.isSetQID()) {
         oprot.writeByte(struct.qID);
       }
       if (struct.isSetFrac()) {
         oprot.writeDouble(struct.frac);
       }
+      if (struct.isSetType()) {
+        oprot.writeString(struct.type);
+      }
     }
 
     @Override
     public void read(org.apache.thrift.protocol.TProtocol prot, Query struct) throws org.apache.thrift.TException {
       TTupleProtocol iprot = (TTupleProtocol) prot;
-      BitSet incoming = iprot.readBitSet(2);
+      BitSet incoming = iprot.readBitSet(3);
       if (incoming.get(0)) {
         struct.qID = iprot.readByte();
         struct.setQIDIsSet(true);
@@ -472,6 +568,10 @@ public class Query implements org.apache.thrift.TBase<Query, Query._Fields>, jav
       if (incoming.get(1)) {
         struct.frac = iprot.readDouble();
         struct.setFracIsSet(true);
+      }
+      if (incoming.get(2)) {
+        struct.type = iprot.readString();
+        struct.setTypeIsSet(true);
       }
     }
   }

@@ -20,6 +20,7 @@ package edu.ecnu.imc.bsma;
 
 import java.util.Properties;
 
+import edu.ecnu.imc.bsma.dao.JobInfo;
 import edu.ecnu.imc.bsma.db.DB;
 
 /**
@@ -29,16 +30,14 @@ import edu.ecnu.imc.bsma.db.DB;
  * initialization should be done by init().
  * 
  */
-public abstract class Workload
-{
+public abstract class Workload {
 
 	/**
 	 * Initialize the scenario. Create any generators and other shared objects
 	 * here. Called once, in the main client thread, before any operations are
 	 * started.
 	 */
-	public void init(Properties p) throws WorkloadException
-	{
+	public void init(JobInfo jobInfo, Properties p) throws WorkloadException {
 	}
 
 	/**
@@ -59,8 +58,8 @@ public abstract class Workload
 	 *         traces from a file, return true when there are more to do, false
 	 *         when you are done.
 	 */
-	public Object initThread(Properties p, int mythreadid, int threadcount) throws WorkloadException
-	{
+	public Object initThread(Properties p, int mythreadid, int threadcount)
+			throws WorkloadException {
 		return null;
 	}
 
@@ -68,8 +67,7 @@ public abstract class Workload
 	 * Cleanup the scenario. Called once, in the main client thread, after all
 	 * operations have completed.
 	 */
-	public void cleanup() throws WorkloadException
-	{
+	public void cleanup() throws WorkloadException {
 	}
 
 	/**

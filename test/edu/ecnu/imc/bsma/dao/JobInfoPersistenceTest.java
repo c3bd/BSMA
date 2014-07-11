@@ -45,7 +45,7 @@ public class JobInfoPersistenceTest {
 		}
 
 		for (int i = 0; i < 4; i++) {
-			jobInfo.addToQueries(new Query((byte) i, 0.1));
+			jobInfo.addToQueries(new Query((byte) i, 0.1, "uniform"));
 		}
 
 		try {

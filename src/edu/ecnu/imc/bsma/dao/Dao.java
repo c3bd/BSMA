@@ -236,7 +236,8 @@ public class Dao {
 		Statement stmt = conn.createStatement();
 		ResultSet set = stmt.executeQuery(sql);
 		while (set.next()) {
-			ret.add(new Query(set.getByte(1), set.getDouble(2)));
+			ret.add(new Query(set.getByte(1), set.getDouble(2), set
+					.getString(3)));
 		}
 		jdbc.putCon(conn);
 		return ret;

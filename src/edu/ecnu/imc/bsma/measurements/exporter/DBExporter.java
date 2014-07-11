@@ -25,10 +25,12 @@ public class DBExporter implements Closeable {
 	RunningReport report = new RunningReport();
 	int idx = 0;
 	JobInfo job;
+	BasicJobInfo subJob;
 
 	public DBExporter(JobInfo job, Properties props) {
 		dao = new Dao(props);
 		this.job = job;
+		subJob = job.getCurJob();
 	}
 
 	public void newReport() {
@@ -39,9 +41,9 @@ public class DBExporter implements Closeable {
 		if (idx < report.qStatus.size() - 1) {
 			report.qStatus.subList(idx + 1, report.qStatus.size()).clear();
 		}
-		BasicJobInfo sub = job.getCurJob();
-		if (sub != null) {
-			report.subJobId = job.getCurJob().getSubJobID();
+
+		if (subJob != null) {
+			report.subJobId = subJob.getSubJobID();
 			dao.insertRunningResults(report);
 		}
 		idx = 0;
@@ -89,7 +91,7 @@ public class DBExporter implements Closeable {
 	 */
 	public void reportSubJobResult(int qID, List<Integer> latencyHist,
 			List<Float> latencyStats) throws SQLException {
-		BasicJobInfo curJob = job.getCurJob();
+		BasicJobInfo curJob = subJob;
 		QueryFinalReport report = jobReport.newQueryFinalReport();
 		report.subjobid = curJob.getSubJobID();
 		report.queryid = qID;
@@ -103,7 +105,7 @@ public class DBExporter implements Closeable {
 	}
 
 	public void reportSubJobResult(long time, int totalOps) throws SQLException {
-		jobReport.jobid = job.getCurJob().getSubJobID();
+		jobReport.jobid = subJob.getSubJobID();
 		jobReport.totaltime = time;
 		jobReport.ops = totalOps;
 	}

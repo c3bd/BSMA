@@ -26,7 +26,8 @@ namespace java rpc
 
 struct Query {
 	1: byte qID,
-	2: double frac
+	2: double frac,
+	3: string type
 }
 
 struct SubJob {

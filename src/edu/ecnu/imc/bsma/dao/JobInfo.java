@@ -69,7 +69,7 @@ public class JobInfo extends Job {
 		for (int i = 0; i < arr.length(); i++) {
 			JSONObject qObj = arr.getJSONObject(i);
 			queries.add(new Query((byte) qObj.getInt("type"), qObj
-					.getDouble("frac")));
+					.getDouble("frac"), qObj.getString("type")));
 		}
 
 		map = obj.getJSONObject("props");
@@ -271,5 +271,16 @@ public class JobInfo extends Job {
 
 	public void setMsg(String msg) {
 		this.msg = msg;
+	}
+
+	public Query getQuery(int i) {
+		Query ret = null;
+		for (Query query : queries) {
+			if (query.getQID() == i) {
+				ret = query;
+				break;
+			}
+		}
+		return ret;
 	}
 }

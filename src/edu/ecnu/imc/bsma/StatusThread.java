@@ -7,6 +7,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import edu.ecnu.imc.bsma.dao.BasicJobInfo;
 import edu.ecnu.imc.bsma.dao.JobInfo;
 import edu.ecnu.imc.bsma.measurements.Measurements;
 import edu.ecnu.imc.bsma.measurements.exporter.DBExporter;
@@ -25,6 +26,7 @@ class StatusThread extends Thread {
 	public static final Logger logger = LoggerFactory
 			.getLogger(StatusThread.class);
 	JobInfo _jobInfo;
+	BasicJobInfo _subJob;
 	Measurements _measurements;
 	DBExporter _exporter;
 	AtomicBoolean _state = null;
@@ -40,6 +42,7 @@ class StatusThread extends Thread {
 		this.coord = coord;
 		_state = coord.getWorkingState();
 		_jobInfo = coord.getJobInfo();
+		_subJob = _jobInfo.getCurJob();
 		_exporter = new DBExporter(_jobInfo, Scheduler.instance.getProps());
 		_measurements = measurements;
 	}
@@ -121,12 +124,12 @@ class StatusThread extends Thread {
 	private void exportMeasurements(long runtime) throws IOException,
 			SQLException {
 		try {
-			if (_jobInfo.getCurJob().getOpCount() >= 1) {
-				_exporter.reportSubJobResult(runtime / 1000, _jobInfo.getCurJob()
-						.getOpCount());
+			if (_subJob.getOpCount() >= 1) {
+				_exporter.reportSubJobResult(runtime / 1000,
+						_subJob.getOpCount());
 			}// modified out by WeiJinxian
 			_measurements.exportMeasurements(_exporter);
-
+			_exporter.reportFinalReport();
 		} finally {
 			if (_exporter != null) {
 				_exporter.close();

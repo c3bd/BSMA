@@ -32,6 +32,7 @@ import edu.ecnu.imc.bsma.dao.BasicJobInfo;
 import edu.ecnu.imc.bsma.dao.Dao;
 import edu.ecnu.imc.bsma.dao.JobInfo;
 import edu.ecnu.imc.bsma.db.DB;
+import edu.ecnu.imc.bsma.db.DBException;
 import edu.ecnu.imc.bsma.db.DBFactory;
 import edu.ecnu.imc.bsma.measurements.Measurements;
 
@@ -118,11 +119,10 @@ public class JobCordinator implements Runnable {
 				}
 				Properties props = constructProp();
 				try {
-					workload.init(props);
-				} catch (WorkloadException e) {
-					e.printStackTrace();
-					e.printStackTrace(System.out);
-					System.exit(0);
+					workload.init(jobInfo, props);
+				} catch (Exception e) {
+					error(e);
+					return;
 				}
 
 				warningthread.interrupt();
@@ -149,8 +149,11 @@ public class JobCordinator implements Runnable {
 					DB db = null;
 					try {
 						db = DBFactory.newDB(jobInfo, props, measurements);
+						db.init();
 					} catch (UnknownDBException ex) {
-
+						error(ex);
+					} catch (DBException e) {
+						error(e);
 					}
 
 					QueryExecThread t = new QueryExecThread(state, db,
@@ -174,9 +177,6 @@ public class JobCordinator implements Runnable {
 				try {
 					workload.cleanup();
 				} catch (WorkloadException e) {
-					e.printStackTrace();
-					e.printStackTrace(System.out);
-					System.exit(0);
 				}
 			}
 			if (!jobInfo.haveExited())
@@ -212,10 +212,8 @@ public class JobCordinator implements Runnable {
 	 * @param ex
 	 */
 	public void error(Exception ex) {
+		logger.error("job canceled due to " + ex.getMessage());
 		state.set(false);
-		// if wait for termination, may never stop
-		// waitForFinish();
-
 		exitCode = ex.getMessage();
 		try {
 			jobInfo.cancel(ex.getMessage());

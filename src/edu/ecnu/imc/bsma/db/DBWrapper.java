@@ -112,8 +112,8 @@ public class DBWrapper extends DB {
 		return result;
 	}
 
-	public String BSMAQuery6(String userID, int returncount, String datetime,
-			String timespan) {
+	public String BSMAQuery6(String userID, int returncount, long datetime,
+			long timespan) {
 		long st = System.currentTimeMillis();
 		String result = _db.BSMAQuery6(userID, returncount, datetime, timespan);
 		long en = System.currentTimeMillis();
@@ -122,7 +122,7 @@ public class DBWrapper extends DB {
 		return result;
 	}
 
-	public String BSMAQuery7(int returncount, String datetime, String timespan) {
+	public String BSMAQuery7(int returncount, long datetime, long timespan) {
 		long st = System.currentTimeMillis();
 		String result = _db.BSMAQuery7(returncount, datetime, timespan);
 		long en = System.currentTimeMillis();
@@ -141,7 +141,7 @@ public class DBWrapper extends DB {
 	}
 
 	public String BSMAQuery9(String userID, String tag, int returncount,
-			String datetime, String timespan) {
+			long datetime, long timespan) {
 		long st = System.currentTimeMillis();
 		String result = _db.BSMAQuery9(userID, tag, returncount, datetime,
 				timespan);
@@ -151,7 +151,7 @@ public class DBWrapper extends DB {
 		return result;
 	}
 
-	public String BSMAQuery10(int returncount, String datetime, String timespan) {
+	public String BSMAQuery10(int returncount, long datetime, long timespan) {
 		long st = System.currentTimeMillis();
 		String result = _db.BSMAQuery10(returncount, datetime, timespan);
 		long en = System.currentTimeMillis();
@@ -160,8 +160,8 @@ public class DBWrapper extends DB {
 		return result;
 	}
 
-	public String BSMAQuery11(String userID, int returncount, String datetime,
-			String timespan) {
+	public String BSMAQuery11(String userID, int returncount, long datetime,
+			long timespan) {
 		long st = System.currentTimeMillis();
 		String result = _db
 				.BSMAQuery11(userID, returncount, datetime, timespan);
@@ -171,8 +171,8 @@ public class DBWrapper extends DB {
 		return result;
 	}
 
-	public String BSMAQuery12(String userID, int returncount, String datetime,
-			String timespan) {
+	public String BSMAQuery12(String userID, int returncount, long datetime,
+			long timespan) {
 		long st = System.currentTimeMillis();
 		String result = _db
 				.BSMAQuery12(userID, returncount, datetime, timespan);
@@ -182,8 +182,8 @@ public class DBWrapper extends DB {
 		return result;
 	}
 
-	public String BSMAQuery13(String userID, int returncount, String datetime,
-			String timespan) {
+	public String BSMAQuery13(String userID, int returncount, long datetime,
+			long timespan) {
 		long st = System.currentTimeMillis();
 		String result = _db
 				.BSMAQuery13(userID, returncount, datetime, timespan);
@@ -193,7 +193,7 @@ public class DBWrapper extends DB {
 		return result;
 	}
 
-	public String BSMAQuery14(int returncount, String datetime, String timespan) {
+	public String BSMAQuery14(int returncount, long datetime, long timespan) {
 		long st = System.currentTimeMillis();
 		String result = _db.BSMAQuery14(returncount, datetime, timespan);
 		long en = System.currentTimeMillis();
@@ -202,8 +202,8 @@ public class DBWrapper extends DB {
 		return result;
 	}
 
-	public String BSMAQuery15(String tag, int returncount, String datetime,
-			String timespan) {
+	public String BSMAQuery15(String tag, int returncount, long datetime,
+			long timespan) {
 		long st = System.currentTimeMillis();
 		String result = _db.BSMAQuery15(tag, returncount, datetime, timespan);
 		long en = System.currentTimeMillis();
@@ -212,8 +212,8 @@ public class DBWrapper extends DB {
 		return result;
 	}
 
-	public String BSMAQuery16(String userID, int returncount, String datetime,
-			String timespan) {
+	public String BSMAQuery16(String userID, int returncount, long datetime,
+			long timespan) {
 		long st = System.currentTimeMillis();
 		String result = _db
 				.BSMAQuery16(userID, returncount, datetime, timespan);
@@ -223,8 +223,8 @@ public class DBWrapper extends DB {
 		return result;
 	}
 
-	public String BSMAQuery17(String userID, int returncount, String datetime,
-			String timespan) {
+	public String BSMAQuery17(String userID, int returncount, long datetime,
+			long timespan) {
 		long st = System.currentTimeMillis();
 		String result = _db
 				.BSMAQuery17(userID, returncount, datetime, timespan);
@@ -234,8 +234,8 @@ public class DBWrapper extends DB {
 		return result;
 	}
 
-	public String BSMAQuery18(String userID, int returncount, String datetime,
-			String timespan) {
+	public String BSMAQuery18(String userID, int returncount, long datetime,
+			long timespan) {
 		long st = System.currentTimeMillis();
 		String result = _db
 				.BSMAQuery18(userID, returncount, datetime, timespan);
@@ -245,8 +245,8 @@ public class DBWrapper extends DB {
 		return result;
 	}
 
-	public String BSMAQuery19(String userID, int returncount, String datetime,
-			String timespan) {
+	public String BSMAQuery19(String userID, int returncount, long datetime,
+			long timespan) {
 		long st = System.currentTimeMillis();
 		String result = _db
 				.BSMAQuery19(userID, returncount, datetime, timespan);
