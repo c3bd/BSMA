@@ -8,6 +8,7 @@ import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransport;
 
+import edu.ecnu.imc.bsma.dao.JobInfo;
 import rpc.BSMAService;
 import rpc.Job;
 import rpc.Query;
@@ -24,9 +25,9 @@ public class BSMAClient {
 			TProtocol protocol = new TBinaryProtocol(transport);
 			BSMAService.Client client = new BSMAService.Client(protocol);
 			Job job = new Job();
-			job.setDbImpl((byte) 0);
+			job.setDbImpl(JobInfo.TEST_DB);
 			Map<String, String> props = new HashMap<String, String>();
-			props.put("hserver", "jdbc:hive://10.11.1.190:10000/bsma");
+			// props.put("hserver", "jdbc:hive://10.11.1.190:10000/bsma");
 			job.setProps(props);
 			job.setJobID(-1);
 			job.setName("test");

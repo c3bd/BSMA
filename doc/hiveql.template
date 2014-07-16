@@ -1,0 +1,346 @@
+Q1:
+SELECT f2.uid, COUNT(f2.followeeID) num
+FROM
+(SELECT a.followeeID AS uid
+FROM friendList a JOIN friendList b
+ON a.followeeID = b.uid
+WHERE a.uid = b.followeeID AND a.uid = "%s")  bif_a 
+JOIN friendList f2 ON (f2.uid = f.bif_a)
+JOIN friendList f1 ON (f1.followeeID = f2.uid) 
+LEFT OUTER JOIN (SELECT fid
+FROM friendList 
+WHERE uid = "%1")  f_a 
+ON (f2.followeeID = f_a.fid)
+WHERE
+f1.uid = f2.followeeID AND
+f_a.fid is null
+GROUP BY f2.uid
+ORDER BY num DESC ;
+
+
+Q2:
+SELECT  followers.uid, count(followers.uid) as num FROM
+(SELECT followeeID FROM friendList
+WHERE uid = "%s")  friends 
+LEFT OUTER JOIN 
+(SELECT f1.uid, f1.followeeID
+FROM 
+(SELECT followeeID
+FROM friendList
+WHERE uid = "%s") f2 JOIN friendList f1 ON (f1.uid = f2.followeeID )
+WHERE f1.uid != "%1") followers 
+ON (followers.uid = friends.followeeID )
+where friends.followeeID is null GROUP BY followers.uid ORDER BY num DESC LIMIT 10;
+
+Q3:
+SELECT f_2step.followeeID
+FROM
+(SELECT f.followeeID
+FROM friendList LEFT OUTER JOIN
+(SELECT followeeID
+FROM friendlist
+WHERE uid = "%s") friends 
+ON (friendlist.uid = friends.followeeID)
+WHERE  friendlist.followeeID <> "%s" ) f_2step 
+LEFTER OUTER JOIN
+(SELECT followeeID
+FROM friendList
+WHERE uid = "%s") friends ON (f_2step.followeeID = friends.followeeID)
+WHERE
+friends.followeeID is null
+GROUP BY f_2step.followeeID
+ORDER BY COUNT(f_2step.uid)DESC
+LIMIT 10;
+
+
+Q4:
+SELECT DISTINCT f1.followeeID
+FROM
+(SELECT followeeID FROM friendList
+WHERE uid = "A")  f1 JOIN
+(SELECT followeeID
+FROM friendList
+WHERE uid = "B")  f2
+ON(f1.followeeID = f2.followeeID);
+
+
+Q5: 
+SELECT distinct uid
+FROM (SELECT uid
+FROM friendList
+WHERE followeeID = "B") fan_b 
+JOIN 
+(SELECT followeeID
+FROM friendList AS a
+WHERE a.uid = "A") friends_a ON (fan_b.uid = friends_a.followeeID)
+
+Q6:
+SELECT microblog.uid
+FROM microblog JOIN mention ON(microblog.mid = mention.mid)
+JOIN (SELECT DISTINCT mention.uid AS uid
+FROM microblog JOIN mention ON (microblog.mid = mention.mid)
+WHERE  microblog.uid = "A") AS a_mension 
+ON (mention.uid = a_mension.uid)
+WHERE microblog.uid<> "A" AND
+microblog.time >= $startime$
+AND microblog.time <= $startime$+$inv$
+GROUP BY microblog.uid
+ORDER BY COUNT(mention.uid) DESC
+LIMIT 10;
+
+Q7: 
+SELECT mention.uid
+FROM microblog JOIN mention ON (microblog.mid = mention.mid)
+microblog.time >= $startime$
+AND microblog.time <= $startime$+$inv$
+GROUP BY mention.uid
+ORDER BY COUNT(*)DESC
+LIMIT 10;
+
+
+Q8:
+SELECT mid
+FROM microblog LEFT OUTER JOIN
+((SELECT followeeID
+FROM friendList
+WHERE uid = "A") UNION
+(SELECT b.followeeID as followeeID
+FROM friendList a join friendList b
+ON (a.followeeID = b.uid)
+WHERE a.uid = "A" )) friends
+ON (microblog.uid in friends.followeeID)
+WHERE friends.followeeID is not null
+ORDER BY microblog.time DESC
+LIMIT 10;
+
+Q9:
+SELECT microblog.uid
+FROM microblog JOIN rel_event_microblog ON (microblog.mid = rel_event_microblog.mid) 
+LEFT OUTER JOIN ((SELECT followeeID
+FROM friendList
+WHERE uid = "A") UNION
+(SELECT b.followeeID as followeeID
+FROM friendList a join friendList b
+WHERE a.uid = "A" a.followeeID = b.uid)) friends on (microblog.uid= friends.followeeID)
+WHERE
+rel_event_microblog.eventID = "?" AND 
+friends.followeeID is not null AND 
+microblog.time >= $startime$
+AND microblog.time <= $startime$+$inv$ GROUP BY microblog.uid
+ORDER BY COUNT(*) DESC
+LIMIT 10;
+
+Q10:
+SELECT x.reuid,COUNT(*) 
+FROM microblog JOIN
+(SELECT retweet.mid as mid, microblog.uid as reuid
+FROM microblog JOIN retweet ON (microblog.mid = retweet.remid)) x
+ON (microblog.mid = x.mid)
+WHERE
+microblog.time >= $startime$
+AND microblog.time <= $startime$+$inv$ 
+GROUP BY x.reuid
+ORDER BY num DESC
+LIMIT 10;
+
+Q11:
+SELECT microblog.uid, COUNT(*) num
+FROM microblog JOIN
+(SELECT retweet.mid as mid,microblog.uid as reuid
+FROM microblog JOIN retweet
+ON (microblog.mid = retweet.remid) WHERE microblog.uid = "A") x 
+ON (microblog.mid = x.mid)
+WHERE
+microblog.time >= $startime$
+AND microblog.time <= $startime$+$inv$ 
+GROUP BY microblog.uid
+ORDER BY num DESC
+LIMIT 10;
+
+Q12:
+SELECT x.remid, COUNT(*) num
+FROM microblog JOIN
+	(SELECT retweet.mid AS mid,retweet.remid AS remid
+	FROM microblog JOIN retweet ON microblog.mid = retweet.remid) x 
+		ON (microblog.mid = x.mid )
+		JOIN ((SELECT followeeID FROM friendList
+				WHERE uid = "A") UNION
+			(SELECT b.followeeID as followeeID
+				FROM friendList a join friendList b
+				WHERE a.uid = "A" a.followeeID = b.uid)) friends
+		ON  (microblog.uid = friends.followeeID)
+JOIN 
+WHERE
+microblog.time >= $startime$
+AND microblog.time <= $startime$+$inv$ 
+GROUP BY x.remid
+ORDER BY  COUNT(*) DESC
+LIMIT 10;
+
+Q13:
+SELECT microblog.uid
+FROM microblog JOIN rel_event_microblog 
+	ON (microblog.mid = rel_event_microblog.mid)
+	JOIN (SELECT DISTINCT eventID
+		FROM rel_event_microblog JOIN microblog 
+			ON (microblog.mid = rel_event_microblog.mid)
+		WHERE microblog.uid = "A") atags 
+	ON (rel_event_microblog.eventID = atags.eventID)
+LEFT OUTER JOIN (SELECT followeeID
+FROM friendList
+WHERE uid = "A") afriends ON (microblog.uid = afriends.uid)
+WHERE
+microblog.uid<> "A" AND
+afriends.uid is null AND
+microblog.time >= $startime$
+AND microblog.time <= $startime$+$inv$ 
+GROUP BY microblog.uid
+ORDER BY COUNT(rel_event_microblog.id)DESC
+LIMIT 10;
+
+Q14:
+SELECT event.tag,COUNT(*) num
+FROM microblog JOIN rel_event_microblog
+ON (microblog.mid = rel_event_microblog.mid)
+JOIN event ON (rel_event_microblog.eventID = event.eventID)
+WHERE 
+microblog.time >= $startime$
+AND microblog.time <= $startime$+$inv$ 
+GROUP BY event.tag
+ORDER BY num DESC
+LIMIT 10;
+
+Q15:
+SELECT microblog.uid
+FROM microblog JOIN rel_event_microblog
+ON (microblog.mid = rel_event_microblog.mid)
+JOIN event ON (rel_event_microblog.eventID = event.eventID)
+WHERE
+event.tag="?" AND
+microblog.time >= $startime$
+AND microblog.time <= $startime$+$inv$ 
+GROUP BY microblog.uid
+ORDER BY COUNT(*)DESC
+LIMIT 10;
+
+Q16:
+SELECT x.reuid,COUNT(*) num
+FROM microblog JOIN
+(SELECT retweet.mid as mid,microblog.uid as reuid
+FROM microblog JOIN retweet
+ON(microblog.mid = retweet.remid)) x
+ON ( microblog.mid = x.mid) LEFT OUTER JOIN
+(SELECT followeeID
+FROM friendList
+WHERE uid = "A") afriends ON (microblog.uid = afriends.followeeID)
+WHERE
+afriends.followeeID is not null
+ AND
+microblog.time >= $startime$
+AND microblog.time <= $startime$+$inv$ 
+GROUP BY x.reuid
+ORDER BY num DESC
+LIMIT 10;
+
+Q17:
+SELECT mention.uid,COUNT(*) num
+FROM microblog JOIN mention ON (microblog.mid = mention.mid)
+LEFT OUTER JOIN
+(SELECT followeeID
+FROM friendList
+WHERE uid = "A") afriends ON (mention.uid = afriends.followeeID)
+WHERE 
+microblog.time >= $startime$
+AND microblog.time <= $startime$+$inv$ 
+GROUP BY mention.uid
+ORDER BY num DESC
+LIMIT 10;
+
+Q18:
+SELECT mention.uid,COUNT(*) num
+FROM microblog JOIN mention ON (microblog.mid = mention.mid)
+JOIN (SELECT uid
+FROM friendList
+WHERE followeeID = "A") afans ON (microblog.uid = afans.uid)
+WHERE
+mention.uid="A" AND
+microblog.time >= $startime$
+AND microblog.time <= $startime$+$inv$ 
+GROUP BY mention.uid
+ORDER BY num DESC
+LIMIT 10;
+
+Q19:
+SELECT event.tag,COUNT(*) num
+FROM microblog JOIN event ON ( microblog.mid = event.mid)
+LEFT OUTER JOIN ((SELECT followeeID
+FROM friendList
+WHERE uid = "A") UNION
+(SELECT b.followeeID as followeeID
+FROM friendList a join friendList b
+WHERE a.uid = "A" a.followeeID = b.uid)) friends ON (microblog.uid = friends.followeeID)
+WHERE 
+microblog.uid<> "A" AND
+friends.followeeID is not null AND
+microblog.time >= $startime$
+AND microblog.time <= $startime$+$inv$ 
+GROUP BY event.tag
+ORDER BY num DESC
+LIMIT 10;
+
+Q20: compute the distribution of retweets over the time line
+SELECT time, count(*) RTTweet FROM
+Microblog JOIN Rel_Event_Microblog ON 
+(Microblog. mid = Rel_Event_Microblog. mid) 
+JOIN Retweet ON (Microblog. mid = Retweet. mid)
+where
+Rel_Event_Microblog.eventID = $eventID$
+and Retweet.reMid != -1 group by time
+
+Q21:事件的mood分布
+SELECT mood, time, count(*) RTTweet FROM
+Microblog JOIN Rel_Event_Microblog ON 
+(Microblog. mid = Rel_Event_Microblog. mid) 
+JOIN Rel_Mood_Microblog 
+ON (Mood. mid = Rel_Mood_Microblog. mid) 
+JOIN Mood 
+ON (Rel_Mood_Microblog.moodID = Mood.moodID)
+where 
+Rel_Event_Microblog.eventID = $eventID$
+and Retweet.reMid != -1 group by mood,time
+
+Q22:
+WITH RECURSIVE rtTree(id, rtMid) As(
+	Select id , reMid 
+	From microblog
+	Where id = $id$
+	UNION ALL
+	Select id, rtMid
+	From Retweet
+	JOIN rtTree on Retweet.rtMid = rtTree.id
+)
+Select id, rtMid, time from rtTree, Tweet where rtTree.rtMid = Tweet.mid. 
+
+
+Q23:事件的城市讨论数
+select city,gender, count(*) as RTTweet from
+Microblog JOIN Rel_Event_Microblog 
+ON (Microblog.mid = Rel_Event_Microblog.mid)
+JOIN Location ON (Microblog.locationId= Location.locationId)
+JOIN User (Microblog.uid = User.uid)
+JOIN Event on (Rel_Event_Microblog.eventID =event.eventID)
+where 
+event.tag = $tag$ 
+group by city, gender.
+
+
+Q24:
+select friendsNumber, count(*) as userNumber from
+Microblog JOIN Rel_Event_Microblog 
+ON (Microblog.mid = TweetEventMapping. mid)
+JOIN User (Microblog.uid = User.uid)
+JOIN Event on (Rel_Event_Microblog.eventID =event.eventID)
+where 
+event.tag = $tag$ 
+group by friendsNumber
+

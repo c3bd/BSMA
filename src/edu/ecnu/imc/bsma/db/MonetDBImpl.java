@@ -1,31 +1,26 @@
 package edu.ecnu.imc.bsma.db;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Properties;
 
-public class HiveDBImpl extends DB {
+public class MonetDBImpl extends DB {
 	Connection conn = null;
 
-	public HiveDBImpl() {
+	public MonetDBImpl() {
 
 	}
 
 	@Override
 	public void init() throws DBException {
 		try {
-			Class.forName("org.apache.hadoop.hive.jdbc.HiveDriver")
-					.newInstance();
+			Class.forName("nl.cwi.monetdb.jdbc.MonetDriver").newInstance();
 			conn = DriverManager.getConnection(_p.getProperty("hserver",
-					"jdbc:hive://10.11.1.190:10000/bsma"), _p.getProperty(
-					"huser", ""), _p.getProperty("hpasswd", ""));
+					"jdbc:monetdb://10.11.1.190/bsma"), _p.getProperty("huser",
+					"monetdb"), _p.getProperty("hpasswd", "monetdb"));
 		} catch (Exception e) {
 			throw new DBException(e);
 		}
@@ -33,10 +28,10 @@ public class HiveDBImpl extends DB {
 
 	@Override
 	public String BSMAQuery1(String userID, int returncount) {
+		String sql = String.format(SQLTemplate.QUERY1, userID);
 		try {
 			Statement stmt = conn.createStatement();
-			ResultSet result = stmt.executeQuery(String.format(
-					HiveQLTemplate.QUERY1, userID));
+			ResultSet result = stmt.executeQuery(sql);
 			StringBuffer buf = new StringBuffer();
 			while (result.next()) {
 				buf.append(result.getString(1));
@@ -46,7 +41,8 @@ public class HiveDBImpl extends DB {
 			}
 			return buf.toString();
 		} catch (SQLException e) {
-
+			System.err.println(sql);
+			e.printStackTrace();
 		}
 		return "";
 	}
@@ -492,33 +488,10 @@ public class HiveDBImpl extends DB {
 		return "";
 	}
 
-	public static void main(String[] args) throws IOException {
-		transform();
+	public static void main(String[] args) throws DBException {
+		MonetDBImpl db = new MonetDBImpl();
+		db.setProperties(new Properties());
+		db.init();
+		System.out.println(db.BSMAQuery1("", 1));
 	}
-
-	public static void transform() throws IOException {
-		BufferedReader br = new BufferedReader(new FileReader(
-				"./doc/hiveql.template"));
-		String line = "";
-		int i = 1;
-		StringBuffer buf = new StringBuffer();
-		Pattern pattern = Pattern.compile("Q[0-9]+");
-		while ((line = br.readLine()) != null) {
-			Matcher matcher = pattern.matcher(line);
-			if (matcher.find()) {
-				if (!buf.toString().isEmpty()) {
-					System.out.println("Query" + i);
-					i++;
-					System.out.println(buf.toString().trim());
-					buf = new StringBuffer();
-				}
-			} else {
-				buf.append(line.trim().replace("\"", "\\\""));
-				buf.append(" ");
-			}
-		}
-		System.out.println(buf.toString());
-		br.close();
-	}
-
 }

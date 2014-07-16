@@ -1,5 +1,8 @@
 package edu.ecnu.imc.bsma.dao;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -11,11 +14,11 @@ import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import edu.ecnu.imc.bsma.util.JSONUtil;
 import rpc.Query;
 import rpc.SubJob;
 import weibo4j.org.json.JSONException;
 import weibo4j.org.json.JSONObject;
+import edu.ecnu.imc.bsma.util.JSONUtil;
 
 public class Dao {
 	public static Logger logger = LoggerFactory.getLogger(Dao.class);
@@ -33,10 +36,60 @@ public class Dao {
 		}
 	}
 
+	private static final String DB_EXIST = "select `TABLE_NAME` from `INFORMATION_SCHEMA`.`TABLES` where `TABLE_SCHEMA`='bsma';";
+
+	/**
+	 * create the database and tables
+	 * 
+	 * @throws SQLException
+	 */
+	public void initDB() throws SQLException {
+		if (!dbExists()) {
+			Connection conn = jdbc.getCon();
+			Statement stmt = conn.createStatement();
+			StringBuffer buf = new StringBuffer();
+
+			try {
+				BufferedReader reader = new BufferedReader(new FileReader(
+						"./conf/initdb.sql"));
+
+				String line = null;
+				while (null != (line = reader.readLine())) {
+					if (!line.startsWith("/*"))
+						buf.append(line);
+				}
+			} catch (IOException e) {
+				throw new RuntimeException(
+						"couldn't find database initialize file");
+			}
+			String[] sqls = buf.toString().split(";");
+			for (String sql : sqls) {
+				int ret = stmt.executeUpdate(sql);
+				if (ret < 0) {
+					logger.error("report database initialization fails");
+					throw new RuntimeException(
+							"report database initialization fails");
+				}
+			}
+		}
+		logger.info("report database initialized");
+	}
+
+	private boolean dbExists() throws SQLException {
+		boolean ret = true;
+		Connection conn = jdbc.getCon();
+		Statement stmt = conn.createStatement();
+		ResultSet set = stmt.executeQuery(DB_EXIST);
+		if (!set.next()) {
+			ret = false;
+		}
+		return ret;
+	}
+
 	public void insertSubJobFinalResult(SubJobFinalReport report)
 			throws SQLException {
 		String sql = String.format(
-				"insert into SubJobFinalReport(subjobid,totalops,totaltime) "
+				"insert into bsma.SubJobFinalReport(subjobid,totalops,totaltime) "
 						+ "values(%d,%d,%d);", report.jobid, report.ops,
 				report.totaltime);
 		Connection conn = jdbc.getCon();
@@ -58,7 +111,7 @@ public class Dao {
 			return ret;
 
 		String sql = String.format(
-				"select * from SubJobFinalReport where subjobid = %d;",
+				"select * from bsma.SubJobFinalReport where subjobid = %d;",
 				subjobid);
 		Connection conn = jdbc.getCon();
 		Statement stmt = conn.createStatement();
@@ -73,13 +126,13 @@ public class Dao {
 
 	public void insertQueryFinalResult(Statement stmt, QueryFinalReport report)
 			throws SQLException {
-		String sql = String.format(
-				"insert into QueryFinalReport(subjobid,queryid,latency50, latency75,latency95,"
+		String sql = String
+				.format("insert into bsma.QueryFinalReport(subjobid,queryid,latency50, latency75,latency95,"
 						+ "latency99,avglatency,minlatency,maxlatency) "
 						+ "values(%d,%d,%d,%d,%d,%d,%f,%f,%f);",
-				report.subjobid, report.queryid, report.latency50,
-				report.latency75, report.latency95, report.latency99,
-				report.avglatency, report.minlatency, report.maxlatency);
+						report.subjobid, report.queryid, report.latency50,
+						report.latency75, report.latency95, report.latency99,
+						report.avglatency, report.minlatency, report.maxlatency);
 		stmt.addBatch(sql);
 	}
 
@@ -89,7 +142,7 @@ public class Dao {
 
 		String sql = String
 				.format("select subjobid,queryid,latency50, latency75,latency95,"
-						+ "latency99,avglatency,minlatency,maxlatency from QueryFinalReport where subjobid = %d",
+						+ "latency99,avglatency,minlatency,maxlatency from bsma.QueryFinalReport where subjobid = %d",
 						subJobID);
 		Connection conn = jdbc.getCon();
 		Statement stmt = conn.createStatement();
@@ -113,7 +166,7 @@ public class Dao {
 
 	public void insertRunningResults(RunningReport report) throws SQLException {
 		String sql = String.format(
-				"insert into RunningReport(subjobid,time,totalops,throughput)"
+				"insert into bsma.RunningReport(subjobid,time,totalops,throughput)"
 						+ "values(%d,%d,%d,%f);", report.subJobId, report.time,
 				report.totalOps, report.curThroughput);
 		Connection conn = jdbc.getCon();
@@ -121,7 +174,7 @@ public class Dao {
 		stmt.addBatch(sql);
 		for (QueryRunningReport qReport : report.qStatus) {
 			sql = String.format(
-					"insert into QueryRunningReport(subjobid,queryid,time,avglatency)"
+					"insert into bsma.QueryRunningReport(subjobid,queryid,time,avglatency)"
 							+ "values(%d,%d,%d,%f);", report.subJobId,
 					qReport.queryId, report.time, qReport.avgLatency);
 			stmt.addBatch(sql);
@@ -130,7 +183,7 @@ public class Dao {
 		jdbc.putCon(conn);
 	}
 
-	private static final String MAXJOBID_SQL = "select max(jobId) from JobInfo;";
+	private static final String MAXJOBID_SQL = "select max(jobId) from bsma.JobInfo;";
 
 	public int getMaxJobID() throws SQLException {
 		Connection conn = jdbc.getCon();
@@ -144,7 +197,7 @@ public class Dao {
 		return ret;
 	}
 
-	private static final String MAXSUBJOBID_SQL = "select max(subjobid) from Rel_Job_SubJob;";
+	private static final String MAXSUBJOBID_SQL = "select max(subjobid) from bsma.Rel_Job_SubJob;";
 
 	public int getMaxSubJobID() throws SQLException {
 		Connection conn = jdbc.getCon();
@@ -168,7 +221,7 @@ public class Dao {
 		String sql;
 		try {
 			sql = String
-					.format("insert into JobInfo(jobid, name,dbImpl,custDBImpl, props, description, jars, state, msg)"
+					.format("insert into bsma.JobInfo(jobid, name,dbImpl,custDBImpl, props, description, jars, state, msg)"
 							+ "values(%d,'%s',%d,'%s','%s', '%s','%s', %d,'%s');",
 							jobInfo.getJobID(), jobInfo.getName(),
 							jobInfo.getDbImpl(), jobInfo.getCustDbImpl(),
@@ -181,7 +234,7 @@ public class Dao {
 			stmt.addBatch(sql);
 			for (Query query : jobInfo.getQueries()) {
 				sql = String.format(
-						"insert into Rel_Job_Query(jobID,queryID,fraction)"
+						"insert into bsma.Rel_Job_Query(jobID,queryID,fraction)"
 								+ "values(%d,%d,%f);", jobInfo.getJobID(),
 						query.getQID(), query.getFrac());
 				stmt.addBatch(sql);
@@ -189,7 +242,7 @@ public class Dao {
 
 			for (SubJob subJob : jobInfo.getSubJobs()) {
 				sql = String.format(
-						"insert into Rel_Job_SubJob(jobID,subJobID,opCount, threadNum, state)"
+						"insert into bsma.Rel_Job_SubJob(jobID,subJobID,opCount, threadNum, state)"
 								+ "values(%d,%d,%d,%d,%d);",
 						jobInfo.getJobID(), subJob.getSubJobID(),
 						subJob.getOpCount(), subJob.getThreadNum(),
@@ -205,8 +258,8 @@ public class Dao {
 	}
 
 	public JobInfo getJobInfo(int jobId) throws SQLException {
-		String sql = String.format("select * from JobInfo where jobid = %d;",
-				jobId);
+		String sql = String.format(
+				"select * from bsma.JobInfo where jobid = %d;", jobId);
 		Connection conn = jdbc.getCon();
 		Statement stmt = conn.createStatement();
 		ResultSet set = stmt.executeQuery(sql);
@@ -231,7 +284,7 @@ public class Dao {
 	public List<Query> getQueries(int jobId) throws SQLException {
 		List<Query> ret = new ArrayList<Query>();
 		String sql = String.format(
-				"select * from Rel_Job_Query where jobid = %d;", jobId);
+				"select * from bsma.Rel_Job_Query where jobid = %d;", jobId);
 		Connection conn = jdbc.getCon();
 		Statement stmt = conn.createStatement();
 		ResultSet set = stmt.executeQuery(sql);
@@ -253,7 +306,7 @@ public class Dao {
 	public List<BasicJobInfo> getSubJobs(int jobId) throws SQLException {
 		List<BasicJobInfo> ret = new ArrayList<BasicJobInfo>();
 		String sql = String.format(
-				"select * from Rel_Job_SubJob where jobid = %d;", jobId);
+				"select * from bsma.Rel_Job_SubJob where jobid = %d;", jobId);
 		Connection conn = jdbc.getCon();
 		Statement stmt = conn.createStatement();
 		ResultSet set = stmt.executeQuery(sql);
@@ -277,7 +330,7 @@ public class Dao {
 	 */
 	public void updateSubJobStatus(BasicJobInfo job) throws SQLException {
 		String sql = String
-				.format("update Rel_Job_SubJob set state=%d where jobID = %d and subJobID = %d",
+				.format("update bsma.Rel_Job_SubJob set state=%d where jobID = %d and subJobID = %d",
 						job.getState(), job.getJobInfo().getJobID(),
 						job.getSubJobID());
 		Connection conn = jdbc.getCon();
@@ -287,18 +340,20 @@ public class Dao {
 	}
 
 	public void updateJobState(JobInfo jobInfo) throws SQLException {
-		String sql = String.format(
-				"update JobInfo set state=%d, msg = \"%s\"where jobID = %d;",
-				jobInfo.getState(), jobInfo.getMsg(), jobInfo.getJobID());
+		String sql = String
+				.format("update bsma.JobInfo set state=%d, msg = \"%s\"where jobID = %d;",
+						jobInfo.getState(), jobInfo.getMsg(),
+						jobInfo.getJobID());
 		Connection conn = jdbc.getCon();
 		Statement stmt = conn.createStatement();
 		stmt.executeUpdate(sql);
 		jdbc.putCon(conn);
 	}
 
-	public static final String[] tables = new String[] { "JobInfo",
-			"Rel_Job_Query", "Rel_Job_SubJob", "SubJobFinalReport",
-			"QueryFinalReport", "RunningReport", "QueryRunningReport" };
+	public static final String[] tables = new String[] { "bsma.JobInfo",
+			"bsma.Rel_Job_Query", "bsma.Rel_Job_SubJob",
+			"bsma.SubJobFinalReport", "bsma.QueryFinalReport",
+			"bsma.RunningReport", "bsma.QueryRunningReport" };
 
 	public void clear() throws SQLException {
 		Connection conn = jdbc.getCon();

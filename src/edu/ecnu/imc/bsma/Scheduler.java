@@ -65,6 +65,7 @@ public class Scheduler implements BSMAService.Iface {
 		// 初始化jobID,subJobID
 		dao = new Dao(Scheduler.instance.getProps());
 		try {
+			dao.initDB();
 			jobIDGen.set(dao.getMaxJobID());
 			subJobIDGen.set(dao.getMaxSubJobID());
 		} catch (SQLException e) {
@@ -96,6 +97,7 @@ public class Scheduler implements BSMAService.Iface {
 
 	/**
 	 * add the job to the schedule queue
+	 * 
 	 * @param job
 	 * @throws SQLException
 	 */

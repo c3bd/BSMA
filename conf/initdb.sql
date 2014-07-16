@@ -1,10 +1,5 @@
 CREATE DATABASE  IF NOT EXISTS `bsma` /*!40100 DEFAULT CHARACTER SET utf8 */;
 USE `bsma`;
--- MySQL dump 10.13  Distrib 5.5.37, for debian-linux-gnu (x86_64)
---
--- Host: localhost    Database: bsma
--- ------------------------------------------------------
--- Server version	5.5.37-0ubuntu0.13.10.1
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -17,9 +12,6 @@ USE `bsma`;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
---
--- Table structure for table `JobInfo`
---
 
 DROP TABLE IF EXISTS `JobInfo`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -32,19 +24,18 @@ CREATE TABLE `JobInfo` (
   `props` varchar(500) DEFAULT NULL,
   `description` varchar(500) DEFAULT NULL,
   `state` varchar(45) DEFAULT NULL,
+  `msg` varchar(100) DEFAULT NULL,
+  `jars` varchar(1000) DEFAULT NULL,
   PRIMARY KEY (`jobid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Table structure for table `QueryFinalReport`
---
 
 DROP TABLE IF EXISTS `QueryFinalReport`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `QueryFinalReport` (
-  `idQueryFinalReport` int(11) NOT NULL,
+  `subjobid` int(11) NOT NULL,
   `queryid` int(11) DEFAULT NULL,
   `latency50` int(11) DEFAULT NULL,
   `latency75` int(11) DEFAULT NULL,
@@ -52,14 +43,10 @@ CREATE TABLE `QueryFinalReport` (
   `latency99` int(11) DEFAULT NULL,
   `avglatency` float DEFAULT NULL,
   `minlatency` float DEFAULT NULL,
-  `maxlatency` varchar(45) DEFAULT NULL,
-  PRIMARY KEY (`idQueryFinalReport`)
+  `maxlatency` varchar(45) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Table structure for table `QueryRunningReport`
---
 
 DROP TABLE IF EXISTS `QueryRunningReport`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -72,9 +59,6 @@ CREATE TABLE `QueryRunningReport` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Table structure for table `Rel_Job_Query`
---
 
 DROP TABLE IF EXISTS `Rel_Job_Query`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -85,10 +69,6 @@ CREATE TABLE `Rel_Job_Query` (
   `fraction` float NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `Rel_Job_SubJob`
---
 
 DROP TABLE IF EXISTS `Rel_Job_SubJob`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -103,23 +83,16 @@ CREATE TABLE `Rel_Job_SubJob` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
---
--- Table structure for table `RunningReport`
---
-
 DROP TABLE IF EXISTS `RunningReport`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `RunningReport` (
   `subjobid` int(11) NOT NULL,
   `time` int(11) NOT NULL,
-  `totalops` int(11) NOT NULL
+  `totalops` int(11) NOT NULL,
+  `throughput` float NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `SubJobFinalReport`
---
 
 DROP TABLE IF EXISTS `SubJobFinalReport`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -141,4 +114,3 @@ CREATE TABLE `SubJobFinalReport` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-07-03 20:56:42
