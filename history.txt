@@ -7,3 +7,25 @@
 完成hive的db接口实现
 
 TODO:argument generator,也即包括怎么配置，动态展示时，展示什么
+
+SELECT f1.uid, COUNT(f2.uid) as num FROM 
+(SELECT a.followeeID AS uid FROM friendList as a JOIN friendList as  b 
+ON (a.followeeID = b.uid) 
+WHERE a.uid = b.followeeID AND a.uid = '1216766752') as f 
+JOIN friendList as f2 ON (f2.uid = f.uid) 
+JOIN friendList as f1 ON (f1.followeeID = f2.uid) 
+WHERE  f1.followeeID = f2.uid AND 
+f1.uid = f2.followeeID AND 
+f1.uid!='1216766752' AND 
+f1.uid!=f.uid  GROUP BY f1.uid  ORDER BY num DESC;
+
+SELECT f1.uid, COUNT(f2.uid) as num FROM 
+(SELECT a.followeruid AS uid FROM followerslist as a JOIN followerslist as  b 
+ON (a.followeruid = b.uid) 
+WHERE a.uid = b.followeruid AND a.uid = '1216766752') as f 
+JOIN followerslist as f2 ON (f2.uid = f.uid) 
+JOIN followerslist as f1 ON (f1.followeruid = f2.uid) 
+WHERE  f1.followeruid = f2.uid AND 
+f1.uid = f2.followeruid AND 
+f1.uid!='1216766752' AND 
+f1.uid!=f.uid  GROUP BY f1.uid  ORDER BY num DESC;

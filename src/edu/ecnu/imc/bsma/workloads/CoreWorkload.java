@@ -24,8 +24,6 @@ import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import edu.ecnu.imc.bsma.Workload;
-import edu.ecnu.imc.bsma.WorkloadException;
 import edu.ecnu.imc.bsma.dao.JobInfo;
 import edu.ecnu.imc.bsma.db.DB;
 import edu.ecnu.imc.bsma.generator.DiscreteGenerator;

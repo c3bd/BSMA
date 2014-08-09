@@ -3,9 +3,9 @@ package edu.ecnu.imc.bsma.dao;
 import java.util.ArrayList;
 import java.util.List;
 
-import weibo4j.org.json.JSONArray;
-import weibo4j.org.json.JSONException;
-import weibo4j.org.json.JSONObject;
+import net.sf.json.JSONArray;
+import net.sf.json.JSONException;
+import net.sf.json.JSONObject;
 
 /**
  * the output of the query status during the runtime of a benchmark job
@@ -21,20 +21,47 @@ public class RunningReport {
 	public List<QueryRunningReport> qStatus = new ArrayList<QueryRunningReport>();
 
 	public JSONObject asJson() throws JSONException {
-		JSONObject obj = new JSONObject();
-		obj.put("id", subJobId);
-		// obj.put("seq", seqId);
-		obj.put("time", time);
-		obj.put("totalOps", totalOps);
-		obj.put("throughput", curThroughput);
+		return JSONObject.fromObject(this);
+	}
 
-		JSONArray arr = new JSONArray();
-		obj.put("qStatus", arr);
-		for (QueryRunningReport status : qStatus) {
-			arr.put(status.asJson());
-		}
+	public int getSubJobId() {
+		return subJobId;
+	}
 
-		return obj;
+	public void setSubJobId(int subJobId) {
+		this.subJobId = subJobId;
+	}
+
+	public long getTime() {
+		return time;
+	}
+
+	public void setTime(long time) {
+		this.time = time;
+	}
+
+	public int getTotalOps() {
+		return totalOps;
+	}
+
+	public void setTotalOps(int totalOps) {
+		this.totalOps = totalOps;
+	}
+
+	public float getCurThroughput() {
+		return curThroughput;
+	}
+
+	public void setCurThroughput(float curThroughput) {
+		this.curThroughput = curThroughput;
+	}
+
+	public List<QueryRunningReport> getqStatus() {
+		return qStatus;
+	}
+
+	public void setqStatus(List<QueryRunningReport> qStatus) {
+		this.qStatus = qStatus;
 	}
 
 	public static void main(String[] args) throws JSONException {
@@ -52,5 +79,6 @@ public class RunningReport {
 		System.out.println(qRt.asJson().toString());
 		rp.qStatus.add(qRt);
 		System.out.println(rp.asJson().toString());
+		System.out.println(JSONObject.fromObject(rp));
 	}
 }

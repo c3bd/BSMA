@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
@@ -43,7 +42,7 @@ public class OneMeasurementHistogram extends OneMeasurement {
 	 * The default number of buckets that all latencies will be partitioned
 	 * into.
 	 */
-	public static final String BUCKETS_DEFAULT = "1000";
+	public static final String BUCKETS_DEFAULT = "10000";
 
 	/**
 	 * The interval (ms) from one bucket to the next one. To set it to 100 means
@@ -51,7 +50,7 @@ public class OneMeasurementHistogram extends OneMeasurement {
 	 * and 100ms to 200ms into bucket2...
 	 */
 	// final int interval = 1;
-	final int interval = 100;
+	final int interval = 1;
 
 	int _buckets;
 	int[] histogram;

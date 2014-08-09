@@ -11,13 +11,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import net.sf.json.JSONArray;
+import net.sf.json.JSONException;
+import net.sf.json.JSONObject;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import rpc.Query;
 import rpc.SubJob;
-import weibo4j.org.json.JSONException;
-import weibo4j.org.json.JSONObject;
 import edu.ecnu.imc.bsma.util.JSONUtil;
 
 public class Dao {
@@ -58,6 +60,7 @@ public class Dao {
 					if (!line.startsWith("/*"))
 						buf.append(line);
 				}
+				reader.close();
 			} catch (IOException e) {
 				throw new RuntimeException(
 						"couldn't find database initialize file");
@@ -95,7 +98,7 @@ public class Dao {
 		Connection conn = jdbc.getCon();
 		Statement stmt = conn.createStatement();
 		stmt.addBatch(sql);
-		for (QueryFinalReport subReport : report.getQueryFReportList()) {
+		for (QueryFinalReport subReport : report.queryFReportList()) {
 			insertQueryFinalResult(stmt, subReport);
 		}
 		stmt.executeBatch();
@@ -223,11 +226,14 @@ public class Dao {
 			sql = String
 					.format("insert into bsma.JobInfo(jobid, name,dbImpl,custDBImpl, props, description, jars, state, msg)"
 							+ "values(%d,'%s',%d,'%s','%s', '%s','%s', %d,'%s');",
-							jobInfo.getJobID(), jobInfo.getName(),
-							jobInfo.getDbImpl(), jobInfo.getCustDbImpl(),
-							JSONObject.valueToString(jobInfo.getProps()),
+							jobInfo.getJobID(),
+							jobInfo.getName(),
+							jobInfo.getDbImpl(),
+							jobInfo.getCustDbImpl(),
+							JSONObject.fromObject(jobInfo.getProps())
+									.toString(),
 							jobInfo.getDescription(),
-							JSONObject.valueToString(jobInfo.getJars()),
+							JSONArray.fromObject(jobInfo.getJars()).toString(),
 							jobInfo.getState(), jobInfo.getMsg());
 			Connection conn = jdbc.getCon();
 			Statement stmt = conn.createStatement();
@@ -281,6 +287,31 @@ public class Dao {
 		return ret;
 	}
 
+	public List<JobInfo> getJobInfoByState(int state) throws SQLException {
+		String sql = String.format(
+				"select * from bsma.JobInfo where state = %d;", state);
+		Connection conn = jdbc.getCon();
+		Statement stmt = conn.createStatement();
+		ResultSet set = stmt.executeQuery(sql);
+		List<JobInfo> jobs = new ArrayList<JobInfo>();
+		while (set.next()) {
+			JobInfo job = new JobInfo(this, set.getByte("state"));
+			job.setJobID(set.getInt("jobid"));
+			job.setName(set.getString("name"));
+			job.setDbImpl(set.getByte("dbImpl"));
+			job.setCustDbImpl(set.getString("custDBImpl"));
+			job.setProps(JSONUtil.toMap(set.getString("props")));
+			job.setDescription(set.getString("description"));
+			job.setQueries(getQueries(job.getJobID()));
+			job.setBasicJobs(getSubJobs(job.getJobID()));
+			job.setJars(JSONUtil.toStringList(set.getString("jars")));
+			job.setMsg(set.getString("msg"));
+			jobs.add(job);
+		}
+		jdbc.putCon(conn);
+		return jobs;
+	}
+
 	public List<Query> getQueries(int jobId) throws SQLException {
 		List<Query> ret = new ArrayList<Query>();
 		String sql = String.format(
@@ -310,12 +341,12 @@ public class Dao {
 		Connection conn = jdbc.getCon();
 		Statement stmt = conn.createStatement();
 		ResultSet set = stmt.executeQuery(sql);
-		if (set.next()) {
+		while (set.next()) {
 			BasicJobInfo subJob = new BasicJobInfo(this, set.getByte(4));
-			subJob.setSubJobID(set.getInt(1));
-			subJob.setOpCount(set.getInt(2));
-			subJob.setThreadNum(set.getInt(3));
-
+			subJob.setSubJobID(set.getInt("subjobid"));
+			subJob.setOpCount(set.getInt("opcount"));
+			subJob.setThreadNum(set.getInt("threadnum"));
+			subJob.setStateLocal(set.getByte("state"));
 			ret.add(subJob);
 		}
 		jdbc.putCon(conn);

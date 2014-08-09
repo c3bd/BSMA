@@ -16,7 +16,7 @@
  * LICENSE file.                                                                                                                                                                   
  */
 
-package edu.ecnu.imc.bsma;
+package edu.ecnu.imc.bsma.workloads;
 
 /**
  * The workload tried to do something bad.

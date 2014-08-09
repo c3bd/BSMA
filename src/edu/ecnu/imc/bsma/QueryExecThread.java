@@ -7,6 +7,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import edu.ecnu.imc.bsma.db.DB;
 import edu.ecnu.imc.bsma.db.DBException;
 import edu.ecnu.imc.bsma.measurements.Measurements;
+import edu.ecnu.imc.bsma.workloads.Workload;
+import edu.ecnu.imc.bsma.workloads.WorkloadException;
 
 /**
  * A thread for executing queries.

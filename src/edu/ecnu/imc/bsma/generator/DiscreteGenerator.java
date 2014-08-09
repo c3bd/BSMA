@@ -23,8 +23,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-import edu.ecnu.imc.bsma.WorkloadException;
 import edu.ecnu.imc.bsma.util.Pair;
+import edu.ecnu.imc.bsma.workloads.WorkloadException;
 
 /**
  * Generates a distribution by choosing from a discrete set of values.
@@ -63,8 +63,8 @@ public class DiscreteGenerator<ValueType> extends Generator<ValueType> {
 			double sum = 0.0f;
 			for (Pair<ValueType> pair : _values) {
 				double tmp = pair._weight;
-				pair._weight = sum;
 				sum += tmp;
+				pair._weight = sum;
 			}
 			inited = true;
 			assert sum > 1.0 - 0.000000000001;
