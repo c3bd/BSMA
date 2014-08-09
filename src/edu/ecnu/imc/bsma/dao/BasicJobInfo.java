@@ -2,9 +2,9 @@ package edu.ecnu.imc.bsma.dao;
 
 import java.sql.SQLException;
 
+import net.sf.json.JSONException;
+import net.sf.json.JSONObject;
 import rpc.SubJob;
-import weibo4j.org.json.JSONException;
-import weibo4j.org.json.JSONObject;
 
 public class BasicJobInfo extends SubJob {
 	public byte state = JobInfo.WAITING;// waiting, running, finish, cancel
@@ -19,6 +19,7 @@ public class BasicJobInfo extends SubJob {
 	public BasicJobInfo(JobInfo jobInfo, SubJob subJob, Dao dao) {
 		super(subJob);
 		this.jobInfo = jobInfo;
+		this.dao = dao;
 	}
 
 	public JobInfo getJobInfo() {
@@ -46,6 +47,10 @@ public class BasicJobInfo extends SubJob {
 		if (dao != null) {
 			dao.updateSubJobStatus(this);
 		}
+	}
+	
+	public void setStateLocal(byte state) {
+		this.state = state;
 	}
 
 	public BasicJobInfo(JSONObject obj) throws JSONException {

@@ -2,6 +2,7 @@ package edu.ecnu.imc.bsma;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -15,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import rpc.BSMAService;
 import rpc.Job;
 import rpc.SubJob;
+import edu.ecnu.imc.bsma.dao.BasicJobInfo;
 import edu.ecnu.imc.bsma.dao.Dao;
 import edu.ecnu.imc.bsma.dao.JobInfo;
 import edu.ecnu.imc.bsma.util.Config;
@@ -40,7 +42,7 @@ public class Scheduler implements BSMAService.Iface {
 	private AtomicInteger jobIDGen = new AtomicInteger(0);
 	private AtomicInteger subJobIDGen = new AtomicInteger(0);
 
-	ConcurrentHashMap<Integer, JobCordinator> runningJobs = new ConcurrentHashMap<Integer, JobCordinator>();
+	ConcurrentHashMap<Integer, JobCoordinator> runningJobs = new ConcurrentHashMap<Integer, JobCoordinator>();
 
 	// ConcurrentLinkedQueue<JobInfo> waitingJobs = new
 	// ConcurrentLinkedQueue<JobInfo>();
@@ -78,10 +80,32 @@ public class Scheduler implements BSMAService.Iface {
 		 * reset all running job to be waiting, delete their related status
 		 * report
 		 */
-
+		try {
+			recover();
+		} catch (SQLException e) {
+			logger.error(e.getMessage());
+			System.exit(e.getErrorCode());
+		}
 		/**
 		 * TODO cleaning resources of finished jobs 1. delete related jars
 		 */
+	}
+
+	private void recover() throws SQLException {
+		List<JobInfo> runningJobs = dao.getJobInfoByState(JobInfo.RUNNING);
+		for (JobInfo job : runningJobs) {
+			for (SubJob sub : job.getSubJobs()) {
+				if (((BasicJobInfo) sub).getState() != JobInfo.FINISH) {
+					((BasicJobInfo) sub).setState(JobInfo.CANCEL);
+				}
+			}
+			job.cancel("server is shutdown accidently");
+		}
+		List<JobInfo> waitting = dao.getJobInfoByState(JobInfo.WAITING);
+		for (JobInfo job : waitting) {
+			JobCoordinator task = new JobCoordinator(job);
+			executors.submit(task);
+		}
 	}
 
 	/**
@@ -104,7 +128,7 @@ public class Scheduler implements BSMAService.Iface {
 	public void scheduleJob(Job job) throws SQLException {
 		JobInfo newJob = new JobInfo(job, dao);
 		newJob.save();
-		JobCordinator task = new JobCordinator(job);
+		JobCoordinator task = new JobCoordinator(job);
 		executors.submit(task);
 	}
 
@@ -126,17 +150,21 @@ public class Scheduler implements BSMAService.Iface {
 
 	@Override
 	public void cancelJob(int jobID) throws TException {
-		JobCordinator client = runningJobs.remove(jobID);
+		JobCoordinator client = runningJobs.remove(jobID);
 		if (client != null) {
-			if (client.cancel()) {
+			try {
+				if (client.cancel()) {
 
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
 			}
 		}
 	}
 
 	@Override
 	public void cancelSubJob(int jobID, int subID) throws TException {
-		JobCordinator client = runningJobs.get(jobID);
+		JobCoordinator client = runningJobs.get(jobID);
 		if (client != null) {
 			if (client.cancel(subID)) {
 

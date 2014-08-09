@@ -35,14 +35,16 @@ import edu.ecnu.imc.bsma.db.DB;
 import edu.ecnu.imc.bsma.db.DBException;
 import edu.ecnu.imc.bsma.db.DBFactory;
 import edu.ecnu.imc.bsma.measurements.Measurements;
+import edu.ecnu.imc.bsma.workloads.Workload;
+import edu.ecnu.imc.bsma.workloads.WorkloadException;
 
 /**
  * Thread responsible for managing the execution of a benchmark job a benchmark
  * job consists of a set of small jobs, each consists of a threadnum and target
  * operation
  */
-public class JobCordinator implements Runnable {
-	public static Logger logger = LoggerFactory.getLogger(JobCordinator.class);
+public class JobCoordinator implements Runnable {
+	public static Logger logger = LoggerFactory.getLogger(JobCoordinator.class);
 	JobInfo jobInfo;
 	Dao dao = new Dao(Scheduler.instance.getProps());
 	String exitCode = "";
@@ -52,7 +54,7 @@ public class JobCordinator implements Runnable {
 
 	AtomicBoolean state = new AtomicBoolean(true);
 
-	public JobCordinator(Job job) {
+	public JobCoordinator(Job job) {
 		this.jobInfo = new JobInfo(job, dao);
 	}
 
@@ -105,7 +107,7 @@ public class JobCordinator implements Runnable {
 				warningthread.start();
 
 				// load the workload
-				ClassLoader classLoader = JobCordinator.class.getClassLoader();
+				ClassLoader classLoader = JobCoordinator.class.getClassLoader();
 				Workload workload = null;
 				try {
 					Class workloadclass = classLoader.loadClass(jobInfo
@@ -251,14 +253,16 @@ public class JobCordinator implements Runnable {
 	}
 
 	Properties constructProp() {
-		return jobInfo.getProperties();
+		return jobInfo.getProperties(Scheduler.instance.getProps());
 	}
 
 	/**
 	 * stop the job
+	 * @throws SQLException 
 	 */
-	public boolean cancel() {
-		// TODO Auto-generated method stub
+	public boolean cancel() throws SQLException {
+		jobInfo.cancel("cancel by user");
+		state.set(false);
 		return true;
 	}
 

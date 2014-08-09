@@ -8,13 +8,12 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Properties;
 
+import net.sf.json.JSONArray;
+import net.sf.json.JSONException;
+import net.sf.json.JSONObject;
 import rpc.Job;
 import rpc.Query;
 import rpc.SubJob;
-import weibo4j.org.json.JSONArray;
-import weibo4j.org.json.JSONException;
-import weibo4j.org.json.JSONObject;
-import edu.ecnu.imc.bsma.Scheduler;
 import edu.ecnu.imc.bsma.util.Config;
 import edu.ecnu.imc.bsma.util.JarLoader;
 
@@ -60,13 +59,13 @@ public class JobInfo extends Job {
 		jobID = obj.getInt("id");
 		JSONArray arr = obj.getJSONArray("subjobs");
 
-		for (int i = 0; i < arr.length(); i++) {
+		for (int i = 0; i < arr.size(); i++) {
 			subJobs.add(new BasicJobInfo(arr.getJSONObject(i)));
 		}
 
 		JSONObject map = obj.getJSONObject("queries");
 		arr = map.names();
-		for (int i = 0; i < arr.length(); i++) {
+		for (int i = 0; i < arr.size(); i++) {
 			JSONObject qObj = arr.getJSONObject(i);
 			queries.add(new Query((byte) qObj.getInt("type"), qObj
 					.getDouble("frac"), qObj.getString("type")));
@@ -74,7 +73,7 @@ public class JobInfo extends Job {
 
 		map = obj.getJSONObject("props");
 		arr = map.names();
-		for (int i = 0; i < arr.length(); i++) {
+		for (int i = 0; i < arr.size(); i++) {
 			String key = arr.getString(i);
 			props.put(key, map.getString(key));
 		}
@@ -218,8 +217,8 @@ public class JobInfo extends Job {
 		return dbClass;
 	}
 
-	public Properties getProperties() {
-		Properties ret = new Properties(Scheduler.instance.getProps());
+	public Properties getProperties(Properties properties) {
+		Properties ret = new Properties(properties);
 		if (props != null) {
 			for (Entry<String, String> entry : props.entrySet()) {
 				ret.setProperty(entry.getKey(), entry.getValue());
@@ -282,5 +281,13 @@ public class JobInfo extends Job {
 			}
 		}
 		return ret;
+	}
+
+	@Override
+	public List<String> getJars() {
+		if (jars == null) {
+			return new ArrayList<String>();
+		}
+		return jars;
 	}
 }

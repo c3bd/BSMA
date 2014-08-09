@@ -30,14 +30,14 @@ class StatusThread extends Thread {
 	Measurements _measurements;
 	DBExporter _exporter;
 	AtomicBoolean _state = null;
-	JobCordinator coord = null;
+	JobCoordinator coord = null;
 
 	/**
 	 * The interval for reporting status. To set it to 100000 means to report
 	 * status every 100 seconds.
 	 */
 
-	public StatusThread(JobCordinator coord, Measurements measurements) {
+	public StatusThread(JobCoordinator coord, Measurements measurements) {
 		super("status " + coord.getJobInfo().getJobID());
 		this.coord = coord;
 		_state = coord.getWorkingState();
@@ -57,8 +57,9 @@ class StatusThread extends Thread {
 		long lasttotalops = 0;
 
 		boolean alldone;
-		long period = Long.parseLong(_jobInfo.getProperties().getProperty(
-				"report_period", sleeptime));
+		long period = Long.parseLong(_jobInfo.getProperties(
+				Scheduler.instance.getProps()).getProperty("report_period",
+				sleeptime));
 		do {
 			alldone = true;
 

@@ -19,7 +19,7 @@ public class BSMAClient {
 		try {
 			TTransport transport;
 
-			transport = new TSocket("localhost", 10000);
+			transport = new TSocket("localhost", 10010);
 			transport.open();
 
 			TProtocol protocol = new TBinaryProtocol(transport);
@@ -33,15 +33,15 @@ public class BSMAClient {
 			job.setName("test");
 			job.setDescription("hello");
 			job.setCustDbImpl("");
-			for (int i = 1; i <= 1; i++) {
+			for (int i = 1; i <= 2; i++) {
 				SubJob subjob = new SubJob();
 				subjob.setSubJobID(i);
-				subjob.setOpCount(24);
+				subjob.setOpCount(1000);
 				subjob.setThreadNum(i);
 				job.addToSubJobs(subjob);
 			}
 
-			int queries = 1;
+			int queries = 5;
 			for (int i = 1; i <= queries; i++) {
 				job.addToQueries(new Query((byte) i, 1.0f / queries, "uniform"));
 			}
