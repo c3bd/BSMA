@@ -1,0 +1,27 @@
+CREATE (a:User { id:1 }),(b:User { id:2 }),(c:User { id:3 }),(d:User{id:4}),
+(a)-[:KNOWS]->(b),(b)-[:KNOWS]->(a),
+(c)-[:KNOWS]->(b),(b)-[:KNOWS]->(c),
+(a)-[:KNOWS]->(d),(d)-[:KNOWS]->(a),
+(c)-[:KNOWS]->(d),(d)-[:KNOWS]->(c),
+(b)-[:KNOWS]->(d),(d)-[:KNOWS]->(b)
+
+Q1. 在a的m好友的m好友中，找出a尚未关注的人
+match (a:User{id:1})-->(b)-->(a)
+match (b)-->(c)-->(b)
+where NOT (a)-->(c) and c.id <> a.id
+return distinct(c)
+
+Q3:
+match (a:User{id:%s})-->(b)-->(c)
+where not (a)-->(c)
+with c, count(b) as num
+order by num limit 10
+return c 
+
+Q4:
+match (a:User{id:%s})-->(b)<--(c:User{id:%s})
+return b.id
+
+Q5:
+match (a:User{id:%s})-->(c)-->(b:User{id:%s})
+return c.id

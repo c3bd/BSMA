@@ -25,7 +25,7 @@ public class BSMAClient {
 			TProtocol protocol = new TBinaryProtocol(transport);
 			BSMAService.Client client = new BSMAService.Client(protocol);
 			Job job = new Job();
-			job.setDbImpl(JobInfo.TEST_DB);
+			job.setDbImpl(JobInfo.NEO4J_DB);
 			Map<String, String> props = new HashMap<String, String>();
 			// props.put("hserver", "jdbc:hive://10.11.1.190:10000/bsma");
 			job.setProps(props);
@@ -41,7 +41,7 @@ public class BSMAClient {
 				job.addToSubJobs(subjob);
 			}
 
-			int queries = 5;
+			int queries = 1;
 			for (int i = 1; i <= queries; i++) {
 				job.addToQueries(new Query((byte) i, 1.0f / queries, "uniform"));
 			}
