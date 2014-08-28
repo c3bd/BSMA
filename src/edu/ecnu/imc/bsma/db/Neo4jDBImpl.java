@@ -1,13 +1,15 @@
 package edu.ecnu.imc.bsma.db;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Properties;
+
+import org.neo4j.jdbc.Driver;
+import org.neo4j.jdbc.Neo4jConnection;
 
 public class Neo4jDBImpl extends DB {
-	Connection conn = null;
+	Neo4jConnection conn = null;
 
 	public Neo4jDBImpl() {
 
@@ -16,19 +18,21 @@ public class Neo4jDBImpl extends DB {
 	@Override
 	public void init() throws DBException {
 		try {
-			Class.forName("org.neo4j.jdbc.Driver").newInstance();
-			conn = DriverManager.getConnection(
+			final Properties props = new Properties();
+			props.put("legacy", ""); // Need to work with Neo4j Community
+										// Edition 2.0.1
+			conn = new Driver().connect(
 					_p.getProperty("nserver", "jdbc:neo4j://localhost:7474/"),
-					_p.getProperty("nuser", "monetdb"),
-					_p.getProperty("npasswd", "monetdb"));
+					props);
 		} catch (Exception e) {
+			e.printStackTrace();
 			throw new DBException(e);
 		}
 	}
 
 	final static String QUERY1 = "match (a:User{id:1})-->(b)-->(a) "
-			+ " match (b)-->(c)-->(b) " + " where NOT (a)-->(c) and c.id <> a.id "
-			+ " return distinct(c) ";
+			+ " match (b)-->(c)-->(b) "
+			+ " where NOT (a)-->(c) and c.id <> a.id " + " return distinct(c) ";
 
 	@Override
 	public String BSMAQuery1(String userID, int returncount) {
@@ -38,7 +42,7 @@ public class Neo4jDBImpl extends DB {
 			ResultSet result = stmt.executeQuery(query);
 			StringBuffer buf = new StringBuffer();
 			while (result.next()) {
-				buf.append(result.getString(1));
+				buf.append(result.getString("c"));
 				buf.append(",");
 			}
 			return buf.toString();

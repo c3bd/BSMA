@@ -156,6 +156,9 @@ public class JobCoordinator implements Runnable {
 						error(ex);
 					} catch (DBException e) {
 						error(e);
+					} catch (Exception e) {
+						e.printStackTrace();
+						error(e);
 					}
 
 					QueryExecThread t = new QueryExecThread(state, db,
@@ -181,12 +184,14 @@ public class JobCoordinator implements Runnable {
 				} catch (WorkloadException e) {
 				}
 			}
-			if (!jobInfo.haveExited())
-				jobInfo.finish();
 		} catch (SQLException e) {
+			error(e);
+		} catch (Exception e) {
 			error(e);
 		} finally {
 			try {
+				if (!jobInfo.haveExited())
+					jobInfo.finish();
 				dao.close();
 			} catch (SQLException e) {
 
@@ -258,7 +263,8 @@ public class JobCoordinator implements Runnable {
 
 	/**
 	 * stop the job
-	 * @throws SQLException 
+	 * 
+	 * @throws SQLException
 	 */
 	public boolean cancel() throws SQLException {
 		jobInfo.cancel("cancel by user");
