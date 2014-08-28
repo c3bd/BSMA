@@ -13,7 +13,7 @@ public class BSMAServer {
 		Scheduler handler = Scheduler.instance;
 		handler.init();
 		BSMAService.Processor processor = new BSMAService.Processor(handler);
-		TServerTransport serverTransport = new TServerSocket(10010);
+		TServerTransport serverTransport = new TServerSocket(10000);
 		// Use this for a multithreaded server
 		TServer masterTServer = new TThreadPoolServer(
 				new TThreadPoolServer.Args(serverTransport)
