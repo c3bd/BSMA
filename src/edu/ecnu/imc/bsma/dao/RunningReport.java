@@ -4,7 +4,6 @@ package edu.ecnu.imc.bsma.dao;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.json.JSONArray;
 import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
 

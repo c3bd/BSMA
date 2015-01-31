@@ -16,34 +16,42 @@ import rpc.SubJob;
 
 public class BSMAClient {
 	public static void main(String[] args) {
+		for (int j = 0; j < 3; j++)
+			for (int i = 1; i <= 5; i++)
+				test("mysql", JobInfo.MYSQL_DB, i);
+
+		for (int j = 0; j < 3; j++)
+			for (int i = 1; i <= 5; i++)
+				test("neo4j", JobInfo.NEO4J_DB, i);
+	}
+
+	private static void test(String name, byte db, int query) {
 		try {
 			TTransport transport;
-
-			transport = new TSocket("localhost", 10010);
+			transport = new TSocket("localhost", 10000);
 			transport.open();
 
 			TProtocol protocol = new TBinaryProtocol(transport);
 			BSMAService.Client client = new BSMAService.Client(protocol);
 			Job job = new Job();
-			job.setDbImpl(JobInfo.NEO4J_DB);
+			job.setDbImpl(db);
 			Map<String, String> props = new HashMap<String, String>();
 			// props.put("hserver", "jdbc:hive://10.11.1.190:10000/bsma");
 			job.setProps(props);
 			job.setJobID(-1);
-			job.setName("test");
+			job.setName(name);
 			job.setDescription("hello");
 			job.setCustDbImpl("");
-			for (int i = 1; i <= 2; i++) {
+			for (int i = 1; i <= 1; i++) {
 				SubJob subjob = new SubJob();
 				subjob.setSubJobID(i);
-				subjob.setOpCount(1000);
+				subjob.setOpCount(500);
 				subjob.setThreadNum(i);
 				job.addToSubJobs(subjob);
 			}
 
-			int queries = 1;
-			for (int i = 1; i <= queries; i++) {
-				job.addToQueries(new Query((byte) i, 1.0f / queries, "uniform"));
+			for (int i = query; i <= query; i++) {
+				job.addToQueries(new Query((byte) i, 1.0f / 1, "uniform"));
 			}
 			System.out.println("before submit job is :" + job);
 			job = client.submit(job);

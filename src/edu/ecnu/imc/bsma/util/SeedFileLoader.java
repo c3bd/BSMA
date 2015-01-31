@@ -31,7 +31,7 @@ public class SeedFileLoader {
 	private Properties props;
 	// private String seedDir = null;
 
-	private static final String DEFAULT_SEED = "realdata";
+	private static final String DEFAULT_SEED = "16t";
 	private HashMap<String, HashMap<String, List<Pair>>> seedMap = new HashMap<String, HashMap<String, List<Pair>>>();
 
 	private SeedFileLoader() {

@@ -30,9 +30,11 @@ public class Neo4jDBImpl extends DB {
 		}
 	}
 
-	final static String QUERY1 = "match (a:User{id:1})-->(b)-->(a) "
+	final static String QUERY1 = "match (a:User{id:%s})-->(b)-->(a) "
 			+ " match (b)-->(c)-->(b) "
-			+ " where NOT (a)-->(c) and c.id <> a.id " + " return distinct(c) ";
+			+ " where NOT (a)-->(c) and c.id <> a.id"
+			+ " with c, count(b) as num "
+			+ " return distinct(c),num order by num  desc limit %d";
 
 	@Override
 	public String BSMAQuery1(String userID, int returncount) {
@@ -53,27 +55,94 @@ public class Neo4jDBImpl extends DB {
 		return null;
 	}
 
+	final static String QUERY2 = "match (a:User{id:%s})-->(b)<--(c) "
+			+ "where not (a)-->(c) and a.id <> c.id "
+			+ "with c, count(b) as num "
+			+ " return c,num  order by num  desc limit %d ";
+
 	@Override
 	public String BSMAQuery2(String userID, int returncount) {
-		// TODO Auto-generated method stub
+		String query = String.format(QUERY2, userID, returncount);
+		try {
+			Statement stmt = conn.createStatement();
+			ResultSet result = stmt.executeQuery(query);
+			StringBuffer buf = new StringBuffer();
+			while (result.next()) {
+				buf.append(result.getString("c"));
+				buf.append(",");
+			}
+			return buf.toString();
+		} catch (SQLException e) {
+			System.err.println(query);
+			e.printStackTrace();
+		}
 		return null;
 	}
+
+	final static String QUERY3 = "match (a:User{id:%s})-->(b)-->(c) "
+			+ "where not (a)-->(c) " + "with c, count(b) as num "
+			+ " return c,num " + " order by num desc limit %d ";
 
 	@Override
 	public String BSMAQuery3(String userID, int returncount) {
-		// TODO Auto-generated method stub
+		String query = String.format(QUERY3, userID, returncount);
+		try {
+			Statement stmt = conn.createStatement();
+			ResultSet result = stmt.executeQuery(query);
+			StringBuffer buf = new StringBuffer();
+			while (result.next()) {
+				buf.append(result.getString("c"));
+				buf.append(",");
+			}
+			return buf.toString();
+		} catch (SQLException e) {
+			System.err.println(query);
+			e.printStackTrace();
+		}
 		return null;
 	}
+
+	final static String QUERY4 = "match (a:User{id:%s})-->(b)<--(c:User{id:%s}) "
+			+ "return b";
 
 	@Override
 	public String BSMAQuery4(String userID1, String userID2) {
-		// TODO Auto-generated method stub
+		String query = String.format(QUERY4, userID1, userID2);
+		try {
+			Statement stmt = conn.createStatement();
+			ResultSet result = stmt.executeQuery(query);
+			StringBuffer buf = new StringBuffer();
+			while (result.next()) {
+				buf.append(result.getString("b"));
+				buf.append(",");
+			}
+			return buf.toString();
+		} catch (SQLException e) {
+			System.err.println(query);
+			e.printStackTrace();
+		}
 		return null;
 	}
 
+	private static final String QUERY5 = "match (a:User{id:%s})-->(c)-->(b:User{id:%s}) "
+			+ "return c.id";
+
 	@Override
 	public String BSMAQuery5(String userID1, String userID2) {
-		// TODO Auto-generated method stub
+		String query = String.format(QUERY5, userID1, userID2);
+		try {
+			Statement stmt = conn.createStatement();
+			ResultSet result = stmt.executeQuery(query);
+			StringBuffer buf = new StringBuffer();
+			while (result.next()) {
+				buf.append(result.getString("c"));
+				buf.append(",");
+			}
+			return buf.toString();
+		} catch (SQLException e) {
+			System.err.println(query);
+			e.printStackTrace();
+		}
 		return null;
 	}
 

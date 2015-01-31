@@ -19,8 +19,8 @@ public class MySQLDBImpl extends DB {
 		try {
 			Class.forName("com.mysql.jdbc.Driver").newInstance();
 			conn = DriverManager.getConnection(_p.getProperty("hserver",
-					"jdbc:mysql://localhost:3306/bsmadata"), _p.getProperty(
-					"huser", "root"), _p.getProperty("hpasswd", ""));
+					"jdbc:mysql://localhost:3306/test"), _p.getProperty(
+					"huser", "root"), _p.getProperty("hpasswd", "Hadoop123"));
 		} catch (Exception e) {
 			throw new DBException(e);
 		}
@@ -28,7 +28,31 @@ public class MySQLDBImpl extends DB {
 
 	@Override
 	public String BSMAQuery1(String userID, int returncount) {
-		String sql = String.format(SQLTemplate.QUERY1, userID);
+		String sql = String.format(MySQLQueryTemplate.QUERY1, userID, returncount);
+		display(1, sql);
+		try {
+			Statement stmt = conn.createStatement();
+			ResultSet result = stmt.executeQuery(sql);
+			StringBuffer buf = new StringBuffer();
+			while (result.next()) {
+				buf.append(result.getString(1));
+				buf.append(",");
+				buf.append(result.getInt(2));
+				buf.append(",");
+			}
+			System.out.println(buf.toString());
+			return buf.toString();
+		} catch (SQLException e) {
+			System.err.println(sql);
+			e.printStackTrace();
+		}
+		return "";
+	}
+
+	@Override
+	public String BSMAQuery2(String userID, int returncount) {
+		String sql = String.format(MySQLQueryTemplate.QUERY2, userID, returncount);
+		display(2, sql);
 		try {
 			Statement stmt = conn.createStatement();
 			ResultSet result = stmt.executeQuery(sql);
@@ -48,31 +72,12 @@ public class MySQLDBImpl extends DB {
 	}
 
 	@Override
-	public String BSMAQuery2(String userID, int returncount) {
-		try {
-			Statement stmt = conn.createStatement();
-			ResultSet result = stmt.executeQuery(String.format(
-					HiveQLTemplate.QUERY2, userID));
-			StringBuffer buf = new StringBuffer();
-			while (result.next()) {
-				buf.append(result.getString(1));
-				buf.append(",");
-				buf.append(result.getInt(2));
-				buf.append(",");
-			}
-			return buf.toString();
-		} catch (SQLException e) {
-
-		}
-		return "";
-	}
-
-	@Override
 	public String BSMAQuery3(String userID, int returncount) {
+		String sql = String.format(MySQLQueryTemplate.QUERY3, userID, returncount);
+		display(3, sql);
 		try {
 			Statement stmt = conn.createStatement();
-			ResultSet result = stmt.executeQuery(String.format(
-					HiveQLTemplate.QUERY3, userID));
+			ResultSet result = stmt.executeQuery(sql);
 			StringBuffer buf = new StringBuffer();
 			while (result.next()) {
 				buf.append(result.getString(1));
@@ -80,17 +85,19 @@ public class MySQLDBImpl extends DB {
 			}
 			return buf.toString();
 		} catch (SQLException e) {
-
+			System.err.println(sql);
+			e.printStackTrace();
 		}
 		return "";
 	}
 
 	@Override
 	public String BSMAQuery4(String userID1, String userID2) {
+		String sql = String.format(MySQLQueryTemplate.QUERY4, userID1, userID2);
+		display(4, sql);
 		try {
 			Statement stmt = conn.createStatement();
-			ResultSet result = stmt.executeQuery(String.format(
-					HiveQLTemplate.QUERY4, userID1, userID2));
+			ResultSet result = stmt.executeQuery(sql);
 			StringBuffer buf = new StringBuffer();
 			while (result.next()) {
 				buf.append(result.getString(1));
@@ -98,17 +105,19 @@ public class MySQLDBImpl extends DB {
 			}
 			return buf.toString();
 		} catch (SQLException e) {
-
+			System.err.println(sql);
+			e.printStackTrace();
 		}
 		return "";
 	}
 
 	@Override
 	public String BSMAQuery5(String userID1, String userID2) {
+		String sql = String.format(MySQLQueryTemplate.QUERY5, userID1, userID2);
+		display(5, sql);
 		try {
 			Statement stmt = conn.createStatement();
-			ResultSet result = stmt.executeQuery(String.format(
-					HiveQLTemplate.QUERY5, userID1, userID2));
+			ResultSet result = stmt.executeQuery(sql);
 			StringBuffer buf = new StringBuffer();
 			while (result.next()) {
 				buf.append(result.getString(1));
@@ -116,7 +125,8 @@ public class MySQLDBImpl extends DB {
 			}
 			return buf.toString();
 		} catch (SQLException e) {
-
+			System.err.println(sql);
+			e.printStackTrace();
 		}
 		return "";
 	}
@@ -127,7 +137,7 @@ public class MySQLDBImpl extends DB {
 		try {
 			Statement stmt = conn.createStatement();
 			ResultSet result = stmt.executeQuery(String.format(
-					HiveQLTemplate.QUERY6, userID, datetime, datetime
+					MySQLQueryTemplate.QUERY6, userID, datetime, datetime
 							+ timespan));
 			StringBuffer buf = new StringBuffer();
 			while (result.next()) {
@@ -146,7 +156,7 @@ public class MySQLDBImpl extends DB {
 		try {
 			Statement stmt = conn.createStatement();
 			ResultSet result = stmt.executeQuery(String.format(
-					HiveQLTemplate.QUERY7, datetime, datetime + timespan));
+					MySQLQueryTemplate.QUERY7, datetime, datetime + timespan));
 			StringBuffer buf = new StringBuffer();
 			while (result.next()) {
 				buf.append(result.getString(1));
@@ -164,7 +174,7 @@ public class MySQLDBImpl extends DB {
 		try {
 			Statement stmt = conn.createStatement();
 			ResultSet result = stmt.executeQuery(String.format(
-					HiveQLTemplate.QUERY8, userID));
+					MySQLQueryTemplate.QUERY8, userID));
 			StringBuffer buf = new StringBuffer();
 			while (result.next()) {
 				buf.append(result.getString(1));
@@ -183,7 +193,7 @@ public class MySQLDBImpl extends DB {
 		try {
 			Statement stmt = conn.createStatement();
 			ResultSet result = stmt.executeQuery(String.format(
-					HiveQLTemplate.QUERY9, userID, tag, datetime, datetime
+					MySQLQueryTemplate.QUERY9, userID, tag, datetime, datetime
 							+ timespan));
 			StringBuffer buf = new StringBuffer();
 			while (result.next()) {
@@ -203,7 +213,7 @@ public class MySQLDBImpl extends DB {
 		try {
 			Statement stmt = conn.createStatement();
 			ResultSet result = stmt.executeQuery(String.format(
-					HiveQLTemplate.QUERY10, datetime, datetime + timespan));
+					MySQLQueryTemplate.QUERY10, datetime, datetime + timespan));
 			StringBuffer buf = new StringBuffer();
 			while (result.next()) {
 				buf.append(result.getString(1));
@@ -223,7 +233,7 @@ public class MySQLDBImpl extends DB {
 		try {
 			Statement stmt = conn.createStatement();
 			ResultSet result = stmt.executeQuery(String.format(
-					HiveQLTemplate.QUERY11, userID, datetime, datetime
+					MySQLQueryTemplate.QUERY11, userID, datetime, datetime
 							+ timespan));
 			StringBuffer buf = new StringBuffer();
 			while (result.next()) {
@@ -244,7 +254,7 @@ public class MySQLDBImpl extends DB {
 		try {
 			Statement stmt = conn.createStatement();
 			ResultSet result = stmt.executeQuery(String.format(
-					HiveQLTemplate.QUERY12, userID, datetime, datetime
+					MySQLQueryTemplate.QUERY12, userID, datetime, datetime
 							+ timespan));
 			StringBuffer buf = new StringBuffer();
 			while (result.next()) {
@@ -265,7 +275,7 @@ public class MySQLDBImpl extends DB {
 		try {
 			Statement stmt = conn.createStatement();
 			ResultSet result = stmt.executeQuery(String.format(
-					HiveQLTemplate.QUERY13, userID, datetime, datetime
+					MySQLQueryTemplate.QUERY13, userID, datetime, datetime
 							+ timespan));
 			StringBuffer buf = new StringBuffer();
 			while (result.next()) {
@@ -284,7 +294,7 @@ public class MySQLDBImpl extends DB {
 		try {
 			Statement stmt = conn.createStatement();
 			ResultSet result = stmt.executeQuery(String.format(
-					HiveQLTemplate.QUERY14, datetime, datetime + timespan));
+					MySQLQueryTemplate.QUERY14, datetime, datetime + timespan));
 			StringBuffer buf = new StringBuffer();
 			while (result.next()) {
 				buf.append(result.getString(1));
@@ -303,9 +313,9 @@ public class MySQLDBImpl extends DB {
 			long timespan) {
 		try {
 			Statement stmt = conn.createStatement();
-			ResultSet result = stmt
-					.executeQuery(String.format(HiveQLTemplate.QUERY15, tag,
-							datetime, datetime + timespan));
+			ResultSet result = stmt.executeQuery(String.format(
+					MySQLQueryTemplate.QUERY15, tag, datetime, datetime
+							+ timespan));
 			StringBuffer buf = new StringBuffer();
 			while (result.next()) {
 				buf.append(result.getString(1));
@@ -325,7 +335,7 @@ public class MySQLDBImpl extends DB {
 		try {
 			Statement stmt = conn.createStatement();
 			ResultSet result = stmt.executeQuery(String.format(
-					HiveQLTemplate.QUERY16, userID, datetime, datetime
+					MySQLQueryTemplate.QUERY16, userID, datetime, datetime
 							+ timespan));
 			StringBuffer buf = new StringBuffer();
 			while (result.next()) {
@@ -346,7 +356,7 @@ public class MySQLDBImpl extends DB {
 		try {
 			Statement stmt = conn.createStatement();
 			ResultSet result = stmt.executeQuery(String.format(
-					HiveQLTemplate.QUERY17, userID, datetime, datetime
+					MySQLQueryTemplate.QUERY17, userID, datetime, datetime
 							+ timespan));
 			StringBuffer buf = new StringBuffer();
 			while (result.next()) {
@@ -367,7 +377,7 @@ public class MySQLDBImpl extends DB {
 		try {
 			Statement stmt = conn.createStatement();
 			ResultSet result = stmt.executeQuery(String.format(
-					HiveQLTemplate.QUERY18, userID, datetime, datetime
+					MySQLQueryTemplate.QUERY18, userID, datetime, datetime
 							+ timespan));
 			StringBuffer buf = new StringBuffer();
 			while (result.next()) {
@@ -388,7 +398,7 @@ public class MySQLDBImpl extends DB {
 		try {
 			Statement stmt = conn.createStatement();
 			ResultSet result = stmt.executeQuery(String.format(
-					HiveQLTemplate.QUERY19, userID, datetime, datetime
+					MySQLQueryTemplate.QUERY19, userID, datetime, datetime
 							+ timespan));
 			StringBuffer buf = new StringBuffer();
 			while (result.next()) {
@@ -408,7 +418,7 @@ public class MySQLDBImpl extends DB {
 		try {
 			Statement stmt = conn.createStatement();
 			ResultSet result = stmt.executeQuery(String.format(
-					HiveQLTemplate.QUERY20, eventID));
+					MySQLQueryTemplate.QUERY20, eventID));
 			StringBuffer buf = new StringBuffer();
 			while (result.next()) {
 				buf.append(result.getString(1));
@@ -427,7 +437,7 @@ public class MySQLDBImpl extends DB {
 		try {
 			Statement stmt = conn.createStatement();
 			ResultSet result = stmt.executeQuery(String.format(
-					HiveQLTemplate.QUERY21, eventID));
+					MySQLQueryTemplate.QUERY21, eventID));
 			StringBuffer buf = new StringBuffer();
 			while (result.next()) {
 				buf.append(result.getString(1));
@@ -453,7 +463,7 @@ public class MySQLDBImpl extends DB {
 		try {
 			Statement stmt = conn.createStatement();
 			ResultSet result = stmt.executeQuery(String.format(
-					HiveQLTemplate.QUERY23, eventID));
+					MySQLQueryTemplate.QUERY23, eventID));
 			StringBuffer buf = new StringBuffer();
 			while (result.next()) {
 				buf.append(result.getString(1));
@@ -474,7 +484,7 @@ public class MySQLDBImpl extends DB {
 		try {
 			Statement stmt = conn.createStatement();
 			ResultSet result = stmt.executeQuery(String.format(
-					HiveQLTemplate.QUERY24, eventID));
+					MySQLQueryTemplate.QUERY24, eventID));
 			StringBuffer buf = new StringBuffer();
 			while (result.next()) {
 				buf.append(result.getString(1));

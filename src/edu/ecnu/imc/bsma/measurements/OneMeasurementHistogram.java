@@ -142,9 +142,10 @@ public class OneMeasurementHistogram extends OneMeasurement {
 		boolean done50th = false;
 		boolean done75th = false;
 		boolean done95th = false;
+		int latency = 0;
 		for (int i = 0; i < _buckets; i++) {
 			opcounter += histogram[i];
-			int latency = (i + 1) * interval;
+			latency = (i + 1) * interval;
 			if ((!done50th)
 					&& (((double) opcounter) / ((double) operations) >= 0.50)) {
 				latencyHist.set(0, latency);
@@ -166,6 +167,14 @@ public class OneMeasurementHistogram extends OneMeasurement {
 				break;
 			}
 		}
+
+		for (int i = latencyHist.size() - 1; i > 0; i--) {
+			if (latencyHist.get(i) == 0)
+				latencyHist.set(i, latency);
+			else
+				break;
+		}
+
 		try {
 			exporter.reportSubJobResult(getQueryID(), latencyHist, latencyStats);
 		} catch (SQLException e) {

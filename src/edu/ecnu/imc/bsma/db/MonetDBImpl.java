@@ -18,9 +18,10 @@ public class MonetDBImpl extends DB {
 	public void init() throws DBException {
 		try {
 			Class.forName("nl.cwi.monetdb.jdbc.MonetDriver").newInstance();
-			conn = DriverManager.getConnection(_p.getProperty("hserver",
-					"jdbc:monetdb://10.11.1.190/bsma"), _p.getProperty("huser",
-					"monetdb"), _p.getProperty("hpasswd", "monetdb"));
+			conn = DriverManager.getConnection(
+					_p.getProperty("hserver", "jdbc:monetdb://127.0.0.1/bsma"),
+					_p.getProperty("huser", "monetdb"),
+					_p.getProperty("hpasswd", "monetdb"));
 		} catch (Exception e) {
 			throw new DBException(e);
 		}
@@ -28,7 +29,8 @@ public class MonetDBImpl extends DB {
 
 	@Override
 	public String BSMAQuery1(String userID, int returncount) {
-		String sql = String.format(SQLTemplate.QUERY1, userID);
+		String sql = String.format(MySQLQueryTemplate.QUERY1, userID, returncount);
+		display(1, sql);
 		try {
 			Statement stmt = conn.createStatement();
 			ResultSet result = stmt.executeQuery(sql);
@@ -52,7 +54,7 @@ public class MonetDBImpl extends DB {
 		try {
 			Statement stmt = conn.createStatement();
 			ResultSet result = stmt.executeQuery(String.format(
-					HiveQLTemplate.QUERY2, userID));
+					MySQLQueryTemplate.QUERY2, userID, returncount));
 			StringBuffer buf = new StringBuffer();
 			while (result.next()) {
 				buf.append(result.getString(1));
@@ -72,7 +74,7 @@ public class MonetDBImpl extends DB {
 		try {
 			Statement stmt = conn.createStatement();
 			ResultSet result = stmt.executeQuery(String.format(
-					HiveQLTemplate.QUERY3, userID));
+					MySQLQueryTemplate.QUERY3, userID, returncount));
 			StringBuffer buf = new StringBuffer();
 			while (result.next()) {
 				buf.append(result.getString(1));
@@ -90,7 +92,7 @@ public class MonetDBImpl extends DB {
 		try {
 			Statement stmt = conn.createStatement();
 			ResultSet result = stmt.executeQuery(String.format(
-					HiveQLTemplate.QUERY4, userID1, userID2));
+					MySQLQueryTemplate.QUERY4, userID1, userID2));
 			StringBuffer buf = new StringBuffer();
 			while (result.next()) {
 				buf.append(result.getString(1));
@@ -108,7 +110,7 @@ public class MonetDBImpl extends DB {
 		try {
 			Statement stmt = conn.createStatement();
 			ResultSet result = stmt.executeQuery(String.format(
-					HiveQLTemplate.QUERY5, userID1, userID2));
+					MySQLQueryTemplate.QUERY5, userID1, userID2));
 			StringBuffer buf = new StringBuffer();
 			while (result.next()) {
 				buf.append(result.getString(1));
@@ -127,7 +129,7 @@ public class MonetDBImpl extends DB {
 		try {
 			Statement stmt = conn.createStatement();
 			ResultSet result = stmt.executeQuery(String.format(
-					HiveQLTemplate.QUERY6, userID, datetime, datetime
+					MySQLQueryTemplate.QUERY6, userID, datetime, datetime
 							+ timespan));
 			StringBuffer buf = new StringBuffer();
 			while (result.next()) {
@@ -146,7 +148,7 @@ public class MonetDBImpl extends DB {
 		try {
 			Statement stmt = conn.createStatement();
 			ResultSet result = stmt.executeQuery(String.format(
-					HiveQLTemplate.QUERY7, datetime, datetime + timespan));
+					MySQLQueryTemplate.QUERY7, datetime, datetime + timespan));
 			StringBuffer buf = new StringBuffer();
 			while (result.next()) {
 				buf.append(result.getString(1));
@@ -164,7 +166,7 @@ public class MonetDBImpl extends DB {
 		try {
 			Statement stmt = conn.createStatement();
 			ResultSet result = stmt.executeQuery(String.format(
-					HiveQLTemplate.QUERY8, userID));
+					MySQLQueryTemplate.QUERY8, userID));
 			StringBuffer buf = new StringBuffer();
 			while (result.next()) {
 				buf.append(result.getString(1));
@@ -183,7 +185,7 @@ public class MonetDBImpl extends DB {
 		try {
 			Statement stmt = conn.createStatement();
 			ResultSet result = stmt.executeQuery(String.format(
-					HiveQLTemplate.QUERY9, userID, tag, datetime, datetime
+					MySQLQueryTemplate.QUERY9, userID, tag, datetime, datetime
 							+ timespan));
 			StringBuffer buf = new StringBuffer();
 			while (result.next()) {
@@ -203,7 +205,7 @@ public class MonetDBImpl extends DB {
 		try {
 			Statement stmt = conn.createStatement();
 			ResultSet result = stmt.executeQuery(String.format(
-					HiveQLTemplate.QUERY10, datetime, datetime + timespan));
+					MySQLQueryTemplate.QUERY10, datetime, datetime + timespan));
 			StringBuffer buf = new StringBuffer();
 			while (result.next()) {
 				buf.append(result.getString(1));
@@ -223,7 +225,7 @@ public class MonetDBImpl extends DB {
 		try {
 			Statement stmt = conn.createStatement();
 			ResultSet result = stmt.executeQuery(String.format(
-					HiveQLTemplate.QUERY11, userID, datetime, datetime
+					MySQLQueryTemplate.QUERY11, userID, datetime, datetime
 							+ timespan));
 			StringBuffer buf = new StringBuffer();
 			while (result.next()) {
@@ -244,7 +246,7 @@ public class MonetDBImpl extends DB {
 		try {
 			Statement stmt = conn.createStatement();
 			ResultSet result = stmt.executeQuery(String.format(
-					HiveQLTemplate.QUERY12, userID, datetime, datetime
+					MySQLQueryTemplate.QUERY12, userID, datetime, datetime
 							+ timespan));
 			StringBuffer buf = new StringBuffer();
 			while (result.next()) {
@@ -265,7 +267,7 @@ public class MonetDBImpl extends DB {
 		try {
 			Statement stmt = conn.createStatement();
 			ResultSet result = stmt.executeQuery(String.format(
-					HiveQLTemplate.QUERY13, userID, datetime, datetime
+					MySQLQueryTemplate.QUERY13, userID, datetime, datetime
 							+ timespan));
 			StringBuffer buf = new StringBuffer();
 			while (result.next()) {
@@ -284,7 +286,7 @@ public class MonetDBImpl extends DB {
 		try {
 			Statement stmt = conn.createStatement();
 			ResultSet result = stmt.executeQuery(String.format(
-					HiveQLTemplate.QUERY14, datetime, datetime + timespan));
+					MySQLQueryTemplate.QUERY14, datetime, datetime + timespan));
 			StringBuffer buf = new StringBuffer();
 			while (result.next()) {
 				buf.append(result.getString(1));
@@ -304,7 +306,7 @@ public class MonetDBImpl extends DB {
 		try {
 			Statement stmt = conn.createStatement();
 			ResultSet result = stmt
-					.executeQuery(String.format(HiveQLTemplate.QUERY15, tag,
+					.executeQuery(String.format(MySQLQueryTemplate.QUERY15, tag,
 							datetime, datetime + timespan));
 			StringBuffer buf = new StringBuffer();
 			while (result.next()) {
@@ -325,7 +327,7 @@ public class MonetDBImpl extends DB {
 		try {
 			Statement stmt = conn.createStatement();
 			ResultSet result = stmt.executeQuery(String.format(
-					HiveQLTemplate.QUERY16, userID, datetime, datetime
+					MySQLQueryTemplate.QUERY16, userID, datetime, datetime
 							+ timespan));
 			StringBuffer buf = new StringBuffer();
 			while (result.next()) {
@@ -346,7 +348,7 @@ public class MonetDBImpl extends DB {
 		try {
 			Statement stmt = conn.createStatement();
 			ResultSet result = stmt.executeQuery(String.format(
-					HiveQLTemplate.QUERY17, userID, datetime, datetime
+					MySQLQueryTemplate.QUERY17, userID, datetime, datetime
 							+ timespan));
 			StringBuffer buf = new StringBuffer();
 			while (result.next()) {
@@ -367,7 +369,7 @@ public class MonetDBImpl extends DB {
 		try {
 			Statement stmt = conn.createStatement();
 			ResultSet result = stmt.executeQuery(String.format(
-					HiveQLTemplate.QUERY18, userID, datetime, datetime
+					MySQLQueryTemplate.QUERY18, userID, datetime, datetime
 							+ timespan));
 			StringBuffer buf = new StringBuffer();
 			while (result.next()) {
@@ -388,7 +390,7 @@ public class MonetDBImpl extends DB {
 		try {
 			Statement stmt = conn.createStatement();
 			ResultSet result = stmt.executeQuery(String.format(
-					HiveQLTemplate.QUERY19, userID, datetime, datetime
+					MySQLQueryTemplate.QUERY19, userID, datetime, datetime
 							+ timespan));
 			StringBuffer buf = new StringBuffer();
 			while (result.next()) {
@@ -408,7 +410,7 @@ public class MonetDBImpl extends DB {
 		try {
 			Statement stmt = conn.createStatement();
 			ResultSet result = stmt.executeQuery(String.format(
-					HiveQLTemplate.QUERY20, eventID));
+					MySQLQueryTemplate.QUERY20, eventID));
 			StringBuffer buf = new StringBuffer();
 			while (result.next()) {
 				buf.append(result.getString(1));
@@ -427,7 +429,7 @@ public class MonetDBImpl extends DB {
 		try {
 			Statement stmt = conn.createStatement();
 			ResultSet result = stmt.executeQuery(String.format(
-					HiveQLTemplate.QUERY21, eventID));
+					MySQLQueryTemplate.QUERY21, eventID));
 			StringBuffer buf = new StringBuffer();
 			while (result.next()) {
 				buf.append(result.getString(1));
@@ -453,7 +455,7 @@ public class MonetDBImpl extends DB {
 		try {
 			Statement stmt = conn.createStatement();
 			ResultSet result = stmt.executeQuery(String.format(
-					HiveQLTemplate.QUERY23, eventID));
+					MySQLQueryTemplate.QUERY23, eventID));
 			StringBuffer buf = new StringBuffer();
 			while (result.next()) {
 				buf.append(result.getString(1));
@@ -474,7 +476,7 @@ public class MonetDBImpl extends DB {
 		try {
 			Statement stmt = conn.createStatement();
 			ResultSet result = stmt.executeQuery(String.format(
-					HiveQLTemplate.QUERY24, eventID));
+					MySQLQueryTemplate.QUERY24, eventID));
 			StringBuffer buf = new StringBuffer();
 			while (result.next()) {
 				buf.append(result.getString(1));

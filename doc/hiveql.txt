@@ -38,11 +38,9 @@ SELECT f_2step.followeeID
 FROM
 (SELECT f.followeeID
 FROM friendList LEFT OUTER JOIN
-(SELECT followeeID
-FROM friendlist
-WHERE uid = "%s") friends 
+(SELECT followeeID FROM friendlist WHERE uid = "%s") friends 
 ON (friendlist.uid = friends.followeeID)
-WHERE  friendlist.followeeID <> "%s" ) f_2step 
+WHERE friendlist.followeeID <> "%s" ) f_2step 
 LEFTER OUTER JOIN
 (SELECT followeeID
 FROM friendList

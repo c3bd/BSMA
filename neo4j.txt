@@ -11,6 +11,13 @@ match (b)-->(c)-->(b)
 where NOT (a)-->(c) and c.id <> a.id
 return distinct(c)
 
+Q2:
+match (a:User{id:%s})-->(b)<--(c)
+where not (a)-->(c) and a.id != c.id
+with c, count(b) as num
+order by num limit 10
+return c 
+
 Q3:
 match (a:User{id:%s})-->(b)-->(c)
 where not (a)-->(c)

@@ -117,7 +117,7 @@ public class Scheduler implements BSMAService.Iface {
 		return Config.instance.getProps();
 	}
 
-	ExecutorService executors = Executors.newFixedThreadPool(2);
+	ExecutorService executors = Executors.newFixedThreadPool(1);
 
 	/**
 	 * add the job to the schedule queue

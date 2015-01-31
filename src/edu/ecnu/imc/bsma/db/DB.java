@@ -272,7 +272,7 @@ public abstract class DB {
 	 * 
 	 */
 	public abstract String BSMAQuery13(String userID, int returncount,
-			long datetime,long timespan);
+			long datetime, long timespan);
 
 	/**
 	 * Perform query14 for a set of records in the database. Result will be
@@ -444,4 +444,11 @@ public abstract class DB {
 	 * 
 	 */
 	public abstract String BSMAQuery24(String eventID);
+
+	private static final boolean VERBOSE = true;
+
+	protected void display(int i, String sql) {
+		if (VERBOSE)
+			System.out.println(i + " sql is " + sql);
+	}
 }

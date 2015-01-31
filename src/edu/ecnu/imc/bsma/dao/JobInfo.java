@@ -167,6 +167,7 @@ public class JobInfo extends Job {
 	public static final byte SHARK_DB = 1;
 	public static final byte MONETDB_DB = 2;
 	public static final byte NEO4J_DB = 3;
+	public static final byte MYSQL_DB = 4;
 	public static final byte USER_CUSTDB = Byte.MAX_VALUE;
 
 	static {
@@ -175,6 +176,7 @@ public class JobInfo extends Job {
 		dbImpls.put(SHARK_DB, "edu.ecnu.imc.bsma.db.SparkDBImpl");
 		dbImpls.put(MONETDB_DB, "edu.ecnu.imc.bsma.db.MonetDBImpl");
 		dbImpls.put(NEO4J_DB, "edu.ecnu.imc.bsma.db.Neo4jDBImpl");
+		dbImpls.put(MYSQL_DB, "edu.ecnu.imc.bsma.db.MySQLDBImpl");
 	}
 
 	public static String getDBImpl(byte idx) {

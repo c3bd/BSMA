@@ -4,7 +4,14 @@ monetdbd start /path/to/mydbfarm
  monetdb release bsma
  mclient -u monetdb -d bsma
 password:<monetdb>
- 
+
+统计分布：
+ufriend_dist
+copy select uid, count(*) as num from FriendList group by uid into '/tmp/ufriend_dist' using delimiters '\t','\n';
+ufan_dist
+copy select followeeID, count(*) as num from FriendList group by followeeID into '/tmp/ufan_dist' using delimiters '\t','\n';
+
+
 //创建mood表
 CREATE TABLE mood(mood CHAR(10), moodID TINYINT);
 copy into mood from '/home/xiafan/Documents/dataset/bsma/mood.txt' using delimiters '\t','\n';
@@ -35,7 +42,7 @@ copy into bsma.MUser from '/home/xiafan/bsma/user/user.txt' using delimiters '\t
 CREATE TABLE FriendList(uid BIGINT, followeeID BIGINT);
 CREATE TABLE FriendList(uid VARCHAR(30), followeeID VARCHAR(30));
 copy into FriendList from '/home/xiafan/Documents/dataset/bsma/mood.txt' using delimiters '\t','\n';
-copy into FriendList from '/home/xiafan/Documents/dataset/data/friendlist.csv' using delimiters '\t','\n';
+copy into FriendList from '/Users/xiafan/Documents/dataset/bsma/1friendlist.csv' using delimiters '\t','\n';
 
 
 //微博

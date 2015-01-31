@@ -10,7 +10,7 @@ public class HiveQLTemplate {
 			+ "WHERE  f1.followeeID = f2.uid AND "
 			+ "f1.uid = f2.followeeID AND "
 			+ "f1.uid!='%1$s' AND "
-			+ "f1.uid!=f.uid " + "GROUP BY f1.uid " + "ORDER BY num DESC";
+			+ "f1.uid!=f.uid " + "GROUP BY f1.uid " + "ORDER BY num DESC limit %d";
 
 	public static final String QUERY2 = "SELECT  followers.uid, count(followers.uid) as num "
 			+ "FROM(SELECT followeeID FROM friendListWHERE uid = \"%s\") "
@@ -19,7 +19,7 @@ public class HiveQLTemplate {
 			+ " f2 JOIN friendList f1 ON (f1.followeeID = f2.followeeID )"
 			+ "WHERE f1.uid != \"%1$s\") followers ON (followers.uid = friends.followeeID )"
 			+ "where friends.followeeID is null "
-			+ "GROUP BY followers.uid ORDER BY num DESC LIMIT 10;";
+			+ "GROUP BY followers.uid ORDER BY num DESC LIMIT %d;";
 
 	public static final String QUERY3 = "SELECT f.followeeID FROM "
 			+ "(SELECT f.followeeID FROM "
@@ -30,7 +30,7 @@ public class HiveQLTemplate {
 			+ " (SELECT followeeID FROM friendList WHERE uid = \"%1$s\") friends "
 			+ "ON (f.followeeID = friends.followeeID) WHERE f.followeeID <> \"%1$s\" "
 			+ "AND friends.followeeID is null "
-			+ "GROUP BY f.followeeID ORDER BY COUNT(f.uid) DESC LIMIT 10;";
+			+ "GROUP BY f.followeeID ORDER BY COUNT(f.uid) DESC LIMIT %d;";
 
 	public static final String QUERY4 = "SELECT DISTINCT f1.followeeID "
 			+ "FROM (SELECT followeeIDFROM friendList WHERE uid = \"%s\")  f1 JOIN "
