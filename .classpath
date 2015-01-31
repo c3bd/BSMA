@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry excluding="edu/ecnu/imc/bsma/httpserver/" kind="src" path="src"/>
+	<classpathentry kind="src" path="test"/>
+	<classpathentry kind="src" path="conf"/>
+	<classpathentry kind="src" path="gen-java"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="lib/commons-logging-1.0.4.jar"/>
+	<classpathentry kind="lib" path="lib/commons-logging-api-1.0.4.jar"/>
+	<classpathentry kind="lib" path="lib/slf4j-api-1.4.3.jar"/>
+	<classpathentry kind="lib" path="lib/slf4j-log4j12-1.4.3.jar"/>
+	<classpathentry kind="lib" path="lib/log4j-1.2.16.jar"/>
+	<classpathentry kind="lib" path="lib/mysql-connector-java-5.0.8-bin.jar"/>
+	<classpathentry kind="lib" path="lib/json-lib-2.4-jdk15.jar"/>
+	<classpathentry kind="lib" path="lib/commons-lang-2.6.jar"/>
+	<classpathentry kind="lib" path="lib/ezmorph-0.8.1.jar"/>
+	<classpathentry kind="lib" path="lib/commons-beanutils-1.9.2.jar"/>
+	<classpathentry kind="lib" path="lib/commons-collections-3.2.1.jar"/>
+	<classpathentry kind="lib" path="lib/mchange-commons-java-0.2.3.4.jar"/>
+	<classpathentry kind="lib" path="lib/monetdb-jdbc-2.11.jar"/>
+	<classpathentry kind="lib" path="lib/servlet-api.jar"/>
+	<classpathentry kind="lib" path="lib/neo4j-jdbc-2.0.1-SNAPSHOT-jar-with-dependencies.jar"/>
+	<classpathentry kind="lib" path="lib/libthrift-0.9.1.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

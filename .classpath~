@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry excluding="persistent/cache/ICacheable.java|app/IntervalTreeApp.java|persistent/intervaltree/basic/|segmentation/" kind="src" path="src"/>
+	<classpathentry excluding="persistent/intervaltree/basic/" kind="src" path="test"/>
+	<classpathentry kind="src" path="conf"/>
+	<classpathentry kind="src" path="data"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry kind="lib" path="lib/commons-logging-1.1.1.jar"/>
+	<classpathentry kind="lib" path="lib/slf4j-api-1.6.1.jar"/>
+	<classpathentry kind="lib" path="lib/slf4j-log4j12-1.6.1.jar"/>
+	<classpathentry kind="lib" path="lib/log4j-1.2.16.jar"/>
+	<classpathentry kind="lib" path="lib/je-5.0.34.jar"/>
+	<classpathentry kind="lib" path="lib/IKAnalyzer2012_u6.jar"/>
+	<classpathentry kind="lib" path="lib/weibolib.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/xiafanlib"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/DumpWeiboData"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
