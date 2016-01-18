@@ -64,9 +64,9 @@ public class Scheduler implements BSMAService.Iface {
 
 		SeedFileLoader.instance.init(Config.instance.getProps());
 
-		// 初始化jobID,subJobID
-		dao = new Dao(Scheduler.instance.getProps());
 		try {
+			// 初始化jobID,subJobID
+			dao = new Dao(Scheduler.instance.getProps());
 			dao.initDB();
 			jobIDGen.set(dao.getMaxJobID());
 			subJobIDGen.set(dao.getMaxSubJobID());
@@ -127,9 +127,10 @@ public class Scheduler implements BSMAService.Iface {
 	 */
 	public void scheduleJob(Job job) throws SQLException {
 		JobInfo newJob = new JobInfo(job, dao);
-		newJob.save();
-		JobCoordinator task = new JobCoordinator(job);
-		executors.submit(task);
+		if (newJob.save()) {
+			JobCoordinator task = new JobCoordinator(job);
+			executors.submit(task);
+		}
 	}
 
 	@Override

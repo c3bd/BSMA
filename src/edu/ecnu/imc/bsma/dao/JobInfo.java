@@ -31,7 +31,6 @@ public class JobInfo extends Job {
 	public static final byte CANCEL = 3;
 
 	public byte state = WAITING;
-	public String msg = "";
 	Dao dao;
 
 	public JobInfo(Dao dao, byte state) {
@@ -239,8 +238,15 @@ public class JobInfo extends Job {
 		return state;
 	}
 
-	public void save() throws SQLException {
-		dao.insertJobInfo(this);
+	public boolean save() {
+		try {
+			dao.insertJobInfo(this);
+		} catch (Exception ex) {
+			state = CANCEL;
+			msg = ex.getMessage();
+			return false;
+		}
+		return true;
 	}
 
 	public void setBasicJobs(List<BasicJobInfo> subJobs) {
@@ -270,10 +276,6 @@ public class JobInfo extends Job {
 	 */
 	public String getMsg() {
 		return msg;
-	}
-
-	public void setMsg(String msg) {
-		this.msg = msg;
 	}
 
 	public Query getQuery(int i) {

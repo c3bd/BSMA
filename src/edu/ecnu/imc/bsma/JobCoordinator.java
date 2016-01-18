@@ -146,12 +146,14 @@ public class JobCoordinator implements Runnable {
 
 				Measurements measurements = new Measurements(props);
 				qThreads.clear();
+				boolean err = true;
 				// latch = new CountDownLatch(basicJobInfo.threadNum + 1);
 				for (int threadid = 0; threadid < basicJobInfo.threadNum; threadid++) {
 					DB db = null;
 					try {
 						db = DBFactory.newDB(jobInfo, props, measurements);
 						db.init();
+						err = false;
 					} catch (UnknownDBException ex) {
 						error(ex);
 					} catch (DBException e) {
@@ -160,7 +162,8 @@ public class JobCoordinator implements Runnable {
 						e.printStackTrace();
 						error(e);
 					}
-
+					if (err)
+						return;
 					QueryExecThread t = new QueryExecThread(state, db,
 							workload, threadid, basicJobInfo.getThreadNum(),
 							props, opcount / basicJobInfo.getThreadNum(),

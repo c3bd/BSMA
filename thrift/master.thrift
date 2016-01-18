@@ -45,6 +45,7 @@ struct Job {
   7: optional map<string, string> props,
   8: string description,
   9: list<string> jars //the name of the jar file
+  10:optional string msg
 }
 
 /**

@@ -46,8 +46,8 @@ public class Dao {
 	 * @throws SQLException
 	 */
 	public void initDB() throws SQLException {
+		Connection conn = jdbc.getCon();
 		if (!dbExists()) {
-			Connection conn = jdbc.getCon();
 			Statement stmt = conn.createStatement();
 			StringBuffer buf = new StringBuffer();
 
@@ -75,6 +75,7 @@ public class Dao {
 				}
 			}
 		}
+		conn.setCatalog("bsma");
 		logger.info("report database initialized");
 	}
 
@@ -226,13 +227,10 @@ public class Dao {
 			sql = String
 					.format("insert into bsma.JobInfo(jobid, name,dbImpl,custDBImpl, props, description, jars, state, msg)"
 							+ "values(%d,'%s',%d,'%s','%s', '%s','%s', %d,'%s');",
-							jobInfo.getJobID(),
-							jobInfo.getName(),
-							jobInfo.getDbImpl(),
-							jobInfo.getCustDbImpl(),
+							jobInfo.getJobID(), jobInfo.getName(), jobInfo
+									.getDbImpl(), jobInfo.getCustDbImpl(),
 							JSONObject.fromObject(jobInfo.getProps())
-									.toString(),
-							jobInfo.getDescription(),
+									.toString(), jobInfo.getDescription(),
 							JSONArray.fromObject(jobInfo.getJars()).toString(),
 							jobInfo.getState(), jobInfo.getMsg());
 			Connection conn = jdbc.getCon();

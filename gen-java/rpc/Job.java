@@ -44,6 +44,7 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
   private static final org.apache.thrift.protocol.TField PROPS_FIELD_DESC = new org.apache.thrift.protocol.TField("props", org.apache.thrift.protocol.TType.MAP, (short)7);
   private static final org.apache.thrift.protocol.TField DESCRIPTION_FIELD_DESC = new org.apache.thrift.protocol.TField("description", org.apache.thrift.protocol.TType.STRING, (short)8);
   private static final org.apache.thrift.protocol.TField JARS_FIELD_DESC = new org.apache.thrift.protocol.TField("jars", org.apache.thrift.protocol.TType.LIST, (short)9);
+  private static final org.apache.thrift.protocol.TField MSG_FIELD_DESC = new org.apache.thrift.protocol.TField("msg", org.apache.thrift.protocol.TType.STRING, (short)10);
 
   private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
   static {
@@ -60,6 +61,7 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
   public Map<String,String> props; // optional
   public String description; // required
   public List<String> jars; // required
+  public String msg; // optional
 
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements org.apache.thrift.TFieldIdEnum {
@@ -71,7 +73,8 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
     SUB_JOBS((short)6, "subJobs"),
     PROPS((short)7, "props"),
     DESCRIPTION((short)8, "description"),
-    JARS((short)9, "jars");
+    JARS((short)9, "jars"),
+    MSG((short)10, "msg");
 
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -104,6 +107,8 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
           return DESCRIPTION;
         case 9: // JARS
           return JARS;
+        case 10: // MSG
+          return MSG;
         default:
           return null;
       }
@@ -147,7 +152,7 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
   private static final int __JOBID_ISSET_ID = 0;
   private static final int __DBIMPL_ISSET_ID = 1;
   private byte __isset_bitfield = 0;
-  private _Fields optionals[] = {_Fields.CUST_DB_IMPL,_Fields.PROPS};
+  private _Fields optionals[] = {_Fields.CUST_DB_IMPL,_Fields.PROPS,_Fields.MSG};
   public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
   static {
     Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
@@ -174,6 +179,8 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
     tmpMap.put(_Fields.JARS, new org.apache.thrift.meta_data.FieldMetaData("jars", org.apache.thrift.TFieldRequirementType.DEFAULT, 
         new org.apache.thrift.meta_data.ListMetaData(org.apache.thrift.protocol.TType.LIST, 
             new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING))));
+    tmpMap.put(_Fields.MSG, new org.apache.thrift.meta_data.FieldMetaData("msg", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
+        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
     metaDataMap = Collections.unmodifiableMap(tmpMap);
     org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(Job.class, metaDataMap);
   }
@@ -242,6 +249,9 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
       List<String> __this__jars = new ArrayList<String>(other.jars);
       this.jars = __this__jars;
     }
+    if (other.isSetMsg()) {
+      this.msg = other.msg;
+    }
   }
 
   public Job deepCopy() {
@@ -261,6 +271,7 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
     this.props = null;
     this.description = null;
     this.jars = null;
+    this.msg = null;
   }
 
   public int getJobID() {
@@ -533,6 +544,30 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
     }
   }
 
+  public String getMsg() {
+    return this.msg;
+  }
+
+  public Job setMsg(String msg) {
+    this.msg = msg;
+    return this;
+  }
+
+  public void unsetMsg() {
+    this.msg = null;
+  }
+
+  /** Returns true if field msg is set (has been assigned a value) and false otherwise */
+  public boolean isSetMsg() {
+    return this.msg != null;
+  }
+
+  public void setMsgIsSet(boolean value) {
+    if (!value) {
+      this.msg = null;
+    }
+  }
+
   public void setFieldValue(_Fields field, Object value) {
     switch (field) {
     case JOB_ID:
@@ -607,6 +642,14 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
       }
       break;
 
+    case MSG:
+      if (value == null) {
+        unsetMsg();
+      } else {
+        setMsg((String)value);
+      }
+      break;
+
     }
   }
 
@@ -639,6 +682,9 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
     case JARS:
       return getJars();
 
+    case MSG:
+      return getMsg();
+
     }
     throw new IllegalStateException();
   }
@@ -668,6 +714,8 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
       return isSetDescription();
     case JARS:
       return isSetJars();
+    case MSG:
+      return isSetMsg();
     }
     throw new IllegalStateException();
   }
@@ -763,6 +811,15 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
       if (!(this_present_jars && that_present_jars))
         return false;
       if (!this.jars.equals(that.jars))
+        return false;
+    }
+
+    boolean this_present_msg = true && this.isSetMsg();
+    boolean that_present_msg = true && that.isSetMsg();
+    if (this_present_msg || that_present_msg) {
+      if (!(this_present_msg && that_present_msg))
+        return false;
+      if (!this.msg.equals(that.msg))
         return false;
     }
 
@@ -872,6 +929,16 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
         return lastComparison;
       }
     }
+    lastComparison = Boolean.valueOf(isSetMsg()).compareTo(other.isSetMsg());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetMsg()) {
+      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.msg, other.msg);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
     return 0;
   }
 
@@ -959,6 +1026,16 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
       sb.append(this.jars);
     }
     first = false;
+    if (isSetMsg()) {
+      if (!first) sb.append(", ");
+      sb.append("msg:");
+      if (this.msg == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.msg);
+      }
+      first = false;
+    }
     sb.append(")");
     return sb.toString();
   }
@@ -1120,6 +1197,14 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
             }
             break;
+          case 10: // MSG
+            if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+              struct.msg = iprot.readString();
+              struct.setMsgIsSet(true);
+            } else { 
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+            }
+            break;
           default:
             org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
         }
@@ -1209,6 +1294,13 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
         }
         oprot.writeFieldEnd();
       }
+      if (struct.msg != null) {
+        if (struct.isSetMsg()) {
+          oprot.writeFieldBegin(MSG_FIELD_DESC);
+          oprot.writeString(struct.msg);
+          oprot.writeFieldEnd();
+        }
+      }
       oprot.writeFieldStop();
       oprot.writeStructEnd();
     }
@@ -1254,7 +1346,10 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
       if (struct.isSetJars()) {
         optionals.set(8);
       }
-      oprot.writeBitSet(optionals, 9);
+      if (struct.isSetMsg()) {
+        optionals.set(9);
+      }
+      oprot.writeBitSet(optionals, 10);
       if (struct.isSetJobID()) {
         oprot.writeI32(struct.jobID);
       }
@@ -1307,12 +1402,15 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
           }
         }
       }
+      if (struct.isSetMsg()) {
+        oprot.writeString(struct.msg);
+      }
     }
 
     @Override
     public void read(org.apache.thrift.protocol.TProtocol prot, Job struct) throws org.apache.thrift.TException {
       TTupleProtocol iprot = (TTupleProtocol) prot;
-      BitSet incoming = iprot.readBitSet(9);
+      BitSet incoming = iprot.readBitSet(10);
       if (incoming.get(0)) {
         struct.jobID = iprot.readI32();
         struct.setJobIDIsSet(true);
@@ -1388,6 +1486,10 @@ public class Job implements org.apache.thrift.TBase<Job, Job._Fields>, java.io.S
           }
         }
         struct.setJarsIsSet(true);
+      }
+      if (incoming.get(9)) {
+        struct.msg = iprot.readString();
+        struct.setMsgIsSet(true);
       }
     }
   }

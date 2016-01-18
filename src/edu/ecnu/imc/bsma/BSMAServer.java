@@ -1,5 +1,6 @@
 package edu.ecnu.imc.bsma;
 
+import org.apache.log4j.Logger;
 import org.apache.thrift.server.TServer;
 import org.apache.thrift.server.TThreadPoolServer;
 import org.apache.thrift.transport.TServerSocket;
@@ -9,6 +10,8 @@ import org.apache.thrift.transport.TTransportException;
 import rpc.BSMAService;
 
 public class BSMAServer {
+	private static final Logger logger = Logger.getLogger(BSMAServer.class);
+
 	public static void main(String[] args) throws TTransportException {
 		Scheduler handler = Scheduler.instance;
 		handler.init();
@@ -19,7 +22,8 @@ public class BSMAServer {
 				new TThreadPoolServer.Args(serverTransport)
 						.processor(processor));
 
-		System.out.println("Starting the simple server...");
+		logger.info("Starting the simple server...");
 		masterTServer.serve();
+		logger.info("simple server stoped");
 	}
 }
